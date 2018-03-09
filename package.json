@@ -1,0 +1,191 @@
+{
+  "name": "vpser",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": {
+    "name": "李茂峰",
+    "email": "limaofeng@msn.com",
+    "url": "https://homeworld.life"
+  },
+  "scripts": {
+    "precommit": "lint-staged",
+    "postinstall": "remotedev-debugger --hostname localhost --port 8000 --injectserver",
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios --simulator \"iPhone X\"",
+    "test": "jest"
+  },
+  "dependencies": {
+    "react": "^16.3.0-alpha.1",
+    "react-native": "^0.54.0",
+    "react-native-kharak": "^1.2.3",
+    "redux-logger": "^3.0.6",
+    "react-native-vector-icons": "^4.5.0",
+    "react-native-i18n": "^2.0.12",
+    "realm": "^2.2.14"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.2.2",
+    "babel-preset-react-native-stage-0": "^1.0.1",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "eslint": "^4.18.2",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-prettier": "^2.6.0",
+    "eslint-plugin-react": "^7.7.0",
+    "husky": "^0.14.3",
+    "jest": "^22.4.2",
+    "lint-staged": "^7.0.0",
+    "prettier": "^1.11.1",
+    "react-dom": "^16.3.0-alpha.1",
+    "react-test-renderer": "^16.3.0-alpha.1",
+    "remote-redux-devtools": "^0.5.12",
+    "remotedev-rn-debugger": "^0.8.3"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "printWidth": 120,
+    "singleQuote": true
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "jest": {
+    "preset": "react-native",
+    "setupFiles": [
+      "<rootDir>/config/jest/setupTests.js"
+    ],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js?(x)"
+    ],
+    "transform": {
+      "^.+\\.(js|jsx)$": "<rootDir>/node_modules/babel-jest",
+      "^(?!.*\\.(js|jsx)$)": "<rootDir>/config/jest/fileTransform.js"
+    },
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}"
+    ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/config/jest/setupTests.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "/node_modules/.*/react-native/",
+      "/node_modules/.*/react/"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!react-native|react-navigation)/"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "babel-preset-react-native-stage-0/decorator-support"
+    ],
+    "env": {
+      "development": {
+        "plugins": [
+          "transform-react-jsx-source"
+        ]
+      }
+    }
+  },
+  "eslintConfig": {
+    "extends": "airbnb",
+    "parser": "babel-eslint",
+    "plugins": [
+      "react",
+      "jsx-a11y",
+      "import",
+      "prettier"
+    ],
+    "env": {
+      "jasmine": true
+    },
+    "globals": {
+      "fetch": true
+    },
+    "rules": {
+      "indent": 0,
+      "semi": 2,
+      "max-len": [
+        2,
+        120,
+        4
+      ],
+      "space-before-function-paren": 0,
+      "prettier/prettier": "error",
+      "global-require": "off",
+      "comma-dangle": 0,
+      "arrow-parens": [
+        "error",
+        "as-needed"
+      ],
+      "consistent-return": 0,
+      "no-restricted-syntax": 0,
+      "no-use-before-define": 0,
+      "no-param-reassign": "warn",
+      "no-console": 1,
+      "no-confusing-arrow": 0,
+      "no-shadow": 0,
+      "no-underscore-dangle": 0,
+      "no-debugger": 1,
+      "no-continue": "warn",
+      "no-plusplus": [
+        "error",
+        {
+          "allowForLoopAfterthoughts": true
+        }
+      ],
+      "object-curly-newline": "off",
+      "function-paren-newline": "off",
+      "generator-star-spacing": [
+        "error",
+        {
+          "before": true,
+          "after": false
+        }
+      ],
+      "import/no-extraneous-dependencies": 0,
+      "import/prefer-default-export": 0,
+      "import/no-duplicates": 0,
+      "import/no-unresolved": [
+        2,
+        {
+          "ignore": [
+            ".png^"
+          ]
+        }
+      ],
+      "jsx-a11y/label-has-for": 0,
+      "jsx-a11y/anchor-is-valid": 0,
+      "jsx-a11y/click-events-have-key-events": 0,
+      "react/no-multi-comp": 0,
+      "react/no-array-index-key": [
+        1
+      ],
+      "react/forbid-prop-types": 0,
+      "react/prefer-stateless-function": "off",
+      "react/jsx-filename-extension": [
+        1,
+        {
+          "extensions": [
+            ".js",
+            ".jsx"
+          ]
+        }
+      ]
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:[object Promise]/vpser.git"
+  }
+}

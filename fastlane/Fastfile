@@ -1,0 +1,145 @@
+# Customize this file, documentation can be found here:
+# https://docs.fastlane.tools/actions/
+# All available actions: https://docs.fastlane.tools/actions
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+# If you want to automatically update fastlane if a new version is available:
+# update_fastlane
+
+# This is the minimum version number required.
+# Update this, if you use features of a newer version
+min_fastlane_version("2.73.0")
+
+default_platform(:ios)
+
+# 修改版本号与BUILD号
+def prepare_version(options = {})
+  if options[:version].nil?
+    options[:version] = (sh "git describe --tags --abbrev=0").gsub(/^[v]/,'') # 获取分支最近的 tags 作为版本号
+  end
+  if options[:build].nil?
+    options[:build] = latest_testflight_build_number + 1 # 获取 testflight 中的 build_number + 1
+  end
+  increment_version_number(
+      version_number: options[:version],
+      xcodeproj: "./ios/vpser.xcodeproj"
+  )
+  increment_build_number(
+      build_number: options[:build],
+      xcodeproj: "./ios/vpser.xcodeproj"
+  )
+end
+
+# 同步证书与配置文件
+def sync_code_signings(options = {})
+  if options[:type].kind_of? String then
+    sync_code_signing(
+      git_url: 'git@gitlab.com:homeworld.life/certificates.git',
+      app_identifier: 'life.homeworld.app.vpser',
+      keychain_name: options[:keychain_name],
+      keychain_password: options[:keychain_password],
+      type: options[:type],
+      clone_branch_directly: true,
+      readonly: true
+    )
+  else
+    for type in options[:type] do
+      sync_code_signings(type: type, keychain_name: options[:keychain_name], keychain_password: options[:keychain_password])
+    end
+  end
+end
+
+platform :ios do
+  before_all do
+    ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
+  end
+
+  keychain_name = "ios-build.keychain"
+  keychain_password = SecureRandom.base64
+
+  desc '获取最新的 证书 与 配置文件'
+  lane :setup_signing do
+    userDir = (sh "cd ~ && pwd").gsub(/[\r\n]$/,'')
+    if File.exists?("#{userDir}/Library/Keychains/ios-build.keychain-db")
+      delete_keychain(name: keychain_name)
+    end
+    create_keychain(
+      name: keychain_name,
+      password: keychain_password,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: true
+    )
+    sync_code_signings(type: ['development', 'appstore'], keychain_name: keychain_name, keychain_password: keychain_password) # 同步证书
+  end
+
+  desc "编译"
+  lane :build do
+    prepare_version
+    cocoapods(podfile: "./ios/Podfile")
+    build_app(scheme: "vpser", workspace:"./ios/vpser.xcworkspace", output_directory: "./ios/build", silent: true, clean: true)
+  end
+
+  desc "提交一个新的测试版本 Apple TestFlight"
+  lane :beta do
+    screenshot
+    build
+    upload_to_testflight(changelog: changelog_from_git_commits(
+      between: ["ed2a506", "HEAD"],
+      pretty: "- %s",
+      date_format: "short",
+      match_lightweight_tag: false,
+      merge_commit_filtering: "exclude_merges"
+    ))
+
+    # sh "your_script.sh"
+    # You can also use other beta testing services here (run `fastlane actions`)
+  end
+
+  desc "自动截图"
+  lane :screenshot do
+    capture_screenshots
+    frame_screenshots
+  end
+
+  desc "部署一个新版本到 App Store"
+  lane :release do
+    prepare_version
+    cocoapods(podfile: "./ios/Podfile")
+    screenshot
+    build_app(scheme: "vpser", workspace:"./ios/vpser.xcworkspace", output_directory: "./ios/build", silent: true, clean: true) # more options available
+    upload_to_app_store(force: true)
+  end
+
+  # You can define as many lanes as you want
+
+  desc "Runs all the tests"
+  lane :test do
+    run_tests
+  end
+
+  after_all do |lane|
+    # This block is called, only if the executed lane was successful
+
+    # slack(
+    #   message: "Successfully deployed new App Update."
+    # )
+  end
+
+  # If the weekly task fails, then ship a message, a success would also send
+  error do |_, exception|
+    slack(message: "Error Deploying Emission: #{exception}",
+          success: false,
+          payload: { Output: exception.error_info.to_s })
+  end
+end
+
+
+# More information about multiple platforms in fastlane: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
+# All available actions: https://docs.fastlane.tools/actions
+
+# fastlane reports which actions are used. No personal data is recorded.
+# Learn more at https://docs.fastlane.tools/#metrics

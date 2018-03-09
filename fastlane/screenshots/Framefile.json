@@ -1,0 +1,40 @@
+{
+  "device_frame_version": "latest",
+  "default": {
+    "title": {
+      "fonts": [
+        {
+          "font": "./fonts/Chinese.ttf",
+          "supported": ["zh-Hans"]
+        }
+      ],
+      "color": "#545454"
+    },
+    "keyword": {
+      "fonts": [
+        {
+          "font": "./fonts/Chinese.ttf",
+          "supported": ["zh-Hans"]
+        }
+      ]
+    },
+    "background": "./background.jpg",
+    "show_complete_frame": false,
+    "stack_title": true
+  },
+  "data": [
+    {
+      "filter": "iPhone X",
+      "keyword": {
+        "color": "#282C34"
+      }
+    },
+    {
+      "filter": "iPhone 6s",
+      "keyword": {
+        "color": "#C278DD"
+      },
+      "padding": "50x80"
+    }
+  ]
+}
