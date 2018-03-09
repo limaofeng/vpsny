@@ -15,6 +15,9 @@ ios/build
 ios/Podfile.lock
 
 # android
+android/**/.settings
+android/**/.classpath
+android/**/.project
 android/.gradle
 android/app/build
 android/build
