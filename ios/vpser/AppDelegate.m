@@ -8,7 +8,8 @@
  */
 
 #import "AppDelegate.h"
-
+#import <Fabric/Fabric.h>
+#import <Crashlytics/Crashlytics.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
@@ -30,6 +31,7 @@
   UIViewController *rootViewController = [UIViewController new];
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
+  [Fabric with:@[[Crashlytics class]]];
   [self.window makeKeyAndVisible];
   return YES;
 }

@@ -5,20 +5,28 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		187FF4FD8F6A425E85F0D27B /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3948FC6C199949C3977E3E81 /* libc++.tbd */; };
 		8DDD9A28EAAE09C3C002F412 /* libPods-vpser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1853865328692888E22859B2 /* libPods-vpser.a */; };
 		BFD3DC6A200F4C6100ED2CDD /* vpserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC69200F4C6100ED2CDD /* vpserUITests.swift */; };
 		BFD3DC72200F4DC900ED2CDD /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */; };
 		D66A7C23B06E4CB4911A3069 /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B7E8E9F4C0B745B89B01F813 /* libRealmReact.a */; };
-		187FF4FD8F6A425E85F0D27B /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3948FC6C199949C3977E3E81 /* libc++.tbd */; };
 		ED260632A1294EC29A9DF52F /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D55469E8572740DAA27C84D5 /* libz.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		BFD36F4120529F8C00EA10AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B5358C53558547148CD470F2 /* RealmReact.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = F60690131CA2766F0003FB26;
+			remoteInfo = RealmReact;
+		};
 		BFD3DC6C200F4C6100ED2CDD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
@@ -38,16 +46,16 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = vpser/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = vpser/main.m; sourceTree = "<group>"; };
 		1853865328692888E22859B2 /* libPods-vpser.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vpser.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3948FC6C199949C3977E3E81 /* libc++.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		89E37662272AF9A5C7C0636A /* Pods-vpser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpser.debug.xcconfig"; path = "Pods/Target Support Files/Pods-vpser/Pods-vpser.debug.xcconfig"; sourceTree = "<group>"; };
 		ADAB584AFEA10EEF6BD9459A /* Pods-vpser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpser.release.xcconfig"; path = "Pods/Target Support Files/Pods-vpser/Pods-vpser.release.xcconfig"; sourceTree = "<group>"; };
+		B5358C53558547148CD470F2 /* RealmReact.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RealmReact.xcodeproj; path = "../node_modules/realm/react-native/ios/RealmReact.xcodeproj"; sourceTree = "<group>"; };
+		B7E8E9F4C0B745B89B01F813 /* libRealmReact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRealmReact.a; sourceTree = "<group>"; };
 		BFD3DC67200F4C6100ED2CDD /* vpserUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vpserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD3DC69200F4C6100ED2CDD /* vpserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vpserUITests.swift; sourceTree = "<group>"; };
 		BFD3DC6B200F4C6100ED2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = ../../fastlane/SnapshotHelper.swift; sourceTree = "<group>"; };
-		B5358C53558547148CD470F2 /* RealmReact.xcodeproj */ = {isa = PBXFileReference; name = "RealmReact.xcodeproj"; path = "../node_modules/realm/react-native/ios/RealmReact.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		B7E8E9F4C0B745B89B01F813 /* libRealmReact.a */ = {isa = PBXFileReference; name = "libRealmReact.a"; path = "libRealmReact.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		3948FC6C199949C3977E3E81 /* libc++.tbd */ = {isa = PBXFileReference; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = sourcecode.text-based-dylib-definition; explicitFileType = undefined; includeInIndex = 0; };
-		D55469E8572740DAA27C84D5 /* libz.tbd */ = {isa = PBXFileReference; name = "libz.tbd"; path = "usr/lib/libz.tbd"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = sourcecode.text-based-dylib-definition; explicitFileType = undefined; includeInIndex = 0; };
+		D55469E8572740DAA27C84D5 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +130,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				707970E6696DDCDB847AA734 /* Pods */,
 				80435731547A72FD32693290 /* Frameworks */,
+				BFD36F3C20529F8B00EA10AD /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -133,6 +142,22 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* vpser.app */,
 				BFD3DC67200F4C6100ED2CDD /* vpserUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BFD36F3C20529F8B00EA10AD /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				B7E8E9F4C0B745B89B01F813 /* libRealmReact.a */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		BFD36F3E20529F8B00EA10AD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BFD36F4220529F8C00EA10AD /* libRealmReact.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -161,6 +186,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				BB36C18F2D1F18309142541E /* [CP] Embed Pods Frameworks */,
 				AC18AF21FBDEF498916173BD /* [CP] Copy Pods Resources */,
+				BFD36F432052A01200EA10AD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -222,6 +248,12 @@
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = BFD36F3E20529F8B00EA10AD /* Products */;
+					ProjectRef = B5358C53558547148CD470F2 /* RealmReact.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* vpser */,
@@ -229,6 +261,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		BFD36F4220529F8C00EA10AD /* libRealmReact.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRealmReact.a;
+			remoteRef = BFD36F4120529F8C00EA10AD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		13B07F8E1A680F5B00A75B9A /* Resources */ = {
@@ -285,7 +327,17 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -306,6 +358,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-vpser/Pods-vpser-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		BFD36F432052A01200EA10AD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" 4cb1ea9f94998b37a4e1ce9ea657eb4ccc3b24f6 d3e06d218ee6f178769904400ca4317e322af32e479836bfc550d00c415dd6a0";
 		};
 		C207110277144C62A586F8A0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -379,8 +444,16 @@
 				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = VLH995V894;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/realm/src/**",
+				);
 				INFOPLIST_FILE = vpser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/vpser\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -391,14 +464,6 @@
 				PROVISIONING_PROFILE = "91c344c5-9c07-4835-9838-8729f87c141e";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development life.homeworld.app.vpser";
 				VERSIONING_SYSTEM = "apple-generic";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/vpser\"",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../node_modules/realm/src/**",
-				);
 			};
 			name = Debug;
 		};
@@ -411,8 +476,16 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = VLH995V894;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../node_modules/realm/src/**",
+				);
 				INFOPLIST_FILE = vpser/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/vpser\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -423,14 +496,6 @@
 				PROVISIONING_PROFILE = "12cf0d2b-025f-499a-b48c-fb0c1b7d7013";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore life.homeworld.app.vpser";
 				VERSIONING_SYSTEM = "apple-generic";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/vpser\"",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SRCROOT)/../node_modules/realm/src/**",
-				);
 			};
 			name = Release;
 		};

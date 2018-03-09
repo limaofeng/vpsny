@@ -32,6 +32,8 @@ target 'vpser' do
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   # React-native-i18n
   pod 'RNI18n', :path => '../node_modules/react-native-i18n'
-
+  # Fabric
+  pod 'Fabric'
+  pod 'Crashlytics'
 
 end
