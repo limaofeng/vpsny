@@ -13,12 +13,12 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		187FF4FD8F6A425E85F0D27B /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3948FC6C199949C3977E3E81 /* libc++.tbd */; };
 		8DDD9A28EAAE09C3C002F412 /* libPods-vpser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1853865328692888E22859B2 /* libPods-vpser.a */; };
+		BF1A7869205614C3007D27CA /* vpser-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF1A7868205614C3007D27CA /* vpser-icons.ttf */; };
 		BF55D48A205410B4009E59DC /* Raleway-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF55D487205410B4009E59DC /* Raleway-Bold.ttf */; };
 		BF55D48B205410B4009E59DC /* Raleway-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF55D488205410B4009E59DC /* Raleway-Regular.ttf */; };
 		BF55D48C205410B4009E59DC /* Raleway-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF55D489205410B4009E59DC /* Raleway-SemiBold.ttf */; };
 		BFD3DC6A200F4C6100ED2CDD /* vpserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC69200F4C6100ED2CDD /* vpserUITests.swift */; };
 		BFD3DC72200F4DC900ED2CDD /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */; };
-		BFFCF2CB20560F07007D1479 /* icomoon.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BFFCF2C920560F07007D1479 /* icomoon.ttf */; };
 		D66A7C23B06E4CB4911A3069 /* libRealmReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B7E8E9F4C0B745B89B01F813 /* libRealmReact.a */; };
 		ED260632A1294EC29A9DF52F /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D55469E8572740DAA27C84D5 /* libz.tbd */; };
 /* End PBXBuildFile section */
@@ -55,6 +55,7 @@
 		ADAB584AFEA10EEF6BD9459A /* Pods-vpser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpser.release.xcconfig"; path = "Pods/Target Support Files/Pods-vpser/Pods-vpser.release.xcconfig"; sourceTree = "<group>"; };
 		B5358C53558547148CD470F2 /* RealmReact.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RealmReact.xcodeproj; path = "../node_modules/realm/react-native/ios/RealmReact.xcodeproj"; sourceTree = "<group>"; };
 		B7E8E9F4C0B745B89B01F813 /* libRealmReact.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRealmReact.a; sourceTree = "<group>"; };
+		BF1A7868205614C3007D27CA /* vpser-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "vpser-icons.ttf"; sourceTree = "<group>"; };
 		BF55D487205410B4009E59DC /* Raleway-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Raleway-Bold.ttf"; sourceTree = "<group>"; };
 		BF55D488205410B4009E59DC /* Raleway-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Raleway-Regular.ttf"; sourceTree = "<group>"; };
 		BF55D489205410B4009E59DC /* Raleway-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Raleway-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -62,7 +63,6 @@
 		BFD3DC69200F4C6100ED2CDD /* vpserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vpserUITests.swift; sourceTree = "<group>"; };
 		BFD3DC6B200F4C6100ED2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = ../../fastlane/SnapshotHelper.swift; sourceTree = "<group>"; };
-		BFFCF2C920560F07007D1479 /* icomoon.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = icomoon.ttf; sourceTree = "<group>"; };
 		D55469E8572740DAA27C84D5 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -158,7 +158,7 @@
 		BF55D4862054108C009E59DC /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
-				BFFCF2C920560F07007D1479 /* icomoon.ttf */,
+				BF1A7868205614C3007D27CA /* vpser-icons.ttf */,
 				BF55D487205410B4009E59DC /* Raleway-Bold.ttf */,
 				BF55D488205410B4009E59DC /* Raleway-Regular.ttf */,
 				BF55D489205410B4009E59DC /* Raleway-SemiBold.ttf */,
@@ -242,7 +242,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 910;
-				LastUpgradeCheck = 910;
+				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
@@ -300,7 +300,7 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				BF55D48A205410B4009E59DC /* Raleway-Bold.ttf in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				BFFCF2CB20560F07007D1479 /* icomoon.ttf in Resources */,
+				BF1A7869205614C3007D27CA /* vpser-icons.ttf in Resources */,
 				BF55D48B205410B4009E59DC /* Raleway-Regular.ttf in Resources */,
 				BF55D48C205410B4009E59DC /* Raleway-SemiBold.ttf in Resources */,
 			);
@@ -614,6 +614,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;

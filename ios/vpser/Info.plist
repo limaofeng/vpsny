@@ -53,6 +53,7 @@
 	<string></string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>vpser-icons.ttf</string>
 		<string>Raleway-Bold.ttf</string>
 		<string>Raleway-Regular.ttf</string>
 		<string>Raleway-SemiBold.ttf</string>

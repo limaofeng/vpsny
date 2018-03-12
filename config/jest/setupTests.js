@@ -17,6 +17,10 @@ jest.mock('NativeModules', () => ({
   },
   SourceCode: {
     scriptURL: null
+  },
+  KeyboardObserver: {
+    addListener: jest.fn(),
+    removeListeners: jest.fn()
   }
 }));
 
