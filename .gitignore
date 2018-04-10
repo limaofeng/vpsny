@@ -1,5 +1,8 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
+# VSCode
+.vscode
+
 # dependencies
 /node_modules
 yarn.lock
@@ -37,3 +40,6 @@ vendor/bundle
 # Test
 __snapshots__
 coverage
+
+# realm
+realm-object-server
