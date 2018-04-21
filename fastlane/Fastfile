@@ -57,28 +57,16 @@ platform :ios do
     ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
   end
 
-  keychain_name = "ios-build.keychain"
-  keychain_password = SecureRandom.base64
+  keychain_name = ENV["KEYCHAIN_NAME"]
+  keychain_password = ENV["KEYCHAIN_PASSWORD"]
 
   desc '获取最新的 证书 与 配置文件'
   lane :setup_signing do
-    userDir = (sh "cd ~ && pwd").gsub(/[\r\n]$/,'')
-    if File.exists?("#{userDir}/Library/Keychains/ios-build.keychain-db")
-      delete_keychain(name: keychain_name)
-    end
-    create_keychain(
-      name: keychain_name,
-      password: keychain_password,
-      unlock: true,
-      timeout: 3600,
-      lock_when_sleeps: true
-    )
     sync_code_signings(type: ['development', 'appstore'], keychain_name: keychain_name, keychain_password: keychain_password) # 同步证书
   end
 
   desc "编译"
   lane :build do
-    prepare_version
     cocoapods(podfile: "./ios/Podfile")
     build_app(scheme: "vpser", workspace:"./ios/vpser.xcworkspace", output_directory: "./ios/build", silent: true, clean: true)
   end
@@ -86,6 +74,7 @@ platform :ios do
   desc "提交一个新的测试版本 Apple TestFlight"
   lane :beta do
     screenshot
+    prepare_version
     build
     upload_to_testflight(changelog: changelog_from_git_commits(
       between: ["ed2a506", "HEAD"],

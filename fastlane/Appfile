@@ -1,7 +1,7 @@
 app_identifier "life.homeworld.app.vpser" # The bundle identifier of your app
-apple_id "" # Your Apple email address
+apple_id "limaofeng@msn.com" # Your Apple email address
 
-team_id "" # Developer Portal Team ID
+team_id "VLH995V894" # Developer Portal Team ID
 
 # you can even provide different app identifiers, Apple IDs and team names per lane:
 # More information: https://docs.fastlane.tools/advanced/#appfile

@@ -7,43 +7,48 @@
     "email": "limaofeng@msn.com",
     "url": "https://homeworld.life"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:limaofeng/vpser.git"
+  },
   "scripts": {
     "precommit": "lint-staged",
     "postinstall": "remotedev-debugger --hostname localhost --port 8000 --injectserver",
     "start": "react-native start",
     "android": "react-native run-android",
-    "ios": "react-native run-ios --simulator \"iPhone X\"",
+    "ios": "react-native run-ios",
     "test": "jest"
   },
   "dependencies": {
-    "react": "^16.3.1",
-    "react-native": "^0.54.4",
-    "react-native-gesture-handler": "^1.0.0-alpha.41",
+    "bluebird": "^3.5.1",
+    "react": "^16.3.2",
+    "react-native": "^0.55.3",
     "react-native-i18n": "^2.0.12",
-    "react-native-kharak": "^1.3.2",
+    "react-native-kharak": "^1.3.6",
+    "react-native-linear-gradient": "^2.4.0",
     "react-native-tab-view": "^0.0.77",
     "react-native-vector-icons": "^4.6.0",
-    "realm": "2.2.18",
+    "realm": "2.2.20",
     "redux-logger": "^3.0.6"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.2.2",
+    "babel-eslint": "^8.2.3",
     "babel-preset-react-native-stage-0": "^1.0.1",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
-    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-react": "^7.7.0",
     "husky": "^0.14.3",
     "jest": "^22.4.3",
     "lint-staged": "^7.0.3",
-    "prettier": "^1.11.1",
-    "react-dom": "^16.3.1",
-    "react-test-renderer": "^16.3.1",
+    "prettier": "^1.12.1",
+    "react-dom": "^16.3.2",
+    "react-test-renderer": "^16.3.2",
     "remote-redux-devtools": "^0.5.12",
     "remotedev-rn-debugger": "^0.8.3"
   },
@@ -68,7 +73,7 @@
     ],
     "moduleNameMapper": {
       "^React$": "<rootDir>/node_modules/react",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":"<rootDir>/config/jest/fileTransform.js"
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/config/jest/fileTransform.js"
     },
     "transform": {
       "^.+\\.(js|jsx)$": "<rootDir>/node_modules/babel-jest",
@@ -89,7 +94,7 @@
     ],
     "transformIgnorePatterns": [
       "/node_modules/(?!react-native|react-navigation)/",
-      "node_modules/(realm)/"
+      "/node_modules/(realm)/"
     ]
   },
   "babel": {
@@ -190,9 +195,5 @@
         }
       ]
     }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:[object Promise]/vpser.git"
   }
 }

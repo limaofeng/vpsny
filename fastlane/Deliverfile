@@ -10,7 +10,7 @@
 app_identifier "life.homeworld.app.vpser" # The bundle identifier of your app
 
 # 2 用户名,Apple ID电子邮件地址
-username "" # your Apple ID user
+username "limaofeng@msn.com" # your Apple ID user
 
 # 3 支持语言
 supportedLanguages = {
