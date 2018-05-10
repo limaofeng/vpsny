@@ -13,6 +13,8 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
+#import "SplashScreen.h"
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -33,6 +35,7 @@
   self.window.rootViewController = rootViewController;
   [Fabric with:@[[Crashlytics class]]];
   [self.window makeKeyAndVisible];
+  [SplashScreen show];
   return YES;
 }
 

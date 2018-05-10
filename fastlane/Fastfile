@@ -73,11 +73,11 @@ platform :ios do
 
   desc "提交一个新的测试版本 Apple TestFlight"
   lane :beta do
-    screenshot
+    # screenshot
     prepare_version
     build
     upload_to_testflight(changelog: changelog_from_git_commits(
-      between: ["ed2a506", "HEAD"],
+      between: ["255d10a", "HEAD"],
       pretty: "- %s",
       date_format: "short",
       match_lightweight_tag: false,
