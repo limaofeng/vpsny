@@ -17,7 +17,8 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "test": "jest"
+    "test": "jest",
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -34,25 +35,28 @@
     "redux-logger": "^3.0.6"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.20",
+    "@types/lodash": "^4.14.110",
+    "@types/react": "^16.4.1",
+    "@types/react-native": "^0.55.22",
+    "@types/react-native-vector-icons": "^4.6.1",
+    "@types/react-navigation": "^2.0.6",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.3",
     "babel-preset-react-native-stage-0": "^1.0.1",
     "enzyme": "^3.3.0",
     "enzyme-adapter-react-16": "^1.1.1",
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb": "^16.1.0",
-    "eslint-plugin-import": "^2.11.0",
-    "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-prettier": "^2.6.0",
-    "eslint-plugin-react": "^7.7.0",
     "husky": "^0.14.3",
     "jest": "^22.4.3",
     "lint-staged": "^7.1.0",
     "prettier": "^1.12.1",
     "react-dom": "^16.3.2",
+    "react-native-typescript-transformer": "^1.2.10",
     "react-test-renderer": "^16.3.2",
     "remote-redux-devtools": "^0.5.12",
-    "remotedev-rn-debugger": "^0.8.3"
+    "remotedev-rn-debugger": "^0.8.3",
+    "tslint": "^5.10.0",
+    "tslint-config-prettier": "^1.13.0",
+    "typescript": "^2.9.2"
   },
   "prettier": {
     "tabWidth": 2,
@@ -109,93 +113,6 @@
           "transform-react-jsx-source"
         ]
       }
-    }
-  },
-  "eslintConfig": {
-    "extends": "airbnb",
-    "parser": "babel-eslint",
-    "plugins": [
-      "react",
-      "jsx-a11y",
-      "import",
-      "prettier"
-    ],
-    "env": {
-      "jasmine": true
-    },
-    "globals": {
-      "fetch": true
-    },
-    "rules": {
-      "indent": 0,
-      "semi": 2,
-      "max-len": [
-        2,
-        120,
-        4
-      ],
-      "space-before-function-paren": 0,
-      "prettier/prettier": "error",
-      "global-require": "off",
-      "comma-dangle": 0,
-      "arrow-parens": [
-        "error",
-        "as-needed"
-      ],
-      "consistent-return": 0,
-      "no-restricted-syntax": 0,
-      "no-use-before-define": 0,
-      "no-param-reassign": "warn",
-      "no-console": 1,
-      "no-confusing-arrow": 0,
-      "no-shadow": 0,
-      "no-underscore-dangle": 0,
-      "no-debugger": 1,
-      "no-continue": "warn",
-      "no-plusplus": [
-        "error",
-        {
-          "allowForLoopAfterthoughts": true
-        }
-      ],
-      "object-curly-newline": "off",
-      "function-paren-newline": "off",
-      "generator-star-spacing": [
-        "error",
-        {
-          "before": true,
-          "after": false
-        }
-      ],
-      "import/no-extraneous-dependencies": 0,
-      "import/prefer-default-export": 0,
-      "import/no-duplicates": 0,
-      "import/no-unresolved": [
-        2,
-        {
-          "ignore": [
-            ".png^"
-          ]
-        }
-      ],
-      "jsx-a11y/label-has-for": 0,
-      "jsx-a11y/anchor-is-valid": 0,
-      "jsx-a11y/click-events-have-key-events": 0,
-      "react/no-multi-comp": 0,
-      "react/no-array-index-key": [
-        1
-      ],
-      "react/forbid-prop-types": 0,
-      "react/prefer-stateless-function": "off",
-      "react/jsx-filename-extension": [
-        1,
-        {
-          "extensions": [
-            ".js",
-            ".jsx"
-          ]
-        }
-      ]
     }
   }
 }

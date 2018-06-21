@@ -39,5 +39,7 @@ target 'vpser' do
   # Fabric
   pod 'Fabric'
   pod 'Crashlytics'
+  # 1Password
+  pod '1PasswordExtension', '~> 1.8.5'
 
 end
