@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { configureStore } from 'react-native-kharak';
+import { configureStore } from 'walkuere-rn';
 import Home from '../src/modules/home';
 
 describe('Home Enzyme Shallow', () => {

@@ -56,9 +56,13 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>vpser-icons.ttf</string>
-		<string>Raleway-Bold.ttf</string>
-		<string>Raleway-Regular.ttf</string>
-		<string>Raleway-SemiBold.ttf</string>
+		<string>Aldrichregular.ttf</string>
+		<string>Ionicons.ttf</string>
+		<string>MaterialIcons.ttf</string>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>

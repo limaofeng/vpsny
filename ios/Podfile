@@ -36,10 +36,18 @@ target 'vpser' do
   pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
   # BVLinearGradient
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+  # RNSVG
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+  # Spinkit
+  pod 'react-native-spinkit', :path => '../node_modules/react-native-spinkit'
+  # RNDeviceInfo
+  pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
+  # RNSSHClient
+  pod 'RNSSHClient', :path => '../node_modules/react-native-ssh-sftp'
+  # NMSSH
+  pod 'NMSSH'
   # Fabric
   pod 'Fabric'
   pod 'Crashlytics'
-  # 1Password
-  pod '1PasswordExtension', '~> 1.8.5'
 
 end
