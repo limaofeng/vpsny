@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>6</string>
+	<string>8</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>Fabric</key>
@@ -58,6 +58,7 @@
 		<string>vpser-icons.ttf</string>
 		<string>Aldrichregular.ttf</string>
 		<string>Ionicons.ttf</string>
+		<string>EvilIcons.ttf</string>
 		<string>MaterialIcons.ttf</string>
 		<string>FontAwesome.ttf</string>
 		<string>FontAwesome5_Brands.ttf</string>

@@ -169,7 +169,6 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				BB36C18F2D1F18309142541E /* [CP] Embed Pods Frameworks */,
 				AC18AF21FBDEF498916173BD /* [CP] Copy Pods Resources */,
 				BFD36F432052A01200EA10AD /* ShellScript */,
 			);
@@ -321,21 +320,6 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-vpser/Pods-vpser-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BB36C18F2D1F18309142541E /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-vpser/Pods-vpser-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		BFD36F432052A01200EA10AD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -419,7 +403,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = VLH995V894;
 				HEADER_SEARCH_PATHS = "$(inherited)";
@@ -447,7 +431,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = VLH995V894;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = vpser/Info.plist;
