@@ -17,11 +17,16 @@ default_platform(:ios)
 
 # 修改版本号与BUILD号
 def prepare_version(options = {})
+  build_number = get_build_number(xcodeproj: "./ios/vpser.xcodeproj")
   if options[:version].nil?
     options[:version] = (sh "git describe --tags --abbrev=0").gsub(/^[v]/,'') # 获取分支最近的 tags 作为版本号
   end
   if options[:build].nil?
-    options[:build] = latest_testflight_build_number + 1 # 获取 testflight 中的 build_number + 1
+    # 获取 testflight 中的 build_number + 1
+    options[:build] = latest_testflight_build_number(
+      version: options[:version],
+      initial_build_number: build_number
+    ) + 1
   end
   increment_version_number(
       version_number: options[:version],
@@ -56,7 +61,7 @@ platform :ios do
   before_all do
     ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
   end
-
+  
   keychain_name = ENV["KEYCHAIN_NAME"]
   keychain_password = ENV["KEYCHAIN_PASSWORD"]
 
@@ -67,6 +72,7 @@ platform :ios do
 
   desc "编译"
   lane :build do
+    sh "cd .. && ./bugfixs/runfixup.sh"
     cocoapods(podfile: "./ios/Podfile")
     build_app(scheme: "vpser", workspace:"./ios/vpser.xcworkspace", output_directory: "./ios/build", silent: true, clean: true)
   end
@@ -76,13 +82,17 @@ platform :ios do
     # screenshot
     prepare_version
     build
-    upload_to_testflight(changelog: changelog_from_git_commits(
-      between: ["ba53e29", "HEAD"],
-      pretty: "- %s",
-      date_format: "short",
-      match_lightweight_tag: false,
-      merge_commit_filtering: "exclude_merges"
-    ))
+    upload_to_testflight(
+      changelog: changelog_from_git_commits(
+        between: ["ba53e29", "HEAD"],
+        pretty: "- %s",
+        date_format: "short",
+        match_lightweight_tag: false,
+        merge_commit_filtering: "exclude_merges"
+      ),
+      beta_app_description: "This is a preview of our new app...",
+      beta_app_feedback_email: "limaofeng@msn.com",
+    )
 
     # sh "your_script.sh"
     # You can also use other beta testing services here (run `fastlane actions`)
