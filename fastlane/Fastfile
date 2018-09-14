@@ -17,15 +17,15 @@ default_platform(:ios)
 
 # 修改版本号与BUILD号
 def prepare_version(options = {})
-  build_number = get_build_number(xcodeproj: "./ios/vpser.xcodeproj")
+  initial_build_number = get_build_number(xcodeproj: "./ios/vpser.xcodeproj")
   if options[:version].nil?
-    options[:version] = (sh "git describe --tags --abbrev=0").gsub(/^[v]/,'') # 获取分支最近的 tags 作为版本号
+    options[:version] = (sh "git describe --tags --abbrev=0").gsub(/^[v]/,'').chomp # 获取分支最近的 tags 作为版本号
   end
   if options[:build].nil?
     # 获取 testflight 中的 build_number + 1
     options[:build] = latest_testflight_build_number(
       version: options[:version],
-      initial_build_number: build_number
+      initial_build_number: initial_build_number
     ) + 1
   end
   increment_version_number(
