@@ -13,6 +13,10 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		8DDD9A28EAAE09C3C002F412 /* libPods-vpser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1853865328692888E22859B2 /* libPods-vpser.a */; };
 		BF1A7869205614C3007D27CA /* vpser-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF1A7868205614C3007D27CA /* vpser-icons.ttf */; };
+		BF9AEA0A2161D7A8005CD6B5 /* RNAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */; };
+		BF9AEA0C2161D8B7005CD6B5 /* RNAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */; };
+		BFB43B43215B1D8400516B59 /* RNSSH.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB43B42215B1D8400516B59 /* RNSSH.swift */; };
+		BFB43B45215B1EFB00516B59 /* RNSSH.m in Sources */ = {isa = PBXBuildFile; fileRef = BFB43B44215B1EFB00516B59 /* RNSSH.m */; };
 		BFD3DC6A200F4C6100ED2CDD /* vpserUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC69200F4C6100ED2CDD /* vpserUITests.swift */; };
 		BFD3DC72200F4DC900ED2CDD /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */; };
 		BFE219752144EF8400578B45 /* Aldrichregular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BFE219742144EF8400578B45 /* Aldrichregular.ttf */; };
@@ -41,6 +45,11 @@
 		89E37662272AF9A5C7C0636A /* Pods-vpser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpser.debug.xcconfig"; path = "Pods/Target Support Files/Pods-vpser/Pods-vpser.debug.xcconfig"; sourceTree = "<group>"; };
 		ADAB584AFEA10EEF6BD9459A /* Pods-vpser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpser.release.xcconfig"; path = "Pods/Target Support Files/Pods-vpser/Pods-vpser.release.xcconfig"; sourceTree = "<group>"; };
 		BF1A7868205614C3007D27CA /* vpser-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "vpser-icons.ttf"; sourceTree = "<group>"; };
+		BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNAudio.swift; sourceTree = "<group>"; };
+		BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNAudio.m; sourceTree = "<group>"; };
+		BFB43B41215B1D8400516B59 /* vpser-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vpser-Bridging-Header.h"; sourceTree = "<group>"; };
+		BFB43B42215B1D8400516B59 /* RNSSH.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNSSH.swift; sourceTree = "<group>"; };
+		BFB43B44215B1EFB00516B59 /* RNSSH.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNSSH.m; sourceTree = "<group>"; };
 		BFD3DC67200F4C6100ED2CDD /* vpserUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vpserUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD3DC69200F4C6100ED2CDD /* vpserUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vpserUITests.swift; sourceTree = "<group>"; };
 		BFD3DC6B200F4C6100ED2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -78,6 +87,11 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				BFB43B42215B1D8400516B59 /* RNSSH.swift */,
+				BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */,
+				BFB43B41215B1D8400516B59 /* vpser-Bridging-Header.h */,
+				BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */,
+				BFB43B44215B1EFB00516B59 /* RNSSH.m */,
 			);
 			name = vpser;
 			sourceTree = "<group>";
@@ -211,6 +225,7 @@
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = VLH995V894;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Manual;
 					};
 					BFD3DC66200F4C6100ED2CDD = {
@@ -359,6 +374,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				BF9AEA0A2161D7A8005CD6B5 /* RNAudio.swift in Sources */,
+				BF9AEA0C2161D8B7005CD6B5 /* RNAudio.m in Sources */,
+				BFB43B43215B1D8400516B59 /* RNSSH.swift in Sources */,
+				BFB43B45215B1EFB00516B59 /* RNSSH.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -401,6 +420,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 11;
@@ -408,6 +428,7 @@
 				DEVELOPMENT_TEAM = VLH995V894;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = vpser/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
@@ -419,6 +440,9 @@
 				PRODUCT_NAME = vpser;
 				PROVISIONING_PROFILE = "91c344c5-9c07-4835-9838-8729f87c141e";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development life.homeworld.app.vpser";
+				SWIFT_OBJC_BRIDGING_HEADER = "vpser-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -429,12 +453,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = VLH995V894;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = vpser/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
@@ -446,6 +472,8 @@
 				PRODUCT_NAME = vpser;
 				PROVISIONING_PROFILE = "12cf0d2b-025f-499a-b48c-fb0c1b7d7013";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore life.homeworld.app.vpser";
+				SWIFT_OBJC_BRIDGING_HEADER = "vpser-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -499,6 +527,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -544,6 +573,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 4.2;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -551,6 +581,7 @@
 		BFD3DC6E200F4C6100ED2CDD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -578,6 +609,7 @@
 		BFD3DC6F200F4C6100ED2CDD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

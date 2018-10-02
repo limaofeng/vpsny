@@ -44,6 +44,10 @@ target 'vpser' do
   pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
   # RNSSHClient
   pod 'RNSSHClient', :path => '../node_modules/react-native-ssh-sftp'
+  # React-native-sound
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+  # RNFabric
+  pod 'ReactNativeFabric', :path => '../node_modules/react-native-fabric'
   # NMSSH
   pod 'NMSSH'
   # Fabric
