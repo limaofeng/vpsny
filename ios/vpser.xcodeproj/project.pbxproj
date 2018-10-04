@@ -13,6 +13,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		8DDD9A28EAAE09C3C002F412 /* libPods-vpser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1853865328692888E22859B2 /* libPods-vpser.a */; };
 		BF1A7869205614C3007D27CA /* vpser-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF1A7868205614C3007D27CA /* vpser-icons.ttf */; };
+		BF6F830F2163867B0081CF51 /* SSHClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6F830E2163867B0081CF51 /* SSHClient.swift */; };
 		BF9AEA0A2161D7A8005CD6B5 /* RNAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */; };
 		BF9AEA0C2161D8B7005CD6B5 /* RNAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */; };
 		BFB43B43215B1D8400516B59 /* RNSSH.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB43B42215B1D8400516B59 /* RNSSH.swift */; };
@@ -45,6 +46,7 @@
 		89E37662272AF9A5C7C0636A /* Pods-vpser.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpser.debug.xcconfig"; path = "Pods/Target Support Files/Pods-vpser/Pods-vpser.debug.xcconfig"; sourceTree = "<group>"; };
 		ADAB584AFEA10EEF6BD9459A /* Pods-vpser.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpser.release.xcconfig"; path = "Pods/Target Support Files/Pods-vpser/Pods-vpser.release.xcconfig"; sourceTree = "<group>"; };
 		BF1A7868205614C3007D27CA /* vpser-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "vpser-icons.ttf"; sourceTree = "<group>"; };
+		BF6F830E2163867B0081CF51 /* SSHClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHClient.swift; sourceTree = "<group>"; };
 		BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNAudio.swift; sourceTree = "<group>"; };
 		BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNAudio.m; sourceTree = "<group>"; };
 		BFB43B41215B1D8400516B59 /* vpser-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vpser-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				BFB43B42215B1D8400516B59 /* RNSSH.swift */,
+				BF6F830E2163867B0081CF51 /* SSHClient.swift */,
 				BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */,
 				BFB43B41215B1D8400516B59 /* vpser-Bridging-Header.h */,
 				BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */,
@@ -220,7 +223,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 910;
-				LastUpgradeCheck = 910;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
@@ -375,6 +378,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				BF9AEA0A2161D7A8005CD6B5 /* RNAudio.swift in Sources */,
+				BF6F830F2163867B0081CF51 /* SSHClient.swift in Sources */,
 				BF9AEA0C2161D8B7005CD6B5 /* RNAudio.m in Sources */,
 				BFB43B43215B1D8400516B59 /* RNSSH.swift in Sources */,
 				BFB43B45215B1EFB00516B59 /* RNSSH.m in Sources */,
@@ -490,12 +494,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -543,12 +549,14 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

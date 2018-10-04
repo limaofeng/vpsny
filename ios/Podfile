@@ -42,8 +42,6 @@ target 'vpser' do
   pod 'react-native-spinkit', :path => '../node_modules/react-native-spinkit'
   # RNDeviceInfo
   pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
-  # RNSSHClient
-  pod 'RNSSHClient', :path => '../node_modules/react-native-ssh-sftp'
   # React-native-sound
   pod 'RNSound', :path => '../node_modules/react-native-sound'
   # RNFabric

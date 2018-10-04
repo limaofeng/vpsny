@@ -12,6 +12,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # ios
+ios/.idea/
+xcshareddata/
 xcuserdata/
 ios/Pods
 ios/build
