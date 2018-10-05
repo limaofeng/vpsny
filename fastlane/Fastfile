@@ -108,7 +108,7 @@ platform :ios do
     build
     upload_to_testflight(
       changelog: changelog_from_git_commits(
-        between: %w[0c9a2bd HEAD],
+        between: %w[b6ba8402 HEAD],
         pretty: '- %s',
         date_format: 'short',
         match_lightweight_tag: false,
