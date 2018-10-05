@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Crashlytics
 
 @objc(RNSSH)
 class RNSSH: RCTEventEmitter {
@@ -71,6 +72,7 @@ class RNSSH: RCTEventEmitter {
             }
             resolve(nil)
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
 
@@ -85,6 +87,7 @@ class RNSSH: RCTEventEmitter {
             }
             resolve(nil)
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
     }
@@ -94,6 +97,7 @@ class RNSSH: RCTEventEmitter {
             let client = try clientForKey(key)
             resolve(try client.execute(command))
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
     }
@@ -104,6 +108,7 @@ class RNSSH: RCTEventEmitter {
             try client.startShell(ptyType: ptyType, delegate: client.delegate(emitter: self)) //  ShellDelegate(key: key), emitter: self
             resolve(nil)
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
     }
@@ -114,6 +119,7 @@ class RNSSH: RCTEventEmitter {
             try client.writeToShell(command)
             resolve(nil)
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
     }
@@ -123,6 +129,7 @@ class RNSSH: RCTEventEmitter {
             let client = try clientForKey(key)
             resolve(client.resizeShell(width: width, height: height))
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
     }
@@ -132,6 +139,7 @@ class RNSSH: RCTEventEmitter {
             let client = try clientForKey(key)
             client.closeShell()
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
     }
@@ -144,6 +152,7 @@ class RNSSH: RCTEventEmitter {
             let client = try clientForKey(key)
             client.disconnect()
         } catch let error as NSError {
+            Crashlytics.sharedInstance().recordError(error)
             reject(String(error.code), error.domain, error)
         }
     }

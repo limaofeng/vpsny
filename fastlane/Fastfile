@@ -118,8 +118,7 @@ platform :ios do
       beta_app_feedback_email: 'limaofeng@msn.com'
     )
 
-    # sh "your_script.sh"
-    # You can also use other beta testing services here (run `fastlane actions`)
+    slack(message: "App successfully released!")
   end
 
   desc '自动截图'
@@ -133,13 +132,7 @@ platform :ios do
     prepare_version
     cocoapods(podfile: './ios/Podfile')
     screenshot
-    build_app(
-      scheme: 'vpser',
-      workspace: './ios/vpser.xcworkspace',
-      output_directory: './ios/build',
-      silent: true,
-      clean: true
-    )
+    build
     upload_to_app_store(force: true)
   end
 
