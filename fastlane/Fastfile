@@ -11,36 +11,42 @@
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
-min_fastlane_version("2.73.0")
+min_fastlane_version('2.73.0')
 
-default_platform(:ios)
+# This value helps us track success metrics for Fastfiles
+# we automatically generate. Feel free to remove this line
+# once you get things running smoothly!
+generated_fastfile_id "633f0d1b-935e-48c7-8427-73d5f5dad4d8"
 
-# 修改版本号与BUILD号
+default_platform :ios
+
+# Modify the version number and BUILD number
 def prepare_version(options = {})
-  initial_build_number = get_build_number(xcodeproj: "./ios/vpser.xcodeproj")
+  initial_build_number = get_build_number(xcodeproj: './ios/vpser.xcodeproj')
   if options[:version].nil?
-    options[:version] = (sh "git describe --tags --abbrev=0").gsub(/^[v]/,'').chomp # 获取分支最近的 tags 作为版本号
+    # Get the recent tags of the branch as the version number
+    options[:version] = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
   end
   if options[:build].nil?
-    # 获取 testflight 中的 build_number + 1
+    # Get testflight build_number + 1
     options[:build] = latest_testflight_build_number(
       version: options[:version],
       initial_build_number: initial_build_number
     ) + 1
   end
   increment_version_number(
-      version_number: options[:version],
-      xcodeproj: "./ios/vpser.xcodeproj"
+    version_number: options[:version],
+    xcodeproj: './ios/vpser.xcodeproj'
   )
   increment_build_number(
-      build_number: options[:build],
-      xcodeproj: "./ios/vpser.xcodeproj"
+    build_number: options[:build],
+    xcodeproj: './ios/vpser.xcodeproj'
   )
 end
 
-# 同步证书与配置文件
+# sync code signings
 def sync_code_signings(options = {})
-  if options[:type].kind_of? String then
+  if options[:type].is_a? String
     sync_code_signing(
       git_url: 'git@gitlab.com:homeworld.life/certificates.git',
       app_identifier: 'life.homeworld.app.vpser',
@@ -51,71 +57,95 @@ def sync_code_signings(options = {})
       readonly: true
     )
   else
-    for type in options[:type] do
-      sync_code_signings(type: type, keychain_name: options[:keychain_name], keychain_password: options[:keychain_password])
+    options[:type].each do |type|
+      sync_code_signings(
+        type: type,
+        keychain_name: options[:keychain_name],
+        keychain_password: options[:keychain_password]
+      )
     end
   end
 end
 
 platform :ios do
   before_all do
-    ENV["SLACK_URL"] = "https://hooks.slack.com/services/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"
+    ENV['SLACK_URL'] = 'https://hooks.slack.com/services/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'
   end
-  
-  keychain_name = ENV["KEYCHAIN_NAME"]
-  keychain_password = ENV["KEYCHAIN_PASSWORD"]
+
+  keychain_name = ENV['KEYCHAIN_NAME']
+  keychain_password = ENV['KEYCHAIN_PASSWORD']
 
   desc '获取最新的 证书 与 配置文件'
   lane :setup_signing do
-    sync_code_signings(type: ['development', 'appstore'], keychain_name: keychain_name, keychain_password: keychain_password) # 同步证书
+    # sync code signings
+    sync_code_signings(
+      type: %w[development appstore],
+      keychain_name: keychain_name,
+      keychain_password:
+      keychain_password
+    )
   end
 
-  desc "编译"
+  desc '编译'
   lane :build do
-    sh "cd .. && ./bugfixs/runfixup.sh"
-    cocoapods(podfile: "./ios/Podfile")
-    build_app(scheme: "vpser", workspace:"./ios/vpser.xcworkspace", output_directory: "./ios/build", silent: true, clean: true)
+    sh 'cd .. && ./bugfixs/runfixup.sh'
+    cocoapods(podfile: './ios/Podfile')
+    build_app(
+      scheme: 'vpser',
+      workspace: './ios/vpser.xcworkspace',
+      output_directory: './ios/build',
+      silent: true,
+      clean: true
+    )
   end
 
-  desc "提交一个新的测试版本 Apple TestFlight"
+  desc '提交一个新的测试版本 Apple TestFlight'
   lane :beta do
-    # screenshot
+    # increment_build_number
     prepare_version
+    # screenshot
+    # build your iOS app
     build
     upload_to_testflight(
       changelog: changelog_from_git_commits(
-        between: ["0c9a2bd", "HEAD"],
-        pretty: "- %s",
-        date_format: "short",
+        between: %w[0c9a2bd HEAD],
+        pretty: '- %s',
+        date_format: 'short',
         match_lightweight_tag: false,
-        merge_commit_filtering: "exclude_merges"
+        merge_commit_filtering: 'exclude_merges'
       ),
-      beta_app_description: "Vpser can help you manage your vps, support vultr",
-      beta_app_feedback_email: "limaofeng@msn.com",
+      beta_app_description: 'Vpser can help you manage your vps, support vultr',
+      beta_app_feedback_email: 'limaofeng@msn.com'
     )
 
     # sh "your_script.sh"
     # You can also use other beta testing services here (run `fastlane actions`)
   end
 
-  desc "自动截图"
+  desc '自动截图'
   lane :screenshot do
     capture_screenshots
     frame_screenshots
   end
 
-  desc "部署一个新版本到 App Store"
+  desc '部署一个新版本到 App Store'
   lane :release do
     prepare_version
-    cocoapods(podfile: "./ios/Podfile")
+    cocoapods(podfile: './ios/Podfile')
     screenshot
-    build_app(scheme: "vpser", workspace:"./ios/vpser.xcworkspace", output_directory: "./ios/build", silent: true, clean: true) # more options available
+    build_app(
+      scheme: 'vpser',
+      workspace: './ios/vpser.xcworkspace',
+      output_directory: './ios/build',
+      silent: true,
+      clean: true
+    )
     upload_to_app_store(force: true)
   end
 
   # You can define as many lanes as you want
 
-  desc "Runs all the tests"
+  desc 'Runs all the tests'
   lane :test do
     run_tests
   end
@@ -135,7 +165,6 @@ platform :ios do
           payload: { Output: exception.error_info.to_s })
   end
 end
-
 
 # More information about multiple platforms in fastlane: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
 # All available actions: https://docs.fastlane.tools/actions

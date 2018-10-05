@@ -171,7 +171,7 @@ class RNSSH: RCTEventEmitter {
         }
 
         func channelShellDidClose(_ channel: NMSSHChannel) -> Void {
-            emitter!.sendEvent(withName: "Shell", body: ["key": key, "name": "Shell", "body": ["name": "cole"]] as [String: Any])
+            emitter!.sendEvent(withName: "Shell", body: ["key": key, "name": "Shell", "body": ["name": "close"]] as [String: Any])
         }
 
     }
