@@ -68,7 +68,6 @@ def sync_code_signings(options = {})
 end
 
 platform :ios do
-
   before_all do
     git_pull(only_tags: true)
   end
@@ -87,7 +86,7 @@ platform :ios do
   def change_log_since_last_tag
     # http://git-scm.com/docs/pretty-formats
     # <short hash> <commit title>
-    return changelog_from_git_commits(
+    changelog_from_git_commits(
       pretty: '%h %s',
       date_format: 'short',
       match_lightweight_tag: false,
@@ -100,7 +99,7 @@ platform :ios do
   end
 
   private_lane :verify_xcode_version do
-    ensure_xcode_version(version: REQUIRED_XCODE_VERSION)
+    ensure_xcode_version(version: '10')
   end
 
   keychain_name = ENV['KEYCHAIN_NAME']
@@ -135,7 +134,7 @@ platform :ios do
     load_keys
 
     ensure_git_branch(
-      branch: "(master|release\\S+|hotfix\\S+)"
+      branch: '(master|release\\S+|hotfix\\S+)'
     )
 
     ensure_git_status_clean
@@ -144,20 +143,70 @@ platform :ios do
 
     version_number = options[:version_number]
 
-    raise "Missing version number: use version_number parameter" unless version_number != nil
+    if version_number.nil?
+      # Get the recent tags of the branch as the version number
+      version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
+    end
 
-    # increment_build_number
-    prepare_version
-    # screenshot
-    # build your iOS app
-    build
-    upload_to_testflight(
-      changelog: change_log_since_last_tag,
-      beta_app_description: 'Vpser can help you manage your vps, support vultr',
-      beta_app_feedback_email: 'limaofeng@msn.com'
+    increment_version_number(
+      version_number: version_number,
+      xcodeproj: './ios/vpser.xcodeproj'
+    )
+    # Get testflight build_number + 1
+    build_number = latest_testflight_build_number(
+      version: version_number,
+      initial_build_number: get_build_number(xcodeproj: './ios/vpser.xcodeproj')
+    ) + 1
+    increment_build_number(
+      build_number: build_number,
+      xcodeproj: './ios/vpser.xcodeproj'
+    )
+    complete_version_number = version_string(version_number, build_number)
+
+    commit_version_bump(
+      message: "Version bump to #{complete_version_number}",
+      xcodeproj: './ios/vpser.xcodeproj'
     )
 
-    slack(message: 'App successfully released!')
+    change_log = "CHANGELOG TBD. Version: #{complete_version_number}"
+
+    skip_metadata = options[:skip_metadata]
+
+    if skip_metadata == true
+      Helper.log.info('Skipping taking screenshots and uploading metadata'.green)
+    else
+      clear_derived_data
+      screenshots
+      update_metadata
+    end
+
+    clean_build_artifacts
+    clear_derived_data
+
+    get_provisioning_profile(output_path: '/tmp')
+    build_app(
+      scheme: 'vpser',
+      workspace: './ios/vpser.xcworkspace',
+      configuration: 'Release',
+      output_directory: './ios/build',
+      silent: true,
+      clean: true
+    )
+
+    testflight(
+      changelog: change_log,
+      skip_submission: true,
+      distribute_external: false,
+      beta_app_feedback_email: 'limaofeng@msn.com',
+      beta_app_description: 'Vpser can help you manage your vps, support vultr'
+    )
+
+    slack(
+      message: "Submitted build of Fabric to TestFlight: v#{complete_version_number}",
+      channel: '#general'
+    )
+
+    rocket
   end
 
   desc '自动截图'
