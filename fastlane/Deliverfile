@@ -9,15 +9,15 @@
 # 1 app_identifier
 app_identifier "life.homeworld.app.vpser" # The bundle identifier of your app
 
-# 2 用户名,Apple ID电子邮件地址
-username "limaofeng@msn.com" # your Apple ID user
+# 2 Username, Apple ID Email
+username ENV["DELIVER_USERNAME"]
 
-# 3 支持语言
+# 3 Support language
 supportedLanguages = {
   "cmn-Hans" => "zh-Hans"
 }
 
-# 4 提交审核信息
+# 4 Submit review information
 submission_information({
   export_compliance_encryption_updated: false,
   export_compliance_uses_encryption: false,

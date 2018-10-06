@@ -33,6 +33,7 @@ android/build
 # fastlane
 fastlane/test_output/
 fastlane/report.xml
+fastlane/Preview.html
 fastlane/screenshots/*/*.png
 fastlane/screenshots/screenshots.html
 

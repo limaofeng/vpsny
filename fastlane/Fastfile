@@ -186,7 +186,7 @@ platform :ios do
       )
 
       slack(
-        message: "Submitted build of Fabric to TestFlight: v#{complete_version_number}",
+        message: "Submitted build of vpsny to TestFlight: v#{complete_version_number}",
         channel: '#general'
       )
     end
