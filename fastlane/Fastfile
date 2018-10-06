@@ -155,7 +155,7 @@ platform :ios do
       skip_metadata = options[:skip_metadata]
 
       if skip_metadata == true
-        Helper.log.info('Skipping taking screenshots and uploading metadata'.green)
+        UI.message('Skipping taking screenshots and uploading metadata'.green)
       else
         clear_derived_data
         screenshots
