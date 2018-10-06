@@ -20,53 +20,6 @@ generated_fastfile_id '10696c64-ce3d-48da-b71b-5ad26e08af52'
 
 default_platform :ios
 
-# Modify the version number and BUILD number
-def prepare_version(options = {})
-  initial_build_number = get_build_number(xcodeproj: './ios/vpser.xcodeproj')
-  if options[:version].nil?
-    # Get the recent tags of the branch as the version number
-    options[:version] = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
-  end
-  if options[:build].nil?
-    # Get testflight build_number + 1
-    options[:build] = latest_testflight_build_number(
-      version: options[:version],
-      initial_build_number: initial_build_number
-    ) + 1
-  end
-  increment_version_number(
-    version_number: options[:version],
-    xcodeproj: './ios/vpser.xcodeproj'
-  )
-  increment_build_number(
-    build_number: options[:build],
-    xcodeproj: './ios/vpser.xcodeproj'
-  )
-end
-
-# sync code signings
-def sync_code_signings(options = {})
-  if options[:type].is_a? String
-    sync_code_signing(
-      git_url: 'git@gitlab.com:homeworld.life/certificates.git',
-      app_identifier: 'life.homeworld.app.vpser',
-      keychain_name: options[:keychain_name],
-      keychain_password: options[:keychain_password],
-      type: options[:type],
-      clone_branch_directly: true,
-      readonly: true
-    )
-  else
-    options[:type].each do |type|
-      sync_code_signings(
-        type: type,
-        keychain_name: options[:keychain_name],
-        keychain_password: options[:keychain_password]
-      )
-    end
-  end
-end
-
 platform :ios do
   before_all do
     git_pull(only_tags: true)
@@ -102,126 +55,41 @@ platform :ios do
     ensure_xcode_version(version: '10')
   end
 
-  keychain_name = ENV['KEYCHAIN_NAME']
-  keychain_password = ENV['KEYCHAIN_PASSWORD']
-
   desc '获取最新的 证书 与 配置文件'
   lane :setup_signing do
-    # sync code signings
-    sync_code_signings(
-      type: %w[development appstore],
+    keychain_name = ENV['KEYCHAIN_NAME']
+    keychain_password = ENV['KEYCHAIN_PASSWORD']
+    sync_code_signing(
+      git_url: 'git@gitlab.com:homeworld.life/certificates.git',
+      app_identifier: 'life.homeworld.app.vpser',
       keychain_name: keychain_name,
-      keychain_password:
-      keychain_password
+      keychain_password: keychain_password,
+      type: 'development',
+      clone_branch_directly: true,
+      readonly: true
     )
-  end
-
-  desc '编译'
-  lane :build do
-    sh 'cd .. && ./bugfixs/runfixup.sh'
-    cocoapods(podfile: './ios/Podfile')
-    build_app(
-      scheme: 'vpser',
-      workspace: './ios/vpser.xcworkspace',
-      output_directory: './ios/build',
-      silent: true,
-      clean: true
+    sync_code_signing(
+      git_url: 'git@gitlab.com:homeworld.life/certificates.git',
+      app_identifier: 'life.homeworld.app.vpser',
+      keychain_name: keychain_name,
+      keychain_password: keychain_password,
+      type: 'appstore',
+      clone_branch_directly: true,
+      readonly: true
     )
-  end
-
-  desc '提交一个新的测试版本 Apple TestFlight'
-  lane :beta do |options|
-    load_keys
-
-    ensure_git_branch(
-      branch: '(master|release\\S+|hotfix\\S+)'
-    )
-
-    ensure_git_status_clean
-
-    verify_xcode_version
-
-    version_number = options[:version_number]
-
-    if version_number.nil?
-      # Get the recent tags of the branch as the version number
-      version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
-    end
-
-    increment_version_number(
-      version_number: version_number,
-      xcodeproj: './ios/vpser.xcodeproj'
-    )
-    # Get testflight build_number + 1
-    build_number = latest_testflight_build_number(
-      version: version_number,
-      initial_build_number: get_build_number(xcodeproj: './ios/vpser.xcodeproj')
-    ) + 1
-    increment_build_number(
-      build_number: build_number,
-      xcodeproj: './ios/vpser.xcodeproj'
-    )
-    complete_version_number = version_string(version_number, build_number)
-
-    commit_version_bump(
-      message: "Version bump to #{complete_version_number}",
-      xcodeproj: './ios/vpser.xcodeproj'
-    )
-
-    change_log = "CHANGELOG TBD. Version: #{complete_version_number}"
-
-    skip_metadata = options[:skip_metadata]
-
-    if skip_metadata == true
-      Helper.log.info('Skipping taking screenshots and uploading metadata'.green)
-    else
-      clear_derived_data
-      screenshots
-      update_metadata
-    end
-
-    clean_build_artifacts
-    clear_derived_data
-
-    get_provisioning_profile(output_path: '/tmp')
-    build_app(
-      scheme: 'vpser',
-      workspace: './ios/vpser.xcworkspace',
-      configuration: 'Release',
-      output_directory: './ios/build',
-      silent: true,
-      clean: true
-    )
-
-    testflight(
-      changelog: change_log,
-      skip_submission: true,
-      distribute_external: false,
-      beta_app_feedback_email: 'limaofeng@msn.com',
-      beta_app_description: 'Vpser can help you manage your vps, support vultr'
-    )
-
-    slack(
-      message: "Submitted build of Fabric to TestFlight: v#{complete_version_number}",
-      channel: '#general'
-    )
-
-    rocket
   end
 
   desc '自动截图'
-  lane :screenshot do
+  lane :screenshots do
+    load_keys
     capture_screenshots
     frame_screenshots
   end
 
-  desc '部署一个新版本到 App Store'
-  lane :release do
-    prepare_version
-    cocoapods(podfile: './ios/Podfile')
-    screenshot
-    build
-    upload_to_app_store(force: true)
+  lane :update_metadata do
+    load_keys
+
+    deliver
   end
 
   desc 'Runs all the tests'
@@ -232,6 +100,98 @@ platform :ios do
     )
   end
 
+  desc '提交一个新的测试版本 Apple TestFlight'
+  lane :beta do |options|
+    load_keys
+
+    only_build = options[:only_build]
+
+    ensure_git_branch(
+      branch: '(master|release\\S+|hotfix\\S+)'
+    )
+
+    unless only_build
+
+      ensure_git_status_clean
+
+      verify_xcode_version
+
+      version_number = options[:version_number]
+
+      if version_number.nil?
+        # Get the recent tags of the branch as the version number
+        version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
+      end
+
+      increment_version_number(
+        version_number: version_number,
+        xcodeproj: './ios/vpser.xcodeproj'
+      )
+      # Get testflight build_number + 1
+      build_number = latest_testflight_build_number(
+        version: version_number,
+        initial_build_number: get_build_number(xcodeproj: './ios/vpser.xcodeproj')
+      ) + 1
+      increment_build_number(
+        build_number: build_number,
+        xcodeproj: './ios/vpser.xcodeproj'
+      )
+      complete_version_number = version_string(version_number, build_number)
+
+      commit_version_bump(
+        message: "Version bump to #{complete_version_number}",
+        xcodeproj: './ios/vpser.xcodeproj'
+      )
+
+      change_log = "CHANGELOG TBD. Version: #{complete_version_number}"
+
+      skip_metadata = options[:skip_metadata]
+
+      if skip_metadata == true
+        Helper.log.info('Skipping taking screenshots and uploading metadata'.green)
+      else
+        clear_derived_data
+        screenshots
+        update_metadata
+      end
+
+      clean_build_artifacts
+      clear_derived_data
+    end
+
+    cocoapods(podfile: './ios/Podfile')
+    build_app(
+      scheme: 'vpser',
+      workspace: './ios/vpser.xcworkspace',
+      configuration: 'Release',
+      output_directory: './ios/build',
+      silent: true,
+      clean: true
+    )
+
+    unless only_build
+      testflight(
+        changelog: change_log,
+        skip_submission: true,
+        distribute_external: false,
+        beta_app_feedback_email: 'limaofeng@msn.com',
+        beta_app_description: 'Vpser can help you manage your vps, support vultr'
+      )
+
+      slack(
+        message: "Submitted build of Fabric to TestFlight: v#{complete_version_number}",
+        channel: '#general'
+      )
+    end
+
+    rocket
+  end
+
+  desc '部署一个新版本到 App Store'
+  lane :release do
+    appstore(force: true)
+  end
+
   # If the weekly task fails, then ship a message, a success would also send
   error do |_, exception|
     slack(message: "Error Deploying Emission: #{exception}",
@@ -239,9 +199,3 @@ platform :ios do
           payload: { Output: exception.error_info.to_s })
   end
 end
-
-# More information about multiple platforms in fastlane: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
-# All available actions: https://docs.fastlane.tools/actions
-
-# fastlane reports which actions are used. No personal data is recorded.
-# Learn more at https://docs.fastlane.tools/#metrics

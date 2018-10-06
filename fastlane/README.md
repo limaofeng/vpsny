@@ -21,31 +21,31 @@ or alternatively using `brew cask install fastlane`
 fastlane ios setup_signing
 ```
 获取最新的 证书 与 配置文件
-### ios build
+### ios screenshots
 ```
-fastlane ios build
-```
-编译
-### ios beta
-```
-fastlane ios beta
-```
-提交一个新的测试版本 Apple TestFlight
-### ios screenshot
-```
-fastlane ios screenshot
+fastlane ios screenshots
 ```
 自动截图
-### ios release
+### ios update_metadata
 ```
-fastlane ios release
+fastlane ios update_metadata
 ```
-部署一个新版本到 App Store
+
 ### ios test
 ```
 fastlane ios test
 ```
 Runs all the tests
+### ios beta
+```
+fastlane ios beta
+```
+提交一个新的测试版本 Apple TestFlight
+### ios release
+```
+fastlane ios release
+```
+部署一个新版本到 App Store
 
 ----
 
