@@ -16,7 +16,7 @@ min_fastlane_version('2.73.0')
 # This value helps us track success metrics for Fastfiles
 # we automatically generate. Feel free to remove this line
 # once you get things running smoothly!
-generated_fastfile_id "633f0d1b-935e-48c7-8427-73d5f5dad4d8"
+generated_fastfile_id '10696c64-ce3d-48da-b71b-5ad26e08af52'
 
 default_platform :ios
 
@@ -68,8 +68,39 @@ def sync_code_signings(options = {})
 end
 
 platform :ios do
+
   before_all do
-    ENV['SLACK_URL'] = 'https://hooks.slack.com/services/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'
+    git_pull(only_tags: true)
+  end
+
+  after_all do
+    push_git_tags
+  end
+
+  def load_keys
+    import('keys')
+  rescue StandardError => exception
+    UI.error('fastlane/keys file not found. To use this Fastfile, copy fastlane/keys.template into fastlane/keys and fill in the values')
+    raise exception
+  end
+
+  def change_log_since_last_tag
+    # http://git-scm.com/docs/pretty-formats
+    # <short hash> <commit title>
+    return changelog_from_git_commits(
+      pretty: '%h %s',
+      date_format: 'short',
+      match_lightweight_tag: false,
+      merge_commit_filtering: 'exclude_merges'
+    )
+  end
+
+  def version_string(version_number, build_number)
+    "#{version_number} (#{build_number})"
+  end
+
+  private_lane :verify_xcode_version do
+    ensure_xcode_version(version: REQUIRED_XCODE_VERSION)
   end
 
   keychain_name = ENV['KEYCHAIN_NAME']
@@ -100,25 +131,33 @@ platform :ios do
   end
 
   desc '提交一个新的测试版本 Apple TestFlight'
-  lane :beta do
+  lane :beta do |options|
+    load_keys
+
+    ensure_git_branch(
+      branch: "(master|release\\S+|hotfix\\S+)"
+    )
+
+    ensure_git_status_clean
+
+    verify_xcode_version
+
+    version_number = options[:version_number]
+
+    raise "Missing version number: use version_number parameter" unless version_number != nil
+
     # increment_build_number
     prepare_version
     # screenshot
     # build your iOS app
     build
     upload_to_testflight(
-      changelog: changelog_from_git_commits(
-        between: %w[b6ba8402 HEAD],
-        pretty: '- %s',
-        date_format: 'short',
-        match_lightweight_tag: false,
-        merge_commit_filtering: 'exclude_merges'
-      ),
+      changelog: change_log_since_last_tag,
       beta_app_description: 'Vpser can help you manage your vps, support vultr',
       beta_app_feedback_email: 'limaofeng@msn.com'
     )
 
-    slack(message: "App successfully released!")
+    slack(message: 'App successfully released!')
   end
 
   desc '自动截图'
@@ -136,19 +175,12 @@ platform :ios do
     upload_to_app_store(force: true)
   end
 
-  # You can define as many lanes as you want
-
   desc 'Runs all the tests'
   lane :test do
-    run_tests
-  end
-
-  after_all do |lane|
-    # This block is called, only if the executed lane was successful
-
-    # slack(
-    #   message: "Successfully deployed new App Update."
-    # )
+    scan(
+      workspace: './ios/vpser.xcworkspace',
+      devices: ['iPhone X']
+    )
   end
 
   # If the weekly task fails, then ship a message, a success would also send

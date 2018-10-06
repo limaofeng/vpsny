@@ -21,13 +21,11 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>16</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<string>17</string>
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
-		<string>4cb1ea9f94998b37a4e1ce9ea657eb4ccc3b24f6</string>
+		<string>52c931deeb500707b410de871a02cb6929fe9856</string>
 		<key>Kits</key>
 		<array>
 			<dict>
@@ -44,6 +42,8 @@
 			</dict>
 		</array>
 	</dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
