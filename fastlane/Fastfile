@@ -116,6 +116,10 @@ platform :ios do
 
       verify_xcode_version
 
+      pre_version_number = get_version_number(xcodeproj: './ios/vpser.xcodeproj')
+      pre_build_number = get_build_number(xcodeproj: './ios/vpser.xcodeproj')
+      pre_complete_version_number = version_string(pre_version_number, pre_build_number)
+      
       version_number = options[:version_number]
 
       if version_number.nil?
@@ -128,9 +132,10 @@ platform :ios do
         xcodeproj: './ios/vpser.xcodeproj'
       )
       # Get testflight build_number + 1
+      initial_build_number = get_build_number(xcodeproj: './ios/vpser.xcodeproj')
       build_number = latest_testflight_build_number(
         version: version_number,
-        initial_build_number: get_build_number(xcodeproj: './ios/vpser.xcodeproj')
+        initial_build_number: initial_build_number
       ) + 1
       increment_build_number(
         build_number: build_number,
@@ -138,10 +143,12 @@ platform :ios do
       )
       complete_version_number = version_string(version_number, build_number)
 
-      commit_version_bump(
-        message: "Version bump to #{complete_version_number}",
-        xcodeproj: './ios/vpser.xcodeproj'
-      )
+      if pre_complete_version_number != complete_version_number
+        commit_version_bump(
+          message: "Version bump to #{complete_version_number}",
+          xcodeproj: './ios/vpser.xcodeproj'
+        )
+      end
 
       change_log = "CHANGELOG TBD. Version: #{complete_version_number}"
 
