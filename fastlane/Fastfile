@@ -149,7 +149,7 @@ platform :ios do
           message: "Version bump to #{complete_version_number}",
           xcodeproj: './ios/vpser.xcodeproj'
         )
-        add_git_tag(tag: complete_version_number)
+        add_git_tag(tag: version_number)
       end
 
       change_log = change_log_since_last_tag(pre_version_number)
