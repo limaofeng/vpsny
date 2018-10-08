@@ -41,6 +41,7 @@ platform :ios do
     # <short hash> <commit title>
     changelog_from_git_commits(
       pretty: '%h %s',
+      commits_count: sh("git cherry origin/master | wc -l").to_i,
       date_format: 'short',
       match_lightweight_tag: false,
       merge_commit_filtering: 'exclude_merges'
