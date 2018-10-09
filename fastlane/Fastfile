@@ -152,8 +152,7 @@ platform :ios do
           xcodeproj: './ios/vpser.xcodeproj'
         )
         git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
-        if git_version_number != version_number
-          add_git_tag(tag: version_number)
+        add_git_tag(tag: version_number) if git_version_number != version_number
       end
 
       change_log = change_log_since_last_tag(pre_version_number)
