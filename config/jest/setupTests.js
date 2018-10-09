@@ -9,11 +9,24 @@ import AsyncStorage from './AsyncStorage';
 jest.mock('NativeModules', () => ({
   RNVectorIconsManager: {
     getImageForFont: jest.fn(),
+    setupFontAwesome5: jest.fn(),
     loadFontWithFileName: jest.fn()
   },
   RNVectorIconsModule: {
     getImageForFont: jest.fn(),
     loadFontWithFileName: jest.fn()
+  },
+  SMXCrashlytics: {
+    crash: jest.fn(),
+    throwException: jest.fn()
+  },
+  RNSSH: {},
+  RNAudio: {},
+  RNSound: {
+    IsAndroid: false,
+    IsWindows: false,
+    setCategory: jest.fn(),
+    prepare: jest.fn()
   },
   SourceCode: {
     scriptURL: null
@@ -24,6 +37,7 @@ jest.mock('NativeModules', () => ({
   }
 }));
 
+global.window = {};
 const storage = new AsyncStorage();
 jest.doMock('AsyncStorage', () => storage);
 
@@ -32,7 +46,7 @@ jest.mock('Linking', () => ({
   removeEventListener: jest.fn(),
   openURL: jest.fn(),
   canOpenURL: jest.fn(),
-  getInitialURL: jest.fn().mockImplementation(value => Promise.resolve(value))
+  getInitialURL: jest.fn().mockImplementation((value: string) => Promise.resolve(value))
 }));
 
 jest.mock('ScrollView', () => {

@@ -44,6 +44,7 @@ vendor/bundle
 # Test
 __snapshots__
 coverage
+.jest
 
 # realm
 realm-object-server
