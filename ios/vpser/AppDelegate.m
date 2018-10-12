@@ -35,7 +35,7 @@
     [Fabric with:@[[Crashlytics class]]];
     [Fabric with:@[[Answers class]]];
     [self.window makeKeyAndVisible];
-    [RNSplashScreen show];
+//    [RNSplashScreen show];
     return YES;
 }
 

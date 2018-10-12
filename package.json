@@ -17,7 +17,7 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "test": "jest --detectOpenHandles  --forceExit",
+    "test": "jest --detectOpenHandles",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
@@ -70,6 +70,7 @@
     "husky": "^0.14.3",
     "jest": "^23.5.0",
     "lint-staged": "^7.2.2",
+    "node-fetch": "^2.2.0",
     "prettier": "^1.14.2",
     "react-dom": "^16.3.2",
     "react-native-typescript-transformer": "^1.2.10",
@@ -107,9 +108,7 @@
     "setupFiles": [
       "<rootDir>/config/jest/setupTests.js"
     ],
-    "testMatch": [
-      "<rootDir>/__tests__/**/*.test.ts?(x)"
-    ],
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "transform": {
       "^.+\\.(js|jsx)$": "<rootDir>/node_modules/babel-jest",
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js",

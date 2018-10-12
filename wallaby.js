@@ -1,8 +1,16 @@
 module.exports = wallaby => ({
-  files: [{ pattern: 'src/**/*.+(json|jpg|jpeg|gif|png|svg)', instrument: false }, 'config/**/*.js', 'src/**/*.js?(x)'],
-  tests: ['tests/**/*.test.js?(x)'],
+  files: [
+    { pattern: 'src/**/*.+(json|png|svg|js|html|yaml|css)', instrument: false },
+    'config/**/*.js',
+    'src/**/*.ts?(x)',
+    '!src/**/*.test.ts?(x)'
+  ],
+  tests: ['src/**/*.test.ts?(x)', '!src/__tests__/*.test.ts?(x)'],
   compilers: {
-    '**/*.js?(x)': wallaby.compilers.babel({ babel: require('babel-core') })
+    'config/**/*.js?(x)': wallaby.compilers.babel({ babel: require('babel-core') }),
+    '**/*.ts?(x)': wallaby.compilers.typeScript({
+      useStandardDefaults: true
+    })
   },
   env: {
     type: 'node',
@@ -13,6 +21,10 @@ module.exports = wallaby => ({
     const jestConfig = require('./package.json').jest;
     jestConfig.globals = { __DEV__: true };
     wallaby.testFramework.configure(jestConfig);
+  },
+  workers: {
+    initial: 6,
+    regular: 2
   },
   debug: true
 });
