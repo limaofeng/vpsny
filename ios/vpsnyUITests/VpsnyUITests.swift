@@ -1,6 +1,6 @@
 //
-//  vpserUITests.swift
-//  vpserUITests
+//  vpsnyUITests.swift
+//  vpsnyUITests
 //
 //  Created by 李茂峰 on 17/01/2018.
 //  Copyright © 2018 Facebook. All rights reserved.
@@ -8,7 +8,7 @@
 
 import XCTest
 
-class vpserUITests: XCTestCase {
+class VpsnyUITests: XCTestCase {
 
     override func setUp() {
         super.setUp()

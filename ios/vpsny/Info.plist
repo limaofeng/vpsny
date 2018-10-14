@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>vpser</string>
+	<string>vpsny</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -61,7 +61,7 @@
 	<string></string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>vpser-icons.ttf</string>
+		<string>vpsny-icons.ttf</string>
 		<string>Aldrichregular.ttf</string>
 		<string>Ionicons.ttf</string>
 		<string>EvilIcons.ttf</string>

@@ -1,6 +1,6 @@
 //
 //  SSHClient.swift
-//  vpser
+//  vpsny
 //
 //  Created by 李茂峰 on 2018/10/2.
 //  Copyright © 2018 Facebook. All rights reserved.

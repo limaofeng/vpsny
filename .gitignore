@@ -13,6 +13,7 @@ yarn-error.log*
 
 # ios
 ios/.idea/
+ios/vpsny.xcworkspace/contents.xcworkspacedata
 xcshareddata/
 xcuserdata/
 ios/Pods

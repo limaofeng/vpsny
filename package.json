@@ -1,5 +1,5 @@
 {
-  "name": "vpser",
+  "name": "vpsny",
   "version": "0.0.2",
   "license": "MIT",
   "author": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:limaofeng/vpser.git"
+    "url": "git@github.com:limaofeng/vpsny.git"
   },
   "scripts": {
     "precommit": "lint-staged",
