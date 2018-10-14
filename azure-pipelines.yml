@@ -14,7 +14,7 @@ steps:
   inputs:
     versionSpec: $(node_version)
 
-- script: npm install
+- script: yarn install
 
 # - task: Xcode@5
 #   inputs:
