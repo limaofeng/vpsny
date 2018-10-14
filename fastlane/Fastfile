@@ -98,7 +98,7 @@ platform :ios do
   desc 'Runs all the tests'
   lane :test do
     scan(
-      workspace: './ios/vpser.xcworkspace',
+      workspace: './ios/vpsny.xcworkspace',
       devices: ['iPhone X']
     )
   end
@@ -119,8 +119,8 @@ platform :ios do
 
       verify_xcode_version
 
-      pre_version_number = get_version_number(xcodeproj: './ios/vpser.xcodeproj')
-      pre_build_number = get_build_number(xcodeproj: './ios/vpser.xcodeproj')
+      pre_version_number = get_version_number(xcodeproj: './ios/vpsny.xcodeproj')
+      pre_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
       pre_complete_version_number = version_string(pre_version_number, pre_build_number)
 
       version_number = options[:version_number]
@@ -132,24 +132,24 @@ platform :ios do
 
       increment_version_number(
         version_number: version_number,
-        xcodeproj: './ios/vpser.xcodeproj'
+        xcodeproj: './ios/vpsny.xcodeproj'
       )
       # Get testflight build_number + 1
-      # initial_build_number = get_build_number(xcodeproj: './ios/vpser.xcodeproj')
+      # initial_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
       build_number = latest_testflight_build_number(
         version: version_number
         # initial_build_number: initial_build_number
       ) + 1
       increment_build_number(
         build_number: build_number,
-        xcodeproj: './ios/vpser.xcodeproj'
+        xcodeproj: './ios/vpsny.xcodeproj'
       )
       complete_version_number = version_string(version_number, build_number)
 
       if pre_complete_version_number != complete_version_number
         commit_version_bump(
           message: "Version bump to #{complete_version_number}",
-          xcodeproj: './ios/vpser.xcodeproj'
+          xcodeproj: './ios/vpsny.xcodeproj'
         )
         git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
         add_git_tag(tag: version_number) if git_version_number != version_number
@@ -173,8 +173,8 @@ platform :ios do
 
     cocoapods(podfile: './ios/Podfile')
     build_app(
-      scheme: 'vpser',
-      workspace: './ios/vpser.xcworkspace',
+      scheme: 'vpsny',
+      workspace: './ios/vpsny.xcworkspace',
       configuration: 'Release',
       output_directory: './ios/build',
       silent: true,
@@ -187,7 +187,7 @@ platform :ios do
         skip_submission: true,
         distribute_external: false,
         beta_app_feedback_email: 'limaofeng@msn.com',
-        beta_app_description: 'Vpser can help you manage your vps, support vultr'
+        beta_app_description: 'vpsny can help you manage your vps, support vultr'
       )
 
       slack(

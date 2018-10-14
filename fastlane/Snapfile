@@ -16,7 +16,7 @@ languages([
 ])
 
 # The name of the scheme which contains the UI Tests
-scheme "vpserUITests"
+scheme "vpsnyUITests"
 
 configuration "Release"
 
@@ -26,8 +26,8 @@ output_directory "./fastlane/screenshots"
 # clear_previous_screenshots true # remove the '#' to clear all previously generated screenshots before creating new ones
 
 # Choose which project/workspace to use
-# project "./ios/vpser.xcodeproj"
-workspace "./ios/vpser.xcworkspace"
+# project "./ios/vpsny.xcodeproj"
+workspace "./ios/vpsny.xcworkspace"
 
 # Arguments to pass to the app on launch. See https://docs.fastlane.tools/actions/snapshot/#launch-arguments
 # launch_arguments([
