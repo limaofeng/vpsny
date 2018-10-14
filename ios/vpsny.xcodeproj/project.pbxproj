@@ -13,14 +13,14 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		1DD03527AC6C867D04320518 /* libPods-vpsny.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B925F31AA0C73EDACCE3D09B /* libPods-vpsny.a */; };
 		BF1A7869205614C3007D27CA /* vpsny-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF1A7868205614C3007D27CA /* vpsny-icons.ttf */; };
-		BF6F830F2163867B0081CF51 /* SSHClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF6F830E2163867B0081CF51 /* SSHClient.swift */; };
-		BF9AEA0A2161D7A8005CD6B5 /* RNAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */; };
-		BF9AEA0C2161D8B7005CD6B5 /* RNAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */; };
-		BFB43B43215B1D8400516B59 /* RNSSH.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFB43B42215B1D8400516B59 /* RNSSH.swift */; };
-		BFB43B45215B1EFB00516B59 /* RNSSH.m in Sources */ = {isa = PBXBuildFile; fileRef = BFB43B44215B1EFB00516B59 /* RNSSH.m */; };
 		BFD3DC6A200F4C6100ED2CDD /* VpsnyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC69200F4C6100ED2CDD /* VpsnyUITests.swift */; };
 		BFD3DC72200F4DC900ED2CDD /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */; };
 		BFE219752144EF8400578B45 /* Aldrichregular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BFE219742144EF8400578B45 /* Aldrichregular.ttf */; };
+		BFF5048C2173600A005E8B84 /* RNAudio.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF5048A2173600A005E8B84 /* RNAudio.m */; };
+		BFF5048D2173600A005E8B84 /* RNAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF5048B2173600A005E8B84 /* RNAudio.swift */; };
+		BFF50494217360B4005E8B84 /* RNSSH.m in Sources */ = {isa = PBXBuildFile; fileRef = BFF50490217360B4005E8B84 /* RNSSH.m */; };
+		BFF50495217360B4005E8B84 /* SSHClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF50491217360B4005E8B84 /* SSHClient.swift */; };
+		BFF50496217360B4005E8B84 /* RNSSH.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF50492217360B4005E8B84 /* RNSSH.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,17 +45,17 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = vpsny/main.m; sourceTree = "<group>"; };
 		B925F31AA0C73EDACCE3D09B /* libPods-vpsny.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vpsny.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF1A7868205614C3007D27CA /* vpsny-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "vpsny-icons.ttf"; sourceTree = "<group>"; };
-		BF6F830E2163867B0081CF51 /* SSHClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHClient.swift; sourceTree = "<group>"; };
-		BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNAudio.swift; sourceTree = "<group>"; };
-		BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNAudio.m; sourceTree = "<group>"; };
-		BFB43B41215B1D8400516B59 /* vpsny-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vpsny-Bridging-Header.h"; sourceTree = "<group>"; };
-		BFB43B42215B1D8400516B59 /* RNSSH.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNSSH.swift; sourceTree = "<group>"; };
-		BFB43B44215B1EFB00516B59 /* RNSSH.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNSSH.m; sourceTree = "<group>"; };
 		BFD3DC67200F4C6100ED2CDD /* vpsnyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vpsnyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD3DC69200F4C6100ED2CDD /* VpsnyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VpsnyUITests.swift; sourceTree = "<group>"; };
 		BFD3DC6B200F4C6100ED2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = ../../fastlane/SnapshotHelper.swift; sourceTree = "<group>"; };
 		BFE219742144EF8400578B45 /* Aldrichregular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Aldrichregular.ttf; sourceTree = "<group>"; };
+		BFF5048A2173600A005E8B84 /* RNAudio.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNAudio.m; path = vpsny/RNAudio.m; sourceTree = "<group>"; };
+		BFF5048B2173600A005E8B84 /* RNAudio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNAudio.swift; path = vpsny/RNAudio.swift; sourceTree = "<group>"; };
+		BFF50490217360B4005E8B84 /* RNSSH.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNSSH.m; path = vpsny/RNSSH.m; sourceTree = "<group>"; };
+		BFF50491217360B4005E8B84 /* SSHClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SSHClient.swift; path = vpsny/SSHClient.swift; sourceTree = "<group>"; };
+		BFF50492217360B4005E8B84 /* RNSSH.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNSSH.swift; path = vpsny/RNSSH.swift; sourceTree = "<group>"; };
+		BFF504B721736238005E8B84 /* vpsny-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "vpsny-Bridging-Header.h"; path = "vpsny/vpsny-Bridging-Header.h"; sourceTree = "<group>"; };
 		F54A2C10A59983F336641983 /* Pods-vpsny.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpsny.debug.xcconfig"; path = "Pods/Target Support Files/Pods-vpsny/Pods-vpsny.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -89,12 +89,12 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				BFB43B42215B1D8400516B59 /* RNSSH.swift */,
-				BF6F830E2163867B0081CF51 /* SSHClient.swift */,
-				BF9AEA092161D7A8005CD6B5 /* RNAudio.swift */,
-				BFB43B41215B1D8400516B59 /* vpsny-Bridging-Header.h */,
-				BF9AEA0B2161D8B7005CD6B5 /* RNAudio.m */,
-				BFB43B44215B1EFB00516B59 /* RNSSH.m */,
+				BFF5048A2173600A005E8B84 /* RNAudio.m */,
+				BFF5048B2173600A005E8B84 /* RNAudio.swift */,
+				BFF50490217360B4005E8B84 /* RNSSH.m */,
+				BFF50492217360B4005E8B84 /* RNSSH.swift */,
+				BFF50491217360B4005E8B84 /* SSHClient.swift */,
+				BFF504B721736238005E8B84 /* vpsny-Bridging-Header.h */,
 			);
 			name = vpsny;
 			sourceTree = "<group>";
@@ -377,13 +377,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFF50494217360B4005E8B84 /* RNSSH.m in Sources */,
+				BFF50495217360B4005E8B84 /* SSHClient.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				BF9AEA0A2161D7A8005CD6B5 /* RNAudio.swift in Sources */,
-				BF6F830F2163867B0081CF51 /* SSHClient.swift in Sources */,
-				BF9AEA0C2161D8B7005CD6B5 /* RNAudio.m in Sources */,
-				BFB43B43215B1D8400516B59 /* RNSSH.swift in Sources */,
-				BFB43B45215B1EFB00516B59 /* RNSSH.m in Sources */,
+				BFF50496217360B4005E8B84 /* RNSSH.swift in Sources */,
+				BFF5048D2173600A005E8B84 /* RNAudio.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				BFF5048C2173600A005E8B84 /* RNAudio.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,7 +446,7 @@
 				PROVISIONING_PROFILE = "91c344c5-9c07-4835-9838-8729f87c141e";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development life.homeworld.app.vpser";
 				RESOURCES_TARGETED_DEVICE_FAMILY = "";
-				SWIFT_OBJC_BRIDGING_HEADER = "vpsny-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "vpsny/vpsny-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -479,7 +479,7 @@
 				PRODUCT_NAME = vpsny;
 				PROVISIONING_PROFILE = "12cf0d2b-025f-499a-b48c-fb0c1b7d7013";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore life.homeworld.app.vpser";
-				SWIFT_OBJC_BRIDGING_HEADER = "vpsny-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "vpsny/vpsny-Bridging-Header.h";
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
