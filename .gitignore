@@ -32,6 +32,7 @@ android/app/build
 android/build
 
 # fastlane
+fastlane/keys
 fastlane/test_output/
 fastlane/report.xml
 fastlane/Preview.html

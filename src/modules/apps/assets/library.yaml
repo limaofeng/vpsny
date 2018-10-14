@@ -1,0 +1,38 @@
+id: library
+name: library
+description: 自带
+apps:
+  - name: nginx
+    logo: 'https://xxx'
+    description: sdf
+    fullDescription: sdf
+    image: nginx
+    tags:
+      - latest
+    ports:
+      - docker: 80
+        name: 说明
+    envs:
+      - key: null
+        name: 说明
+    links:
+      - alias: 123
+        name: 123123
+    volumes:
+      - dest: /123123
+        name: 123123
+  - name: 123123
+    description: sdf
+    fullDescription: sdf
+    image: sdf
+    tags:
+      - latest
+    ports:
+      - docker: 80
+        name: 外网
+    links:
+      - alias: 123
+        name: 123123
+    volumes:
+      - dest: /123123
+        name: 123123

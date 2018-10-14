@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16">
+    <g fill-rule="evenodd">
+        <rect width="16" height="14" y="1" rx="2"/>
+        <path fill="#FFF" d="M7 7.75h3.273v1H7zM4.477 6.373l-1.73 1.73.589.59L5.65 6.378l-.022-.021.006-.005L3.32 4.037l-.59.59 1.747 1.746z"/>
+    </g>
+</svg>
