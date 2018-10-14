@@ -13,6 +13,10 @@ steps:
 - task: NodeTool@0 
   inputs:
     versionSpec: $(node_version)
+- task: UseRubyVersion@0
+  inputs:
+    versionSpec: '>= 2.4'
+    addToPath: true
 
 - script: yarn install
 
