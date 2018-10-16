@@ -11,18 +11,19 @@ import HeaderLeftClose from '../../../components/HeaderLeftClose';
 import SubmitButtonWrapper, { SubmitButton } from '../../../components/SubmitButton';
 import Theme, { withTheme } from '../../../components/Theme';
 import { APIKey, User, Bill } from '../Agent';
-import { AWSAPIKey, AWSLightsailAgent } from '../AWSProvider';
-import ConnectToAWSLightsail from '../components/ConnectToAWSLightsail';
-import ConnectToVultr from '../components/ConnectToVultr';
+import { AWSAPIKey, AWSLightsailAgent, AWSOptions } from '../AWSProvider';
+import AWSLightsailNew from '../components/AWSLightsailNew';
+import VultrNew from '../components/VultrNew';
 import { Account } from '../type';
 import { VultrAgent, VultrAPIKey } from '../VultrProvider';
 import { AppState } from '@modules';
+import { Region } from '../Provider';
 
 interface AccountNewProps {
   dispatch: Dispatch;
   navigation: NavigationScreenProp<any>;
   provider: 'vultr' | 'lightsail';
-  addAccount: (user: User) => void;
+  addAccount: (account: Account) => void;
   goBack: (user?: User) => void;
   findAccountByApiKey: (apiKey: APIKey) => Account | undefined;
   theme?: Theme;
@@ -33,6 +34,8 @@ interface AccountNewState {
   bill?: Bill;
   status: 'initialize' | 'success';
   apiKey?: APIKey;
+  regions?: Region[];
+  options?: AWSOptions;
 }
 
 class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
@@ -40,9 +43,13 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
   static navigationOptions = ({ navigation }: AccountNewProps): NavigationScreenOptions => {
     return {
       headerTitle: 'Add Account',
-      headerLeft: <HeaderLeftClose onPress={() => {
-        navigation.popToTop();
-      }}/>
+      headerLeft: (
+        <HeaderLeftClose
+          onPress={() => {
+            navigation.popToTop();
+          }}
+        />
+      )
     };
   };
   submit = React.createRef<SubmitButton>();
@@ -56,12 +63,16 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
     };
   }
 
+  componentDidMount() {
+    this.submit.current!.disable();
+  }
+
   handleValueChange = (value: string) => {
     this.setState({ apiKey: value });
   };
 
-  handleAPIKeyChange = (apiKey?: APIKey) => {
-    this.setState({ apiKey });
+  handleAPIKeyChange = (apiKey?: APIKey, options: any = {}) => {
+    this.setState({ apiKey, options });
     if (apiKey) {
       this.submit.current!.enable();
     } else {
@@ -112,11 +123,23 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
 
   handleSaveForLightsail = async () => {
     const { addAccount, dispatch } = this.props;
+    const { apiKey, options } = this.state;
     const submit = this.submit.current!;
-    const apiKey = this.state.apiKey as AWSAPIKey;
-    const api = new AWSLightsailAgent(apiKey);
+    const api = new AWSLightsailAgent(apiKey as AWSAPIKey, options!);
     const user = await api.user();
-    addAccount(user);
+    addAccount({
+      id: user.id,
+      title: 'AWS Lightsail',
+      apiKey: user.apiKey,
+      name: user.name,
+      email: user.email,
+      provider: 'lightsail',
+      sshkeys: [],
+      settings: {
+        defaultRegion: options!.defaultRegion
+      }
+    });
+    this.setState({ user });
     setApi(api.id, api);
     submit.submittingText('Pulling SSH Keys');
     const sshkeys = await api.sshkeys();
@@ -124,6 +147,7 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
     submit.submittingText('Pulling Instances');
     const instances = await api.instance.list();
     await dispatch({ type: 'cloud/instances', payload: { instances } });
+    this.setState({ status: 'success' });
   };
 
   handleSaveForVultr = async () => {
@@ -132,7 +156,15 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
     const submit = this.submit.current as SubmitButton;
     const api = new VultrAgent(apiKey!);
     const user = await api.user();
-    addAccount(user);
+    addAccount({
+      id: user.id,
+      title: 'Vultr',
+      apiKey: user.apiKey,
+      name: user.name,
+      email: user.email,
+      provider: 'vultr',
+      sshkeys: []
+    });
     setApi(api.id, api);
     this.setState({ user });
     submit.submittingText('Pulling Bill');
@@ -150,12 +182,12 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
   render() {
     const { provider } = this.props;
     const { colors } = this.props.theme as Theme;
-    const { user, bill } = this.state;
+    const { user, bill, regions } = this.state;
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
         <ScrollView style={{ flex: 1, paddingTop: 13 }}>
-          {provider === 'vultr' && <ConnectToVultr user={user} bill={bill} onChangeAPIKey={this.handleAPIKeyChange} />}
-          {provider === 'lightsail' && <ConnectToAWSLightsail onChangeAPIKey={this.handleAPIKeyChange} />}
+          {provider === 'vultr' && <VultrNew user={user} bill={bill} onChangeAPIKey={this.handleAPIKeyChange} />}
+          {provider === 'lightsail' && <AWSLightsailNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
           <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
             <SubmitButtonWrapper
               style={{ width: Dimensions.get('window').width - 40 }}
@@ -189,8 +221,8 @@ const mapStateToProps = ({ cloud: { accounts }, nav: { routes } }: AppState, { n
     },
     goBack(user?: User) {
       const accountNewRoute = routes[routes.length - 1];
-        navigation.goBack(accountNewRoute.key);
-        callback && callback(user);
+      navigation.goBack(accountNewRoute.key);
+      callback && callback(user);
     }
   };
 };
@@ -198,8 +230,8 @@ const mapStateToProps = ({ cloud: { accounts }, nav: { routes } }: AppState, { n
 const mapDispatchToProps = (dispatch: Dispatch, { navigation }: AccountNewProps) => {
   const provider = navigation.getParam('provider') || 'lightsail';
   return {
-    addAccount(user: User) {
-      dispatch({ type: 'cloud/addAccount', payload: { ...user, provider } });
+    addAccount(account: Account) {
+      dispatch({ type: 'cloud/addAccount', payload: { ...account, provider } });
     },
     dispatch
   };

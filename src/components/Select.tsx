@@ -263,11 +263,12 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
             }}
           />
         </View>
-        {value && !this.props.hideClearButton && (
-          <TouchableOpacity activeOpacity={1} onPress={this.handleCleanValue}>
-            <Ionicons style={{ marginTop: 2, marginRight: 10 }} color="#CCCCCC" size={17} name="ios-close-circle" />
-          </TouchableOpacity>
-        )}
+        {value &&
+          !this.props.hideClearButton && (
+            <TouchableOpacity activeOpacity={1} onPress={this.handleCleanValue}>
+              <Ionicons style={{ marginTop: 2, marginRight: 10 }} color="#CCCCCC" size={17} name="ios-close-circle" />
+            </TouchableOpacity>
+          )}
         {this.renderIcon()}
       </View>
     );
@@ -300,10 +301,12 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
           {this.renderDoneBar()}
           <View style={[styles.modalViewBottom, style.modalViewBottom]}>
             <Picker
-              itemStyle={{
-                fontSize: 14,
-                color: '#24262C'
-              }}
+              itemStyle={
+                {
+                  fontSize: 14,
+                  color: '#24262C'
+                } as any
+              }
               onValueChange={this.handleValueChange}
               selectedValue={this.state.selectedItem.value}
               testID="RNPickerSelectIOS"
@@ -404,7 +407,6 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 13,
-    paddingLeft: 10,
     textAlign: 'left',
     color: '#363b40'
   },

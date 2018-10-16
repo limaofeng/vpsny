@@ -1,12 +1,13 @@
 import React from 'react';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions, NavigationRoute } from 'react-navigation';
-import { StyleSheet, ScrollView, Text, View, Alert, Dimensions, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
+
 import Theme, { withTheme } from './Theme';
 
 interface BottomRegionProps {
   theme?: Theme;
   height?: number;
   isVisible?: boolean;
+  backgroundColor?: string;
 }
 
 class BottomRegion extends React.Component<BottomRegionProps> {
@@ -16,14 +17,14 @@ class BottomRegion extends React.Component<BottomRegionProps> {
   };
   render() {
     const { colors } = this.props.theme!;
-    const { height = 60, children, isVisible = true } = this.props;
+    const { height = 60, children, isVisible = true, backgroundColor = colors.backgroundColor } = this.props;
     return isVisible ? (
       <View
         style={[
           {
             marginBottom: -35,
             height: height + 35,
-            backgroundColor: colors.backgroundColor
+            backgroundColor
           }
         ]}
       >
@@ -31,7 +32,7 @@ class BottomRegion extends React.Component<BottomRegionProps> {
           style={[
             {
               height: height + 10,
-              backgroundColor: colors.backgroundColor,
+              backgroundColor,
               shadowColor: 'rgba(0, 0, 0, 0.04)',
               shadowOffset: {
                 width: 0,

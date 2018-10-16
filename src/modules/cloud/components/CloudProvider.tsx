@@ -1,11 +1,10 @@
 import React from 'react';
-import { NavigationActions } from 'react-navigation';
-import { SafeAreaView, NavigationScreenOptions, NavigationScreenProps } from 'react-navigation';
-import { StyleSheet, ScrollView, Text, View, TouchableHighlight } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { NavigationActions, NavigationScreenOptions } from 'react-navigation';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
 import Svg from '../../../components/Svg';
-import { Dispatch } from 'redux';
 
 interface CloudProviderProps {
   name: string;
@@ -30,7 +29,6 @@ class CloudProvider extends React.Component<CloudProviderProps> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundColor,
     paddingLeft: 20,
     paddingRight: 16,
     paddingTop: 13

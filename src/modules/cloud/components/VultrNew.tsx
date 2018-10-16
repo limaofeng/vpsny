@@ -7,30 +7,25 @@ import { APIKey, User, Bill } from '../Agent';
 import { VultrAPIKey } from '../VultrProvider';
 import { format } from '../../../utils/index';
 
-interface ConnectToVultrProps {
+interface VultrNewProps {
   theme?: Theme;
   user?: User;
   bill?: Bill;
   onChangeAPIKey: (apiKey?: APIKey) => void;
 }
 
-interface ConnectToVultrState {
+interface VultrNewState {
   apiKey?: string;
 }
 
-class ConnectToVultr extends React.Component<ConnectToVultrProps, ConnectToVultrState> {
-  constructor(props: ConnectToVultrProps) {
+class VultrNew extends React.Component<VultrNewProps, VultrNewState> {
+  constructor(props: VultrNewProps) {
     super(props);
     this.state = {
       apiKey: ''
     };
   }
-  componentDidMount() {
-    setTimeout(() => {
-      this.handleAPIKey(this.state.apiKey);
-    }, 1000);
-  }
-  handleAPIKey(apiKey?: string) {
+  handleAPIKey = (apiKey?: string) => {
     const { onChangeAPIKey } = this.props;
     this.setState({ apiKey });
     if (apiKey) {
@@ -51,7 +46,7 @@ class ConnectToVultr extends React.Component<ConnectToVultrProps, ConnectToVultr
           </Item>
         </List>
         {!!user && (
-          <List title="Profile">
+          <List title="Info">
             <Item>
               <Label>Name</Label>
               <Note>{user!.name}</Note>
@@ -101,4 +96,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default withTheme(ConnectToVultr);
+export default withTheme(VultrNew);

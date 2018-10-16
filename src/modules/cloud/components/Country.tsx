@@ -1,7 +1,6 @@
+import { Svg } from '@components';
 import React from 'react';
-
 import { Image } from 'react-native';
-import Svg from '../../../components/Svg';
 
 const shorts: { [key: string]: string } = {
   Australia: 'au',

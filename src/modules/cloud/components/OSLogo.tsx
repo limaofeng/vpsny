@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from 'react-native';
+
 import { Icon } from '../../../components';
 import Theme, { withTheme } from '../../../components/Theme';
 

@@ -1,13 +1,12 @@
+import { HeaderRight, Item, List, Note, Theme, withTheme } from '@components';
+import { AppState } from '@modules';
 import React from 'react';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions } from 'react-navigation';
-import { StyleSheet, ScrollView, Text, View, Picker, TouchableHighlight, Clipboard, Alert } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { Account } from '../type';
-import Theme, { withTheme } from '../../../components/Theme';
-import { List, Item, Note } from '../../../components';
-import HeaderRight from '../../../components/HeaderRight';
 
 type Mode = 'choose' | 'manage';
 
@@ -120,12 +119,13 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { accounts } }: any, { navigation }: any) => {
+const mapStateToProps = ({ cloud: { accounts } }: AppState, { navigation }: AccountListProps) => {
+  const provider = navigation.getParam('provider');
   const onChange = navigation.getParam('callback');
   const value = navigation.getParam('value');
   const mode: Mode = !!onChange ? 'choose' : 'manage';
   return {
-    accounts: accounts as Account[],
+    accounts: provider ? accounts.filter(a => a.provider === provider) : accounts,
     mode,
     value,
     onChange: (value: Account) => {

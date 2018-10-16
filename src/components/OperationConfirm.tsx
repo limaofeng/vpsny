@@ -1,12 +1,11 @@
+import { resolve } from 'dns';
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, StyleProp, TextStyle } from 'react-native';
+import { StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 
-import Theme, { withTheme } from './Theme';
 import { Icon } from './Item';
-import { sleep } from '../utils';
 import SubmitButton from './SubmitButton';
-import { resolve } from 'dns';
+import Theme, { withTheme } from './Theme';
 
 interface OperationConfirmProps {
   theme?: Theme;

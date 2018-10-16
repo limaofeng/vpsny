@@ -5,7 +5,6 @@ export * from './Provider';
 
 export interface Account {
   id: string;
-  status: 'refreshing' | 'unauthorized' | 'authorized';
   provider: 'vultr' | 'lightsail';
   title?: string;
   alias?: string;
@@ -14,11 +13,12 @@ export interface Account {
   apiKey?: APIKey;
   bill?: Bill;
   sshkeys: SSHKey[];
-  settings: {
+  settings?: {
     /**
      * aws 需要查询的区域，过多的区域会导致查询效率底下
      */
-    regions: string[];
+    defaultRegion?: string;
+    regions?: string[];
   };
 }
 

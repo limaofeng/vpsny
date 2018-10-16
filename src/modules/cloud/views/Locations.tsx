@@ -1,18 +1,17 @@
 import React from 'react';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions } from 'react-navigation';
-import { StyleSheet, Text, View, ScrollView, RefreshControl } from 'react-native';
-import { Dispatch } from 'redux';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
-import { Region } from '../Provider';
-import Country from '../components/Country';
-
-import { List, Item, Label, Input, Icon, Note } from '../../../components';
-import { ItemStart, ItemBody } from '../../../components/Item';
-import { ItemGroup, ItemDivider } from '../../../components/List';
-import Theme, { withTheme } from '../../../components/Theme';
-import HeaderRight from '../../../components/HeaderRight';
 import { getApi } from '..';
+import { Item, List } from '../../../components';
+import HeaderRight from '../../../components/HeaderRight';
+import { ItemBody, ItemStart } from '../../../components/Item';
+import { ItemDivider, ItemGroup } from '../../../components/List';
+import Theme, { withTheme } from '../../../components/Theme';
+import Country from '../components/Country';
+import { Region } from '../Provider';
 
 type Mode = 'choose' | 'manage';
 

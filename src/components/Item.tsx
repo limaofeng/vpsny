@@ -1,32 +1,30 @@
 import * as React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
+  GestureResponderEvent,
+  KeyboardTypeOptions,
   StyleProp,
-  ViewStyle,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
   TextProps,
   TextStyle,
   TouchableHighlight,
-  GestureResponderEvent,
-  KeyboardTypeOptions,
-  TextInputProps,
-  TouchableOpacity
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
-
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import Feather from 'react-native-vector-icons/Feather';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
+import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Theme, { withTheme } from './Theme';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import { IcoMoon } from '../utils';
-import Select from './Select';
+import Theme, { withTheme } from './Theme';
 
 interface LabelProps {
   fixed?: boolean;
@@ -124,7 +122,7 @@ interface RadioProps {
 const Radio = withTheme(
   class Radio extends React.Component<RadioProps> {
     render() {
-      const { colors, fonts } = this.props.theme as Theme;
+      const { colors } = this.props.theme as Theme;
       const { checked, style } = this.props;
       if (!checked) {
         return <View />;
@@ -271,15 +269,6 @@ export const Note = withTheme(
   }
 );
 
-interface ItemStyle {
-  labelColor?: string;
-  inputColor?: string;
-  lineColor?: string;
-  lineWidth?: number;
-}
-
-interface AvatarProps {}
-
 export class Avatar extends React.Component<ItemBodyProps> {
   render() {
     return <ItemStart />;
@@ -357,8 +346,8 @@ export default withTheme(
       if (!this.props.visible) {
         return [];
       }
-      const { colors, fonts } = this.props.theme as Theme;
-      const { size = 'normal', last, mode, checked, style, bodyStyle, onValueChange, push, arrowStyle } = this.props;
+      const { colors } = this.props.theme as Theme;
+      const { size = 'normal', last, mode, checked, style, bodyStyle, push, arrowStyle } = this.props;
       const children: React.ReactElement<any>[] = React.Children.toArray(this.props.children) as React.ReactElement<
         any
       >[];

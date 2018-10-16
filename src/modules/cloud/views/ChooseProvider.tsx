@@ -1,14 +1,10 @@
+import { Card, HeaderLeftClose, Theme, withTheme } from '@components';
 import React from 'react';
-import { SafeAreaView, NavigationScreenConfigProps, NavigationScreenOptions } from 'react-navigation';
-import { StyleSheet, View, Image, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { NavigationScreenProp } from 'react-navigation';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NavigationScreenConfigProps, NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
-
 import { Dispatch } from 'redux';
-import Theme, { withTheme } from '../../../components/Theme';
-import { Icon, List, Item } from '../../../components';
-import HeaderLeftClose from '../../../components/HeaderLeftClose';
-import Card from '../../../components/Card';
+
 import { User } from '../Agent';
 
 interface CloudProviderProps {

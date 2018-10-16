@@ -1,8 +1,8 @@
-import { CostExplorer, IAM, Lightsail } from 'aws-sdk/dist/aws-sdk-react-native';
+import { format, md5 } from '@utils';
+import { IAM, Lightsail } from 'aws-sdk/dist/aws-sdk-react-native';
 import axios from 'axios';
 import querystring from 'querystring';
 
-import { format, md5 } from '../../utils';
 import { Agent, APIKey, Bill, Continent, Country, User } from './Agent';
 import { Features, ImageVersion, Instance, InstanceNetworking, Plan, Region, SSHKey, SystemImage } from './Provider';
 
@@ -18,19 +18,19 @@ export const AWSRegions: {
     name: 'US East (N. Virginia)',
     continent: Continent.NA,
     country: Country.us,
-    state: 'Virginia'
+    state: 'N. Virginia'
   },
   'us-east-2': {
     name: 'US East (Ohio)',
     continent: Continent.NA,
     country: Country.us,
-    state: 'Virginia'
+    state: 'Ohio'
   },
   'us-west-1': {
     name: 'US West (N. California)',
     continent: Continent.NA,
     country: Country.us,
-    state: 'California'
+    state: 'N. California'
   },
   'us-west-2': {
     name: 'US West (Oregon)',
@@ -42,7 +42,7 @@ export const AWSRegions: {
     name: 'Canada (Central)',
     continent: Continent.NA,
     country: Country.ca,
-    state: 'Montreal'
+    state: 'Central' // Montreal
   },
   'eu-central-1': {
     name: 'EU (Frankfurt)',
@@ -108,7 +108,7 @@ export const AWSRegions: {
     name: 'South America (São Paulo)',
     continent: Continent.SA,
     country: Country.br,
-    state: 'Sao paulo'
+    state: 'São Paulo'
   }
 };
 
@@ -119,14 +119,18 @@ function parseRegion(data: Lightsail.Region): Region {
     providers: [
       {
         id: data.name!,
-        name: 'lightsail'
+        type: 'lightsail',
+        availabilityZones: data.availabilityZones!.map(data => ({
+          state: data.state!,
+          zoneName: data.zoneName!
+        })),
+        ...location
       }
     ],
     name: data.displayName!,
     state: location.state,
     country: location.country,
-    continent: location.continent,
-    availabilityZones: []
+    continent: location.continent
   };
 }
 
@@ -241,50 +245,77 @@ export interface AWSAPIKey extends APIKey {
   secretAccessKey: string;
 }
 
+export interface AWSOptions {
+  defaultRegion: string;
+  regions: string[];
+}
+
 export class AWSLightsailAgent implements Agent {
   id: string;
-  apiKey: {
-    accessKeyId: string;
-    secretAccessKey: string;
-  };
+  apiKey: AWSAPIKey;
+  options: AWSOptions;
   alllightsails: Map<string, Lightsail> = new Map();
   lightsail: Lightsail;
   iam: IAM;
-  ce: CostExplorer;
-  static defaultRegion = 'us-east-1';
-  constructor(apiKey: AWSAPIKey) {
-    const { accessKeyId, secretAccessKey } = apiKey;
-    this.id = md5(accessKeyId + ':' + secretAccessKey, ':');
+  constructor(apiKey: AWSAPIKey, options: AWSOptions) {
+    this.options = options;
+    this.id = md5(apiKey.accessKeyId + ':' + apiKey.secretAccessKey, ':');
     this.apiKey = apiKey;
     this.lightsail = new Lightsail({
-      region: 'us-east-1',
+      region: options.defaultRegion,
       ...this.apiKey
     });
     this.iam = new IAM({
-      region: 'us-east-1',
+      region: options.defaultRegion,
       ...this.apiKey
     });
-    this.ce = new CostExplorer({
-      region: 'us-east-1',
-      ...this.apiKey
-    });
+    this.setQueryRegions(options.regions);
   }
 
-  options(post: boolean = false) {
-    const options: any = {
-      headers: {
-        'API-Key': this.apiKey
-      }
-    };
-    if (post) {
-      options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
-    }
-    return options;
+  setDefaultRegion(defaultRegion: string): void {
+    this.lightsail = new Lightsail({
+      region: defaultRegion,
+      ...this.apiKey
+    });
+    this.options.defaultRegion = defaultRegion;
+    this.setQueryRegions(this.options.regions);
   }
+
+  setQueryRegions = (regions: string[]) => {
+    this.alllightsails.clear();
+    this.alllightsails.set(this.options.defaultRegion, this.lightsail);
+    for (const region of regions.filter(region => region !== this.options.defaultRegion)) {
+      this.alllightsails.set(
+        region,
+        new Lightsail({
+          region,
+          ...this.apiKey
+        })
+      );
+    }
+    this.options.regions = regions;
+  };
 
   async regions(): Promise<Region[]> {
-    const { regions = [] } = await this.lightsail.getRegions().promise();
-    return regions.map(data => parseRegion(data));
+    const start = Date.now();
+    const lightsails = Array.from(this.alllightsails.values());
+
+    const resps = await Promise.all(
+      lightsails.map(lightsail => lightsail.getRegions({ includeAvailabilityZones: true }).promise())
+    );
+
+    const results = new Map<string, Lightsail.Region>();
+    for (const { regions } of resps) {
+      for (const region of regions!) {
+        if (region.availabilityZones!.length) {
+          results.set(region.name!, region);
+        } else if (!results.has(region.name!)) {
+          results.set(region.name!, region);
+        }
+      }
+    }
+    console.log('query regions -> ', (Date.now() - start) / 1000);
+    return Array.from(results.values()).map(data => parseRegion(data));
   }
   async pricing(): Promise<Plan[]> {
     const { bundles = [] } = await this.lightsail.getBundles().promise();
@@ -348,8 +379,7 @@ export class AWSLightsailAgent implements Agent {
         ddos_protection: features.DDOSProtection ? 'yes' : 'no',
         auto_backups: features.AutoBackups ? 'yes' : 'no',
         hostname
-      }),
-      this.options(true)
+      })
     );
     console.log('server deploy!', data);
     return data.SUBID;
@@ -371,7 +401,7 @@ export class AWSLightsailAgent implements Agent {
     };
   }
   async sshkeys(): Promise<SSHKey[]> {
-    const lightsails = await this.getAlllightsails();
+    const lightsails = Array.from(this.alllightsails.values());
     const resps = await Promise.all(lightsails.map(lightsail => lightsail.getKeyPairs().promise()));
     const results = [];
     for (const { keyPairs } of resps) {
@@ -437,31 +467,7 @@ export class AWSLightsailAgent implements Agent {
     console.log('destroySSHKey', info);
   }
 
-  async getAlllightsails(): Promise<Lightsail[]> {
-    if (this.alllightsails.size) {
-      return Array.from(this.alllightsails.values());
-    }
-    const { regions: awsregions } = await this.lightsail.getRegions().promise();
-    const regions = awsregions!.map(data => parseRegion(data));
-    for (const {
-      providers: [{ id }]
-    } of regions) {
-      if (id === this.lightsail.config.region) {
-        this.alllightsails.set(id, this.lightsail);
-        continue;
-      }
-      this.alllightsails.set(
-        id,
-        new Lightsail({
-          region: id,
-          ...this.apiKey
-        })
-      );
-    }
-    return Array.from(this.alllightsails.values());
-  }
   async getlightsail(region: string): Promise<Lightsail> {
-    await this.getAlllightsails();
     return this.alllightsails.get(region)!;
   }
   parseId(id: string) {
@@ -470,7 +476,7 @@ export class AWSLightsailAgent implements Agent {
   }
   instance = {
     list: async (): Promise<Instance[]> => {
-      const lightsails = await this.getAlllightsails();
+      const lightsails = Array.from(this.alllightsails.values());
       const resps = await Promise.all(lightsails.map(lightsail => lightsail.getInstances().promise()));
       const results = [];
       for (const { instances } of resps) {
