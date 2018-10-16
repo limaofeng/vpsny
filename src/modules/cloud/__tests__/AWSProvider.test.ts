@@ -3,11 +3,11 @@ import { AWSLightsailAgent } from '../AWSProvider';
 describe('AWSProvider', () => {
   const api = new AWSLightsailAgent(
     {
-      accessKeyId: 'AKIAJKX7F3VXTOKFKUSQ',
-      secretAccessKey: '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'
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID, // 污点
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     },
     {
-      defaultRegion: 'us-east-2',
+      defaultRegion: 'us-east-1',
       regions: []
     }
   );
