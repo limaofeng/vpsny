@@ -83,18 +83,24 @@ export interface Plan {
   /**
    * 适用地区
    */
-  regions: number[];
+  regions: string[];
 }
 
-interface RegionProvider {
+export interface RegionProvider {
   id: string;
-  name: 'vultr' | 'lightsail';
+  name?: string;
+  type: 'vultr' | 'lightsail';
+  availabilityZones?: AvailabilityZone[];
+  features?: {
+    ddosProtection: string;
+    blockStorage: string;
+  };
   [key: string]: any;
 }
 
 export interface AvailabilityZone {
-  zoneName: String;
-  state: 'available';
+  zoneName: string;
+  state: string;
 }
 
 /**
@@ -125,10 +131,6 @@ export interface Region {
    * 大陆，州
    */
   continent: string;
-  /**
-   * 可用区
-   */
-  availabilityZones: AvailabilityZone[];
 }
 
 export interface OS {

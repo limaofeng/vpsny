@@ -111,8 +111,8 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                   <Image source={logos[a.provider]} resizeMode="contain" style={{ height: 32, width: 32 }} />
                 </ItemStart>
                 <View style={{ flex: 1 }}>
-                  <Note style={[{ color: colors.major, textAlignVertical: 'bottom' }, fonts.callout]}>{a.name}</Note>
-                  <Note style={{ color: colors.secondary, marginTop: 4 }}>{a.email}</Note>
+                  <Note style={[{ color: colors.major, textAlignVertical: 'bottom' }, fonts.callout]}>{a.title}</Note>
+                  <Note style={{ color: colors.secondary, marginTop: 4 }}>{a.alias || a.name}</Note>
                 </View>
               </Item>
             ))}

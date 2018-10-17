@@ -298,11 +298,11 @@ export class VultrAgent implements Agent {
     for (const id of Object.keys(data)) {
       const region = data[id];
       regions.push({
-        id: (region.name as string).toLowerCase(),
+        id: region.name!.toLowerCase(),
         providers: [
           {
             id: id,
-            name: 'vultr',
+            type: 'vultr',
             features: {
               ddosProtection: region.ddos_protection,
               blockStorage: region.block_storage
@@ -312,8 +312,7 @@ export class VultrAgent implements Agent {
         name: region.name,
         state: region.state,
         country: countryNames[region.country.toLowerCase()],
-        continent: region.continent,
-        availabilityZones: []
+        continent: region.continent
       });
     }
     return regions;
@@ -437,7 +436,7 @@ export class VultrAgent implements Agent {
   ): Promise<string> {
     console.log(
       querystring.stringify({
-        DCID: region.id,
+        DCID: region.providers.find(p => p.type === 'vultr')!.id,
         VPSPLANID: plan.id,
         OSID: (image.version as ImageVersion).id,
         SSHKEYID: sshkeys.map(sshkey => sshkey.id),
@@ -629,33 +628,33 @@ export class VultrAgent implements Agent {
   };
 }
 
-class VultrProvider implements Provider {
-  images: SystemImage[] = [];
-  prices: string[] = [];
-  products = ['ssd', 'baremetal', 'storage', 'dedicated'];
-  id = 'vultr';
-  name = 'Vultr';
-  url = 'https://www.vultr.com';
-  private agent: Agent;
-  constructor(agent: Agent) {
-    this.agent = agent;
-  }
+// class VultrProvider implements Provider {
+//   images: SystemImage[] = [];
+//   prices: string[] = [];
+//   products = ['ssd', 'baremetal', 'storage', 'dedicated'];
+//   id = 'vultr';
+//   name = 'Vultr';
+//   url = 'https://www.vultr.com';
+//   private agent: Agent;
+//   constructor(agent: Agent) {
+//     this.agent = agent;
+//   }
 
-  pricing(region?: string): Plan[] {
-    const plans: Plan[] = [];
-    return plans;
-  }
-  regions(plan?: string): Region[] {
-    throw new Error('Method not implemented.');
-  }
-  os(): OS[] {
-    throw new Error('Method not implemented.');
-  }
-  apps(): App[] {
-    throw new Error('Method not implemented.');
-  }
-  getAgent(): Agent {
-    return this.agent;
-  }
-  sshkey(): void {}
-}
+//   pricing(region?: string): Plan[] {
+//     const plans: Plan[] = [];
+//     return plans;
+//   }
+//   regions(plan?: string): Region[] {
+//     throw new Error('Method not implemented.');
+//   }
+//   os(): OS[] {
+//     throw new Error('Method not implemented.');
+//   }
+//   apps(): App[] {
+//     throw new Error('Method not implemented.');
+//   }
+//   getAgent(): Agent {
+//     return this.agent;
+//   }
+//   sshkey(): void {}
+// }

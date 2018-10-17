@@ -1,17 +1,14 @@
+import { Icon, Item, Label, List, Note, Theme, withTheme } from '@components';
+import { AppState } from '@modules';
+import { format, SafeArea } from '@utils';
 import React from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NavigationScreenOptions, NavigationScreenProp } from 'react-navigation';
 import { connect } from 'react-redux';
-import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
-
-import { StyleSheet, Text, View, TouchableHighlight, ScrollView, Image, TouchableOpacity } from 'react-native';
-
-import { List, Item, Label, Input, Icon, Note, ItemStart, ItemBody } from '../../../components';
-import { AppState } from '../..';
 import { Dispatch } from 'redux';
-import Theme, { withTheme } from '../../../components/Theme';
-import { SafeArea, format } from '../../../utils';
+
 import { Account, Instance } from '../../cloud/type';
 import AccountLable, { AllAccountLable, NewAccountLable } from '../components/AccountLable';
-import { color } from '../../../utils/format';
 
 interface SettingsProps {
   dispatch: any;
@@ -142,9 +139,9 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
               {current ? (
                 <>
                   <Text style={[{ color: colors.major, fontWeight: 'bold', marginBottom: 5 }, fonts.title]}>
-                    {current.provider.replace(/^\S/, s => s.toUpperCase())}
+                    {current.title}
                   </Text>
-                  <Text style={[{ color: colors.secondary }, fonts.headline]}>{current.email}</Text>
+                  <Text style={[{ color: colors.secondary }, fonts.headline]}>{current.alias || current.name}</Text>
                 </>
               ) : (
                 <Text style={[{ color: colors.major, fontWeight: 'bold', marginBottom: 5 }, fonts.title]}>

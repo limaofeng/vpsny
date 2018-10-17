@@ -1,14 +1,10 @@
+import { Icon, OperationConfirm, OperationConfirmType, Theme, withTheme } from '@components';
 import React from 'react';
 import { ActionSheetIOS, Alert, Text, TouchableOpacity, View } from 'react-native';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
+
 import { getApi } from '..';
-import { AppState } from '../..';
-import { Icon } from '../../../components';
-import Confirm, { OperationConfirm } from '../../../components/OperationConfirm';
-import Theme, { withTheme } from '../../../components/Theme';
-import { Instance } from '../Provider';
 import { Agent } from '../Agent';
+import { Instance } from '../Provider';
 
 export type Operate = 'start' | 'stop' | 'reboot' | 'delete' | 'reinstall';
 export type OperateStatus = 'start' | 'end';
@@ -20,7 +16,7 @@ interface InstanceActionsProps {
 }
 
 class InstanceActions extends React.Component<InstanceActionsProps> {
-  confirm = React.createRef<OperationConfirm>();
+  confirm = React.createRef<OperationConfirmType>();
   api(): Agent {
     return getApi(this.props.data.account);
   }
@@ -65,7 +61,7 @@ class InstanceActions extends React.Component<InstanceActionsProps> {
         }
       );
     });
-    const confirm = this.confirm.current as OperationConfirm;
+    const confirm = this.confirm.current!;
     const additions = (
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Text style={[{ color: colors.minor }, fonts.headline]}>Instance:</Text>
@@ -173,7 +169,7 @@ class InstanceActions extends React.Component<InstanceActionsProps> {
     const { colors, fonts } = this.props.theme as Theme;
     return (
       <>
-        <Confirm ref={this.confirm} />
+        <OperationConfirm ref={this.confirm} />
         <TouchableOpacity
           onPress={this.handleMoreActions}
           style={{ width: 30, height: 30, alignItems: 'center', justifyContent: 'center' }}

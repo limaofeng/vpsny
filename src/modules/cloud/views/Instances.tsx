@@ -1,25 +1,21 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView, RefreshControl, Dimensions, Image } from 'react-native';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions, HeaderBackButton } from 'react-navigation';
-import Spinner from 'react-native-spinkit';
-import { Dispatch } from 'redux';
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
-import { Icon, List, Item, Note, Label, ItemBody } from '../../../components';
-import { KeyPair, Instance, Account } from '../type';
-import Theme, { withTheme } from '../../../components/Theme';
-import DashLine from '../../../components/DashLine';
-import ActionButton from '../../../components/ActionButton';
-import { utils, getApi } from '../';
-import MergeAgent from '../AgentAdapter';
-import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
-import { sleep, format, SafeArea } from '../../../utils';
-import OSLogo from './OSLogo';
-import Card from '../../../components/Card';
-import { getSSHClient } from '../../ssh';
+import { getApi, utils } from '../';
 import { AppState } from '../..';
-import { User } from '../Agent';
+import { Icon, Item, ItemBody, Label, List } from '../../../components';
+import ActionButton from '../../../components/ActionButton';
+import Card from '../../../components/Card';
+import Theme, { withTheme } from '../../../components/Theme';
+import { SafeArea, sleep } from '../../../utils';
 import { SSHConnection } from '../../ssh/type';
+import { User } from '../Agent';
+import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
+import { Account, Instance, KeyPair } from '../type';
+import OSLogo from '../components/OSLogo';
 
 interface InstancesProps {
   navigation: NavigationScreenProp<any>;
@@ -190,6 +186,8 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                           paddingVertical: 5
                         }}
                       >
+                        {/*
+                          TODO: 先隐藏 Terminal 功能
                         <TouchableOpacity
                           onPress={this.handleOpenTerminal(data)}
                           style={{
@@ -201,10 +199,8 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                         >
                           <Icon name="terminal" color="#4180EE" size={18} />
                         </TouchableOpacity>
-                        <InstanceActions
-                          data={data}
-                          onExecute={this.handleActionExecute}
-                        />
+                        */}
+                        <InstanceActions data={data} onExecute={this.handleActionExecute} />
                       </View>
                     </ItemBody>
                   </Item>

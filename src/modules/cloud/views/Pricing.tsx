@@ -1,32 +1,19 @@
 import React from 'react';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions } from 'react-navigation';
-import {
-  StyleSheet,
-  ScrollView,
-  Text,
-  View,
-  Picker,
-  Dimensions,
-  Image,
-  TouchableOpacity,
-  RefreshControl
-} from 'react-native';
+import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { fileSize } from '../../../utils/format';
-
-import { Plan, Region, Provider } from '../Provider';
-
-import { List, Item, Label, Input, Icon, Note } from '../../../components';
-import { ItemStart, ItemBody } from '../../../components/Item';
+import { getApi } from '..';
+import { Icon, Item, Label, List, Note } from '../../../components';
+import HeaderRight from '../../../components/HeaderRight';
+import { ItemBody, ItemStart } from '../../../components/Item';
 import MultiSelection from '../../../components/MultiSelection';
 import Theme, { withTheme } from '../../../components/Theme';
-import HeaderRight from '../../../components/HeaderRight';
-import { getApi } from '..';
-import { sleep } from '../../../utils';
+import { fileSize } from '../../../utils/format';
+import { Plan, Provider, Region } from '../Provider';
 
 const { Option } = MultiSelection;
 

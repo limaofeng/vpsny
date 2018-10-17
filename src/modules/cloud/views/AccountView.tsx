@@ -1,27 +1,26 @@
+import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
+import { AppState } from '@modules';
 import React from 'react';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions } from 'react-navigation';
-import { StyleSheet, ScrollView, Text, Alert, TouchableOpacity, Dimensions, View, RefreshControl } from 'react-native';
+import { Alert, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import axios from 'axios';
-import Spinner from 'react-native-spinkit';
-import { number } from '../../../utils/format';
 
-import { List, Item, Label, Input, Icon, Note } from '../../../components';
-import { Account } from '../type';
-import Theme, { withTheme } from '../../../components/Theme';
-import BottomRegion from '../../../components/BottomRegion';
-import { AppState } from '../..';
+import { APIKey } from '../Agent';
+import AWSLightsailView from '../components/AWSLightsailView';
+import VultrView from '../components/VultrView';
 import { Instance } from '../Provider';
-import { Bill } from '../Agent';
-import { VultrAPIKey } from '../VultrProvider';
-import { AWSAPIKey } from '../AWSProvider';
+import { Account } from '../type';
+import { getApi } from '..';
+import { AWSLightsailAgent } from '../AWSProvider';
+
+export type UpdateAccount = (key: 'title' | 'alias' | 'apiKey' | 'defaultRegion', value: string | APIKey) => void;
 
 interface AccountViewProps {
   navigation: NavigationScreenProp<any>;
   account: Account;
   instances: Instance[];
-  updateKey: (id: string, apiKey: string) => void;
+  update: UpdateAccount;
   findAccountByApiKey: (provider: string, apiKey: string) => Account | undefined;
   deleteAccount: () => void;
   refreshAccount: () => void;
@@ -29,27 +28,27 @@ interface AccountViewProps {
 }
 
 interface AccountViewState {
-  apiKey?: string;
-  mode: 'edit' | 'view';
-  status: 'initialize' | 'verifying';
+  apiKey: APIKey;
+  title?: string;
+  alias?: string;
   refreshing: boolean;
 }
 
 class AccountView extends React.Component<AccountViewProps, AccountViewState> {
   static navigationOptions = ({ navigation }: AccountViewProps): NavigationScreenOptions => {
-    const account = navigation.getParam('data') as Account;
     return {
-      headerTitle: account.provider.replace(/^\S/, s => s.toUpperCase())
+      headerTitle: 'Account Details'
     };
   };
 
   constructor(props: AccountViewProps) {
     super(props);
+    const { account } = this.props;
     this.state = {
-      apiKey: undefined,
-      mode: 'view',
-      refreshing: false,
-      status: 'initialize'
+      apiKey: account.apiKey!,
+      title: account.title,
+      alias: account.alias || account.name,
+      refreshing: false
     };
   }
 
@@ -60,13 +59,11 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
     };
   };
 
-  handleValueChange = (value: string) => {
-    const { account } = this.props;
-    if (account.apiKey !== value) {
-      this.setState({ apiKey: value, mode: 'edit' });
-    } else {
-      this.setState({ apiKey: undefined, mode: 'view' });
-    }
+  handleTitleChange = (title: string) => {
+    this.props.update('title', title);
+  };
+  handleAliasChange = (alias: string) => {
+    this.props.update('alias', alias);
   };
 
   handleDelete = () => {
@@ -79,46 +76,6 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
         cancelable: false
       }
     );
-  };
-
-  handleSave = async () => {
-    try {
-      const {
-        findAccountByApiKey,
-        account: { id },
-        updateKey
-      } = this.props;
-      const { apiKey } = this.state;
-      this.setState({ status: 'verifying' });
-      const account = findAccountByApiKey('vultr', apiKey as string);
-      if (account && account.id !== id) {
-        Alert.alert('Duplicated', `This is already added as ${account.name}`);
-        this.setState({ status: 'initialize' });
-        return;
-      }
-      const reps = await axios.get('https://api.vultr.com/v1/auth/info', {
-        headers: {
-          'API-Key': apiKey
-        }
-      });
-      const { data } = reps;
-      console.log('data', data);
-      // 更新
-      updateKey(id, apiKey as string);
-      this.setState({ status: 'initialize', mode: 'view' });
-    } catch ({ response }) {
-      if (response) {
-        if (response.status === 403) {
-          Alert.alert(
-            'Invalid API key',
-            'Please enter the correct API-Key',
-            [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
-            { cancelable: false }
-          );
-        }
-      }
-      this.setState({ status: 'initialize' });
-    }
   };
 
   handleRefresh = () => {
@@ -139,15 +96,9 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
   };
 
   render() {
-    const { colors, fonts } = this.props.theme as Theme;
-    const { account, instances } = this.props;
-    const { mode, status } = this.state;
-    const bill = account.bill;
-    const visible = status === 'verifying';
-    let butTitle = 'Save';
-    if (status === 'verifying') {
-      butTitle = 'Verifying API-Key';
-    }
+    const { colors } = this.props.theme as Theme;
+    const { account } = this.props;
+    const { title, alias } = this.state;
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
         <ScrollView
@@ -160,56 +111,19 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
             />
           }
         >
-          {account.provider === 'vultr' && (
-            <List title="API-Key">
-              <Item>
-                <Input
-                  editable={false}
-                  onValueChange={this.handleValueChange}
-                  value={(account.apiKey as VultrAPIKey).apiKey}
-                />
-              </Item>
-            </List>
-          )}
-          {account.provider === 'lightsail' && (
-            <>
-              <List title="Access Key">
-                <Item>
-                  <Input defaultValue={(account.apiKey as AWSAPIKey).accessKeyId} />
-                </Item>
-              </List>
-              <List title="Secret Key">
-                <Item>
-                  <Input defaultValue={(account.apiKey as AWSAPIKey).secretAccessKey} />
-                </Item>
-              </List>
-            </>
-          )}
-          <List title="Info">
+          <List>
+            <Item>
+              <Label>Title</Label>
+              <Input defaultValue={title} onValueChange={this.handleTitleChange} clearButtonMode="never" />
+            </Item>
             <Item>
               <Label>Name</Label>
-              <Note>{account.name}</Note>
-            </Item>
-            <Item visible={account.provider === 'vultr'}>
-              <Label>E-Mail</Label>
-              <Note>{account.email}</Note>
+              <Input defaultValue={alias} onValueChange={this.handleAliasChange} clearButtonMode="never" />
             </Item>
           </List>
-          {account.provider === 'vultr' && (
-            <List title="Billing">
-              <Item>
-                <Label>Balance</Label>
-                <Note>${number(bill!.balance, '0.00')}</Note>
-              </Item>
-              <Item>
-                <Label>This Month</Label>
-                <Note>${number(bill!.pendingCharges, '0.00')}</Note>
-              </Item>
-              <Item>
-                <Label>Remaining</Label>
-                <Note>${number(bill!.balance - bill!.pendingCharges, '0.00')}</Note>
-              </Item>
-            </List>
+          {account.provider === 'vultr' && <VultrView account={account} />}
+          {account.provider === 'lightsail' && (
+            <AWSLightsailView navigation={this.props.navigation} update={this.props.update} account={account} />
           )}
           <List title=" ">
             <Item onClick={this.handleDelete}>
@@ -219,43 +133,6 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
             </Item>
           </List>
         </ScrollView>
-        <BottomRegion isVisible={mode === 'edit'}>
-          <TouchableOpacity
-            style={{
-              height: 40,
-              width: Dimensions.get('window').width - 40,
-              borderRadius: 2,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.primary,
-              borderColor: 'green',
-              borderStyle: 'solid',
-              paddingBottom: 2
-            }}
-            onPress={this.handleSave}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Spinner
-                isVisible={visible}
-                style={{ marginRight: 10 }}
-                size={21}
-                type="Arc"
-                color={colors.backgroundColorDeeper}
-              />
-              <Text
-                style={[
-                  {
-                    textAlign: 'center',
-                    color: colors.backgroundColorDeeper
-                  },
-                  fonts.callout
-                ]}
-              >
-                {butTitle}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </BottomRegion>
       </SafeAreaView>
     );
   }
@@ -282,19 +159,38 @@ const mapStateToProps = ({ cloud: { accounts, instances } }: AppState, { navigat
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch, { navigation }: AccountViewProps) => ({
-  deleteAccount() {
-    dispatch({ type: 'cloud/dropAccount', payload: { id: navigation.getParam('data').id } });
-    navigation.goBack();
-  },
-  refreshAccount() {
-    const { id, apiKey } = navigation.getParam('data');
-    dispatch({ type: 'cloud/refreshAccount', payload: { id, apiKey } });
-  },
-  updateKey(id: string, apiKey: string) {
-    dispatch({ type: 'cloud/updateAccountApiKey', payload: { id, apiKey } });
-  }
-});
+const mapDispatchToProps = (dispatch: Dispatch, { navigation }: AccountViewProps) => {
+  const account = navigation.getParam('data') as Account;
+  const api = getApi(account.id);
+  return {
+    deleteAccount() {
+      dispatch({ type: 'cloud/dropAccount', payload: { id: account.id } });
+      navigation.goBack();
+    },
+    refreshAccount() {
+      const { id, apiKey } = navigation.getParam('data');
+      dispatch({ type: 'cloud/refreshAccount', payload: { id, apiKey } });
+    },
+    update(key: 'title' | 'alias' | 'apiKey' | 'defaultRegion', value: string | APIKey) {
+      switch (key) {
+        case 'title':
+          dispatch({ type: 'cloud/updateAccount', payload: { id: account.id, title: value } });
+          break;
+        case 'alias':
+          dispatch({ type: 'cloud/updateAccount', payload: { id: account.id, alias: value } });
+          break;
+        case 'defaultRegion':
+          account.settings!.defaultRegion = value as string;
+          (api as AWSLightsailAgent).setDefaultRegion(value as string);
+          dispatch({ type: 'cloud/updateAccount', payload: { id: account.id, settings: account.settings } });
+          break;
+        case 'apiKey':
+          dispatch({ type: 'cloud/updateAccountApiKey', payload: { id: account.id, apiKey: value } });
+          break;
+      }
+    }
+  };
+};
 
 export default connect(
   mapStateToProps,

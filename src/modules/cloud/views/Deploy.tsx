@@ -1,31 +1,23 @@
 import React from 'react';
-import { SafeAreaView, NavigationScreenOptions, NavigationScreenProp } from 'react-navigation';
-import { StyleSheet, ScrollView, Text, View, TextStyle, Dimensions, Alert, TouchableOpacity } from 'react-native';
+import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import LinearGradient from 'react-native-linear-gradient';
 
-import CloudProvider from '../components/CloudProvider';
-import Location from '../components/Location';
-import Pricing from '../components/Pricing';
-import { Region, Plan, SystemImage, ImageVersion, Provider, SSHKey, Features, Instance } from '../Provider';
-
-import Theme, { withTheme } from '../../../components/Theme';
+import { getApi } from '..';
+import { Icon, Input, Item, ItemBody, ItemStart, Label, List, Note } from '../../../components';
 import BottomRegion from '../../../components/BottomRegion';
-import { List, Item, Label, Input, Icon, Note, Svg, ItemBody, ItemStart } from '../../../components';
-
-import { KeyPair, Account } from '../type';
-import { number } from '../../../utils/format';
-import { format, sleep } from '../../../utils';
 import SubmitButton from '../../../components/SubmitButton';
+import Theme, { withTheme } from '../../../components/Theme';
+import { format, sleep } from '../../../utils';
 import Country from '../components/Country';
-import { getApi, InstanceAction } from '..';
+import { Features, ImageVersion, Plan, Provider, Region, SSHKey, SystemImage } from '../Provider';
+import { Account, KeyPair } from '../type';
 
 interface DeployProps {
   navigation: NavigationScreenProp<any>;
   keyPairs: KeyPair[];
   theme: Theme;
-  provider: Provider;
   getDefaultRegion: (plan: Plan) => Region | undefined;
   getDefaultImage: () => SystemImage;
   getDefaultPlan: () => Plan;
@@ -43,7 +35,7 @@ interface DeployProps {
 
 interface DeployState {
   hostname: string;
-  provider: Provider;
+  provider: string;
   plan: Plan;
   location?: Region;
   image: SystemImage;
@@ -64,7 +56,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
     const plan = props.getDefaultPlan();
     this.state = {
       hostname: '',
-      provider: props.provider,
+      provider: plan.provider,
       plan,
       location: props.getDefaultRegion(plan),
       image: props.getDefaultImage(),
@@ -77,14 +69,6 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   componentWillUnmount() {
     this.timer && clearTimeout(this.timer);
   }
-
-  toCloudProviderList = () => {
-    this.props.navigation.navigate('CloudProviderList', {
-      callback: (provider: Provider) => {
-        this.setState({ provider });
-      }
-    });
-  };
 
   toLocations = () => {
     const { plan, location: value } = this.state;
@@ -119,7 +103,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
     });
   };
 
-  toAccounts = () => {
+  handleJumpToAccounts = () => {
     const { provider, account } = this.state;
     this.props.navigation.navigate('AccountList', {
       provider,
@@ -138,7 +122,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
       provider,
       location,
       callback: (plan: Plan) => {
-        const state: any =  { plan };
+        const state: any = { plan, provider: plan.provider };
         if (!location || !plan.regions.some(id => id === location.id)) {
           state.location = getDefaultRegion(plan);
         }
@@ -305,11 +289,15 @@ class Deploy extends React.Component<DeployProps, DeployState> {
                       </Note>
                     </View>
                     <View style={{ height: 30, justifyContent: 'center' }}>
-                      <Text style={[{ color: colors.minor }, fonts.caption]}>
-                        Private Networking, Backups, IPv6
-                        {location.features.ddosProtection && ', DDOS Protection'}
-                        {location.features.blockStorage && ', Block Storage'}
-                      </Text>
+                      {provider === 'vultr' && (
+                        <Text style={[{ color: colors.minor }, fonts.caption]}>
+                          Private Networking, Backups, IPv6
+                          {location.providers.find(p => p.type === 'vultr')!.features!.ddosProtection &&
+                            ', DDOS Protection'}
+                          {location.providers.find(p => p.type === 'vultr')!.features!.blockStorage &&
+                            ', Block Storage'}
+                        </Text>
+                      )}
                     </View>
                   </>
                 ) : (
@@ -351,7 +339,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
           </Text>
         */}
           <List title="Choose a account">
-            <Item push onClick={this.toAccounts}>
+            <Item push onClick={this.handleJumpToAccounts}>
               <Note>
                 {account.name} - {account.email}
               </Note>
@@ -391,15 +379,6 @@ class Deploy extends React.Component<DeployProps, DeployState> {
               </View>
             </Item>
           </List>
-          {/*
-          <List>
-            <Item push onClick={this.toCloudProviderList}>
-              <Icon type="FontAwesome5" color="#4180EE" name="cloud" size={16} />
-              <Label>服务商</Label>
-              <Note>{provider.name}</Note>
-            </Item>
-          </List>
-          */}
           <List
             type="multi-choice-circle"
             value={this.state.features || []}
@@ -423,7 +402,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
                   </Item>
                 )}
                 {location &&
-                  location.features.ddosProtection && (
+                  location.providers.find(p => p.type === 'vultr')!.features!.ddosProtection && (
                     <Item value="DDOS Protection">
                       <Note style={{ color: colors.secondary }}>Enable DDOS Protection</Note>
                       <View style={[styles.additionalCostContainer, { backgroundColor: colors.primary }]}>
@@ -442,7 +421,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             )}
           </List>
         </ScrollView>
-        <BottomRegion height={125}>
+        <BottomRegion height={125} backgroundColor={colors.backgroundColorDeeper}>
           <View style={{ flexDirection: 'row', paddingVertical: 10, paddingLeft: 20 }}>
             <View style={{ flex: 1 }}>
               <Text
@@ -516,7 +495,7 @@ const mapStateToProps = ({ settings: { keyPairs }, cloud: { accounts, regions, p
   const iaccounts = accounts as Account[];
   return {
     getDefaultRegion: (plan: Plan) => {
-      const regions = dregions.filter(region => plan.regions.some(id => id === region.id));
+      const regions = dregions.filter(r => r.providers.some(p => p.type === plan.provider));
       if (!regions.length) {
         return undefined;
       }
@@ -559,7 +538,7 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: DeployProps) => 
       const node = await api.instance.get(id);
       dispatch({ type: 'cloud/instance', payload: { operate: 'insert', instance: node } });
       await sleep(500);
-      dispatch({ type: 'cloud/track', payload: {node} });
+      dispatch({ type: 'cloud/track', payload: { node } });
     }
   };
 };

@@ -1,33 +1,30 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Input, Item, List, Select } from '../../../components';
-import Theme, { withTheme } from '../../../components/Theme';
-import { APIKey } from '../Agent';
-import { AWSAPIKey, AWSRegions } from '../AWSProvider';
+import { APIKey, User } from '../Agent';
+import { AWSAPIKey, AWSRegions, AWSOptions } from '../AWSProvider';
+import { Theme, List, Item, Input, Select, Label, Note, withTheme } from '@components';
 
-interface ConnectToAWSLightsailProps {
+interface AWSLightsailNewProps {
   theme?: Theme;
-  onChangeAPIKey: (apiKey?: APIKey) => void;
+  user?: User;
+  onChangeAPIKey: (apiKey?: APIKey, options?: AWSOptions) => void;
 }
 
-interface ConnectToAWSLightsailState {
-  accessKey?: string;
-  secretKey?: string;
+interface AWSLightsailNewState {
+  accessKey: string;
+  secretKey: string;
+  defaultRegion: string;
 }
 
-class ConnectToAWSLightsail extends React.Component<ConnectToAWSLightsailProps, ConnectToAWSLightsailState> {
-  constructor(props: ConnectToAWSLightsailProps) {
+class AWSLightsailNew extends React.Component<AWSLightsailNewProps, AWSLightsailNewState> {
+  constructor(props: AWSLightsailNewProps) {
     super(props);
     this.state = {
       accessKey: '',
-      secretKey: ''
+      secretKey: '',
+      defaultRegion: 'us-east-1'
     };
-  }
-  componentDidMount() {
-    setTimeout(() => {
-      this.handleAPIKey(this.state.accessKey, this.state.secretKey);
-    }, 1000);
   }
   handleAccessKey = (accessKey: string) => {
     this.setState({ accessKey });
@@ -37,17 +34,22 @@ class ConnectToAWSLightsail extends React.Component<ConnectToAWSLightsailProps, 
     this.setState({ secretKey });
     this.handleAPIKey(this.state.accessKey, secretKey);
   };
+  handleDefaultRegion = (defaultRegion: string) => {
+    this.setState({ defaultRegion });
+  };
   handleAPIKey(accessKeyId?: string, secretAccessKey?: string) {
+    const { defaultRegion } = this.state;
     const { onChangeAPIKey } = this.props;
     if (accessKeyId && secretAccessKey) {
       const apiKey: AWSAPIKey = { accessKeyId, secretAccessKey };
-      onChangeAPIKey(apiKey);
+      onChangeAPIKey(apiKey, { defaultRegion, regions: [] });
     } else {
       onChangeAPIKey(undefined);
     }
   }
   render() {
-    const { accessKey, secretKey } = this.state;
+    const { user } = this.props;
+    const { accessKey, secretKey, defaultRegion } = this.state;
     const regions = Object.keys(AWSRegions).map(key => ({
       label: AWSRegions[key].name,
       value: key
@@ -67,14 +69,22 @@ class ConnectToAWSLightsail extends React.Component<ConnectToAWSLightsailProps, 
         <List title="Default Region">
           <Item>
             <Select
-              defaultValue={regions[0]}
+              defaultValue={regions.find(r => r.value === defaultRegion)}
               required
               hideClearButton
-              onValueChange={() => {}}
+              onValueChange={this.handleDefaultRegion}
               items={regions}
             />
           </Item>
         </List>
+        {!!user && (
+          <List title="Info">
+            <Item>
+              <Label>Name</Label>
+              <Note>{user!.name}</Note>
+            </Item>
+          </List>
+        )}
       </>
     );
   }
@@ -86,4 +96,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default withTheme(ConnectToAWSLightsail);
+export default withTheme(AWSLightsailNew);

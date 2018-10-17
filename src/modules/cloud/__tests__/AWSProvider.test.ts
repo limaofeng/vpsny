@@ -1,10 +1,16 @@
 import { AWSLightsailAgent } from '../AWSProvider';
 
 describe('AWSProvider', () => {
-  const api = new AWSLightsailAgent({
-    accessKeyId: 'AKIAJKX7F3VXTOKFKUSQ',// 污点
-    secretAccessKey: '7aI9qdYa5P+ELGpI0hIcM87ymWs28Uv7GfVVEP3K'
-  });
+  const api = new AWSLightsailAgent(
+    {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID, // 污点
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+    },
+    {
+      defaultRegion: 'us-east-1',
+      regions: []
+    }
+  );
   const id = 'us-east-2:WordPress-512MB-Ohio-1';
   it('test user', async () => {
     const user = await api.user(); /*? $.id */

@@ -14,7 +14,7 @@ import { Program } from '../../home/components/Program';
 import { InstantState } from '../../home/type';
 import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
 import { Instance } from '../type';
-import OSLogo from './OSLogo';
+import OSLogo from '../components/OSLogo';
 
 interface InstanceViewProps {
   navigation: NavigationScreenProp<any>;
@@ -159,6 +159,7 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
                     paddingRight: 10
                   }}
                 >
+                {/* TODO: 先隐藏 Terminal 功能
                   <TouchableOpacity
                     style={{
                       width: 30,
@@ -170,6 +171,7 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
                   >
                     <Icon name="terminal" color="#4180EE" size={18} />
                   </TouchableOpacity>
+                  */}
                   <InstanceActions data={data} onExecute={this.handleActionExecute} />
                 </View>
               </View>

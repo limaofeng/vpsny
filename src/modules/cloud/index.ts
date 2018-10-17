@@ -10,11 +10,12 @@ import { AppState } from './../index';
 import { Agent, Bill, User } from './Agent';
 import AgentAdapter from './AgentAdapter';
 import { AWSAPIKey, AWSLightsailAgent } from './AWSProvider';
-import { Plan, SSHKey } from './Provider';
+import { Plan, SSHKey, SystemImage } from './Provider';
 import { Account, Instance, Provider, Region } from './type';
 import AccountList from './views/AccountList';
 import AccountNew from './views/AccountNew';
 import AccountView from './views/AccountView';
+import AWSRegions from './views/AWSRegions';
 import ChooseProvider from './views/ChooseProvider';
 import Deploy from './views/Deploy';
 import Images from './views/Images';
@@ -24,6 +25,7 @@ import Locations from './views/Locations';
 import Pricing from './views/Pricing';
 import SSHPublicKeys from './views/SSHPublicKeys';
 import { VultrAgent, VultrAPIKey } from './VultrProvider';
+import { SystemControl } from 'aws-sdk/clients/ecs';
 
 export const getApi = (key: 'vultr' | 'adapter' | string): Agent => {
   const agent = agents.get(key);
@@ -142,10 +144,11 @@ export interface InstanceAction extends AnyAction {
 export default new Feature({
   namespace: 'cloud',
   routes: {
-    AccountList,
+    ChooseProvider,
     AccountNew,
     AccountView,
-    ChooseProvider,
+    AWSRegions,
+    AccountList,
     Deploy,
     Images,
     Instances,
@@ -169,12 +172,7 @@ export default new Feature({
     saveAccount(state: CloudState, { payload }: AnyAction) {
       const { accounts } = state;
       accounts.push({
-        id: payload.id,
-        status: 'authorized',
-        name: payload.name,
-        email: payload.email,
-        provider: payload.provider,
-        apiKey: payload.apiKey,
+        ...payload,
         sshkeys: [],
         bill: {
           balance: 0,
@@ -183,7 +181,7 @@ export default new Feature({
       });
       return { ...state, accounts: [...accounts] };
     },
-    updateAccount(state: CloudState, { payload: { id, ...values } }: AnyAction) {
+    updateAccount(state: CloudState, { payload: { id, ...values } }: InAction<Account>) {
       const { accounts } = state;
       for (let i = 0; i < accounts.length; i++) {
         if (accounts[i].id === id) {
@@ -409,7 +407,7 @@ export default new Feature({
     }
   },
   subscriptions: {
-    async initAgents({ state, store }: { state: CloudState; store: Store }) {
+    async initAgents({ state, store, dispatch }: { dispatch: Dispatch; state: CloudState; store: Store }) {
       const { accounts } = state;
       // 加载适配器
       const adapter = new AgentAdapter(agents, finder => finder(store.getState()));
@@ -420,7 +418,10 @@ export default new Feature({
         if (account.provider === 'vultr') {
           api = new VultrAgent(account.apiKey as VultrAPIKey);
         } else if (account.provider === 'lightsail') {
-          api = new AWSLightsailAgent(account.apiKey as AWSAPIKey);
+          api = new AWSLightsailAgent(account.apiKey as AWSAPIKey, {
+            defaultRegion: account.settings!.defaultRegion!,
+            regions: []
+          });
         } else {
           console.warn('Wrong parameter' + JSON.stringify(account));
         }
@@ -429,6 +430,40 @@ export default new Feature({
         }
       }
       console.log('setup agents ->', Array.from(agents.keys()));
+      // 加载默认数据
+      agents.set('vultr', new VultrAgent({ apiKey: 'wrong' }));
+      // TODO: AWS 请求数据需要一个 KEY , 不想写死在代码中。可以从服务端获取。
+      // agents.set(
+      //   'aws',
+      //   new AWSLightsailAgent(
+      //     { accessKeyId: '', secretAccessKey: '' },
+      //     {
+      //       defaultRegion: 'us-east-1',
+      //       regions: []
+      //     }
+      //   )
+      // );
+      // 加载 Vultr 数据
+      const { provider, ...vultrDatabase } = await loadVultr(agents.get('vultr')!);
+      // 加载 AWS 数据
+      // const awsDatabase = await loadAWS(agents.get('aws') as AWSLightsailAgent);
+      // 合并地区数据
+      const allRegions = new Map<string, Region>();
+      for (const region of vultrDatabase.regions) {
+        allRegions.set(region.id, region);
+      }
+      // for (const region of awsDatabase.regions) {
+      //   if (allRegions.has(region.id)) {
+      //     allRegions.get(region.id)!.providers.push(...region.providers);
+      //   } else {
+      //     allRegions.set(region.id, region);
+      //   }
+      // }
+
+      dispatch({
+        type: 'setup',
+        payload: { providers: [provider], ...vultrDatabase, regions: Array.from(allRegions.values()) }
+      });
     },
     async tracking({ dispatch, state }: { dispatch: Dispatch; state: CloudState }) {
       const { instances } = state;
@@ -440,21 +475,60 @@ export default new Feature({
         dispatch({ type: 'track', payload: node });
       }
     }
-    // async syncWithVultr({ dispatch, state }: { dispatch: Dispatch; state: CloudState }) {
-    //   const agent = vultr.getAgent();
-    //   const pricing = await agent.pricing();
-    //   const regions = await agent.regions();
-    //   const images = await agent.images();
-    //   const { id, name, products } = vultr;
-
-    //   const prices: any[] = [];
-    //   for (const plan of pricing) {
-    //     if (!prices.includes(plan.price)) {
-    //       prices.push(plan.price);
-    //     }
-    //   }
-
-    //   dispatch({ type: 'setup', payload: { pricing, regions, providers: [{ id, name, products, prices, images }] } });
-    // }
   }
 });
+
+type Database = {
+  provider: any;
+  regions: Region[];
+  pricing: Plan[];
+};
+
+async function loadAWS(api: AWSLightsailAgent): Promise<Database> {
+  const pricing = await api.pricing();
+  const tempRegions = await api.regions();
+  const regionNames = tempRegions.map(({ providers: [{ id }] }) => id);
+  api.setQueryRegions(regionNames);
+  const regions = await api.regions();
+  // const images = await api.images();
+  const prices: number[] = [];
+  for (const plan of pricing) {
+    if (!prices.some(p => p === plan.price)) {
+      prices.push(plan.price);
+    }
+  }
+  return {
+    provider: {
+      id: 'aws',
+      name: 'AWS',
+      products: [],
+      prices,
+      images: []
+    },
+    pricing,
+    regions
+  };
+}
+
+async function loadVultr(api: Agent): Promise<Database> {
+  const pricing = await api.pricing();
+  const regions = await api.regions();
+  const images = await api.images();
+  const prices: number[] = [];
+  for (const plan of pricing) {
+    if (!prices.some(p => p === plan.price)) {
+      prices.push(plan.price);
+    }
+  }
+  return {
+    provider: {
+      id: 'vultr',
+      name: 'Vultr',
+      products: ['ssd', 'baremetal', 'storage', 'dedicated'],
+      prices,
+      images
+    },
+    pricing,
+    regions
+  };
+}

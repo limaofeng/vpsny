@@ -1,22 +1,21 @@
-import * as React from 'react';
 import { merge } from 'lodash';
+import * as React from 'react';
+import { TouchableOpacity } from 'react-native';
 import {
-  StackNavigator,
   createBottomTabNavigator,
   createStackNavigator,
   NavigationScreenConfigProps,
+  NavigationScreenOptions,
   NavigationScreenProp,
-  HeaderBackButton,
-  NavigationScreenOptions
 } from 'react-navigation';
-import modules from '../modules';
-import { defaultTheme } from '../components/Theme';
-import { format } from '../utils';
-import { Icon, IconType } from '../components';
-import { ScrollView, Text, View, TouchableOpacity } from 'react-native';
-import SideMenu from '../components/SideMenu';
 
-const { colors, fonts } = defaultTheme;
+import { Icon, IconType } from '../components';
+import SideMenu from '../components/SideMenu';
+import { defaultTheme } from '../components/Theme';
+import modules from '../modules';
+import { format } from '../utils';
+
+const { colors } = defaultTheme;
 
 const {
   AccountList,
@@ -41,6 +40,7 @@ const {
   SSHKeyList,
   SSHPublicKeys,
   SSHKeyView,
+  AWSRegions,
   Terminal,
   ...routes
 } = merge.apply(undefined, modules.routes);
@@ -287,6 +287,7 @@ export default createStackNavigator(
           KeyPairs: {
             screen: SSHKeyList
           },
+          AWSRegions,
           SSHKeyView
         },
         {
