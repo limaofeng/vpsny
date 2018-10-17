@@ -15,6 +15,7 @@ steps:
       versionSpec: $(node_version)
   - task: UseRubyVersion@0
     inputs:
+      versionSpec: '2.5.1p57'
       addToPath: true
 
   - script: |
