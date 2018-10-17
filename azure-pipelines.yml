@@ -4,31 +4,37 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
 
 pool:
-  vmImage: 'macOS 10.13'
+  vmImage: "macOS 10.13"
 strategy:
   matrix:
     node_8_x:
       node_version: 8.x
 steps:
-- task: NodeTool@0 
-  inputs:
-    versionSpec: $(node_version)
-- task: UseRubyVersion@0
-  inputs:
-    versionSpec: '>= 2.5'
+  - task: NodeTool@0
+    inputs:
+      versionSpec: $(node_version)
+  - task: UseRubyVersion@0
+    inputs:
+      versionSpec: ">= 2.5"
 
-- script: |
-    gem install bundler
-    bundle install --retry=3 --jobs=4
-  displayName: 'bundle install'
+  - script: |
+      gem install bundler
+      bundle install --retry=3 --jobs=4
+    displayName: "bundle install"
 
-- script: yarn install
+  - script: |
+      yarn install
+    displayName: "yarn install"
 
-# - task: Xcode@5
-#   inputs:
-#     actions: 'build'
-#     scheme: ''
-#     sdk: 'iphoneos'
-#     configuration: 'Release'
-#     xcWorkspacePath: '**/*.xcodeproj/project.xcworkspace'
-#     xcodeVersion: 'default' # Options: 8, 9, default, specifyPath
+  - script: |
+      bundle exec fastlane beta skip_metadata:true only_build:true
+    displayName: "fastlane beta"
+
+  # - task: Xcode@5
+  #   inputs:
+  #     actions: 'build'
+  #     scheme: ''
+  #     sdk: 'iphoneos'
+  #     configuration: 'Release'
+  #     xcWorkspacePath: '**/*.xcodeproj/project.xcworkspace'
+  #     xcodeVersion: 'default' # Options: 8, 9, default, specifyPath
