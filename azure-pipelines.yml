@@ -13,24 +13,25 @@ steps:
   - task: NodeTool@0
     inputs:
       versionSpec: $(node_version)
-  # - task: UseRubyVersion@0
-  #   inputs:
-  #     versionSpec: '2.5.1p57'
-  #     addToPath: true
-
+  - task: Xcode@5
+    inputs:
+      sdk: "iphoneos"
+      configuration: "Release"
+      xcodeVersion: "10"
+      packageApp: false
   - script: |
       gem install bundler
       bundle install --retry=3 --jobs=4
     displayName: "bundle install"
-
   - script: |
       yarn install
     displayName: "yarn install"
-
   - script: |
-      bundle exec fastlane beta skip_metadata:true only_build:true
-    displayName: "fastlane beta"
-
+      bundle exec fastlane setup_signing
+    displayName: "sync code signing"
+  # - script: |
+  #     bundle exec fastlane beta skip_metadata:true only_build:true
+  #   displayName: "fastlane beta"
   # - task: Xcode@5
   #   inputs:
   #     actions: 'build'
