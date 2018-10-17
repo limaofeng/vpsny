@@ -13,11 +13,11 @@ steps:
   - task: NodeTool@0
     inputs:
       versionSpec: $(node_version)
-  - task: Xcode@5
-    inputs:
-      sdk: "iphoneos"
-      configuration: "Release"
-      xcodeVersion: "10"
+  # - task: Xcode@5
+  #   inputs:
+  #     sdk: "iphoneos"
+  #     configuration: "Release"
+  #     xcodeVersion: "10"
   - script: |
       gem install bundler
       bundle install --retry=3 --jobs=4
