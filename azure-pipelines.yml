@@ -15,8 +15,12 @@ steps:
     versionSpec: $(node_version)
 - task: UseRubyVersion@0
   inputs:
-    versionSpec: '>= 2.4'
-    addToPath: true
+    versionSpec: '>= 2.5'
+
+- script: |
+    gem install bundler
+    bundle install --retry=3 --jobs=4
+  displayName: 'bundle install'
 
 - script: yarn install
 
