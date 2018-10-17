@@ -1,14 +1,16 @@
-import React, { StaticLifecycle } from 'react';
-import { StyleSheet, Text, View, TouchableHighlight, ImageSourcePropType, Image } from 'react-native';
-import Theme, { withTheme } from '../../../components/Theme';
-import { Account } from '../../cloud/type';
-import { format } from '../../../utils';
+import React from 'react';
+import { Image, TouchableHighlight, View } from 'react-native';
+
 import { Icon } from '../../../components';
+import Theme, { withTheme } from '../../../components/Theme';
+import { format } from '../../../utils';
+import { Account } from '../../cloud/type';
 
 export const logos = {
   vpsny: require('../../cloud/assets/logo/vpsny.png'),
   vultr: require('../../cloud/assets/logo/vultr.png'),
-  lightsail: require('../../cloud/assets/logo/lightsail.png')
+  lightsail: require('../../cloud/assets/logo/lightsail.png'),
+  digitalocean: require('../../cloud/assets/logo/digitalocean.png')
 };
 
 interface AccountLableProps {

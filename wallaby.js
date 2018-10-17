@@ -5,7 +5,7 @@ module.exports = wallaby => ({
     'src/**/*.ts?(x)',
     '!src/**/*.test.ts?(x)'
   ],
-  tests: ['src/**/*.test.ts?(x)', '!src/__tests__/*.test.ts?(x)'],
+  tests: ['src/**/*.test.ts?(x)'],
   compilers: {
     'config/**/*.js?(x)': wallaby.compilers.babel({ babel: require('babel-core') }),
     '**/*.ts?(x)': wallaby.compilers.typeScript({
@@ -22,6 +22,8 @@ module.exports = wallaby => ({
     jestConfig.globals = { __DEV__: true };
     wallaby.testFramework.configure(jestConfig);
   },
+  filesWithNoCoverageCalculated: ['config/**/*.js'],
+  reportUnhandledPromises: false,
   workers: {
     initial: 6,
     regular: 2

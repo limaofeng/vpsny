@@ -26,6 +26,7 @@ import Pricing from './views/Pricing';
 import SSHPublicKeys from './views/SSHPublicKeys';
 import { VultrAgent, VultrAPIKey } from './VultrProvider';
 import { SystemControl } from 'aws-sdk/clients/ecs';
+import { DigitalOceanAPIKey, DigitalOceanAgent } from './agents/DigitalOceanAgent';
 
 export const getApi = (key: 'vultr' | 'adapter' | string): Agent => {
   const agent = agents.get(key);
@@ -287,8 +288,7 @@ export default new Feature({
           yield call(sleep, interval * 1000);
         } while (true);
       } catch (error) {
-        const { response } = error;
-        if (response && response.status === 412) {
+        if (error.code === 'NotFoundException') {
           yield put({ type: 'instance', payload: { operate: 'delete', instance: { id } } });
         }
         console.warn(error);
@@ -422,6 +422,8 @@ export default new Feature({
             defaultRegion: account.settings!.defaultRegion!,
             regions: []
           });
+        } else if (account.provider === 'digitalocean') {
+          api = new DigitalOceanAgent(account.apiKey as DigitalOceanAPIKey);
         } else {
           console.warn('Wrong parameter' + JSON.stringify(account));
         }
