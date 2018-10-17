@@ -25,6 +25,7 @@
     "axios": "^0.18.0",
     "bluebird": "^3.5.1",
     "d3-shape": "^1.2.2",
+    "dots-wrapper": "^2.5.0",
     "handlebars": "^4.0.12",
     "js-yaml": "^3.12.0",
     "node-forge": "^0.7.5",
@@ -116,7 +117,9 @@
     },
     "moduleNameMapper": {
       "^image![a-zA-Z0-9$_-]+$": "GlobalImageStub",
-      "^[@./a-zA-Z0-9$_-]+\\.(png|gif)$": "RelativeImageStub"
+      "^[@./a-zA-Z0-9$_-]+\\.(png|gif)$": "RelativeImageStub",
+      "@utils": "<rootDir>/src/utils",
+      "@components": "<rootDir>/src/components"
     },
     "testPathIgnorePatterns": [
       "\\.snap$",

@@ -563,14 +563,24 @@ export class VultrAgent implements Agent {
       return list;
     },
     get: async (id: string): Promise<Instance> => {
-      const { data }: any = await axios.get(
-        'https://api.vultr.com/v1/server/list?' +
-          querystring.stringify({
-            SUBID: id
-          }),
-        this.options()
-      );
-      return parseInstance(this.id as string, data);
+      try {
+        const { data }: any = await axios.get(
+          'https://api.vultr.com/v1/server/list?' +
+            querystring.stringify({
+              SUBID: id
+            }),
+          this.options()
+        );
+        return parseInstance(this.id as string, data);
+      } catch (error) {
+        const { response } = error;
+        if (response && response.status === 412) {
+          console.warn(error);
+          error.code = 'NotFoundException';
+          throw error;
+        }
+        throw error;
+      }
     },
     stop: async (id: string): Promise<void> => {
       const { data }: any = await axios.post(

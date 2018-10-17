@@ -3,9 +3,11 @@ import { Bill, APIKey } from './Agent';
 
 export * from './Provider';
 
+export type ProviderType = 'vultr' | 'lightsail' | 'digitalocean';
+
 export interface Account {
   id: string;
-  provider: 'vultr' | 'lightsail';
+  provider: ProviderType;
   title?: string;
   alias?: string;
   name: string;

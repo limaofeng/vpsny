@@ -14,15 +14,17 @@ import { APIKey, User, Bill } from '../Agent';
 import { AWSAPIKey, AWSLightsailAgent, AWSOptions } from '../AWSProvider';
 import AWSLightsailNew from '../components/AWSLightsailNew';
 import VultrNew from '../components/VultrNew';
-import { Account } from '../type';
+import { Account, ProviderType } from '../type';
 import { VultrAgent, VultrAPIKey } from '../VultrProvider';
 import { AppState } from '@modules';
 import { Region } from '../Provider';
+import DigitalOceanNew from '../components/DigitalOceanNew';
+import { DigitalOceanAgent, DigitalOceanAPIKey } from '../agents/DigitalOceanAgent';
 
 interface AccountNewProps {
   dispatch: Dispatch;
   navigation: NavigationScreenProp<any>;
-  provider: 'vultr' | 'lightsail';
+  provider: ProviderType;
   addAccount: (account: Account) => void;
   goBack: (user?: User) => void;
   findAccountByApiKey: (apiKey: APIKey) => Account | undefined;
@@ -109,6 +111,8 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
         await this.handleSaveForLightsail();
       } else if (provider === 'vultr') {
         await this.handleSaveForVultr();
+      } else if (provider === 'digitalocean') {
+        await this.handleSaveForDigitalOcean();
       }
     } catch (error) {
       this.setState({ status: 'initialize' });
@@ -134,6 +138,35 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
       name: user.name,
       email: user.email,
       provider: 'lightsail',
+      sshkeys: [],
+      settings: {
+        defaultRegion: options!.defaultRegion
+      }
+    });
+    this.setState({ user });
+    setApi(api.id, api);
+    submit.submittingText('Pulling SSH Keys');
+    const sshkeys = await api.sshkeys();
+    await dispatch({ type: 'cloud/sshkeys', payload: { id: user.id, sshkeys } });
+    submit.submittingText('Pulling Instances');
+    const instances = await api.instance.list();
+    await dispatch({ type: 'cloud/instances', payload: { instances } });
+    this.setState({ status: 'success' });
+  };
+
+  handleSaveForDigitalOcean = async () => {
+    const { addAccount, dispatch, provider } = this.props;
+    const { apiKey, options } = this.state;
+    const submit = this.submit.current!;
+    const api = new DigitalOceanAgent(apiKey as DigitalOceanAPIKey);
+    const user = await api.user();
+    addAccount({
+      id: user.id,
+      title: 'DigitalOcean',
+      apiKey: user.apiKey,
+      name: user.name,
+      email: user.email,
+      provider,
       sshkeys: [],
       settings: {
         defaultRegion: options!.defaultRegion
@@ -188,6 +221,7 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
         <ScrollView style={{ flex: 1, paddingTop: 13 }}>
           {provider === 'vultr' && <VultrNew user={user} bill={bill} onChangeAPIKey={this.handleAPIKeyChange} />}
           {provider === 'lightsail' && <AWSLightsailNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
+          {provider === 'digitalocean' && <DigitalOceanNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
           <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
             <SubmitButtonWrapper
               style={{ width: Dimensions.get('window').width - 40 }}
