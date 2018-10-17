@@ -18,7 +18,6 @@ steps:
       sdk: "iphoneos"
       configuration: "Release"
       xcodeVersion: "10"
-      packageApp: false
   - script: |
       gem install bundler
       bundle install --retry=3 --jobs=4
