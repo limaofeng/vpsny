@@ -1,9 +1,10 @@
 import React from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Spinner from 'react-native-spinkit';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+
 import { getApi, utils } from '..';
 import { Icon } from '../../../components';
 import Theme, { withTheme } from '../../../components/Theme';
@@ -13,8 +14,8 @@ import Overview from '../../home/components/Overview';
 import { Program } from '../../home/components/Program';
 import { InstantState } from '../../home/type';
 import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
-import { Instance } from '../type';
 import OSLogo from '../components/OSLogo';
+import { Instance } from '../type';
 
 interface InstanceViewProps {
   navigation: NavigationScreenProp<any>;

@@ -34,6 +34,7 @@ export interface User {
   name: string;
   email: string;
   acls?: string[];
+  [key: string]: any;
 }
 
 export interface Bill {

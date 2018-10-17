@@ -48,6 +48,12 @@ class CloudProvider extends React.Component<CloudProviderProps> {
         summary: 'Global Cloud Hosting'
       },
       {
+        id: 'digitalocean',
+        logo: require('../assets/logo/digitalocean.png'),
+        name: 'DigitalOcean',
+        summary: 'The simplest cloud platform for developers & teams'
+      },
+      {
         id: 'lightsail',
         logo: require('../assets/logo/lightsail.png'),
         name: 'Lightsail',
@@ -80,7 +86,7 @@ class CloudProvider extends React.Component<CloudProviderProps> {
                   </View>
                   <View style={{ flex: 2 }}>
                     <Text style={[{ lineHeight: 30, color: colors.major }, fonts.title]}>{data.name}</Text>
-                    <Text style={[{ lineHeight: 30, color: colors.minor }, fonts.body]}>{data.summary}</Text>
+                    <Text style={[{ lineHeight: 17, color: colors.minor }, fonts.body]}>{data.summary}</Text>
                   </View>
                 </TouchableOpacity>
               </Card>

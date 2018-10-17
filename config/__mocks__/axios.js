@@ -16,6 +16,9 @@ async function NodeFetchAdapter(config) {
 }
 
 export default {
+  create: jest.fn((...args) => {
+    return axios.create(...args);
+  }),
   get: jest.fn((...args) => {
     return axios.get(args[0], {
       adapter: NodeFetchAdapter

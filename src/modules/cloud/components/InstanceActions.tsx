@@ -5,6 +5,7 @@ import { ActionSheetIOS, Alert, Text, TouchableOpacity, View } from 'react-nativ
 import { getApi } from '..';
 import { Agent } from '../Agent';
 import { Instance } from '../Provider';
+import { sleep } from '@utils';
 
 export type Operate = 'start' | 'stop' | 'reboot' | 'delete' | 'reinstall';
 export type OperateStatus = 'start' | 'end';
@@ -42,11 +43,10 @@ class InstanceActions extends React.Component<InstanceActionsProps> {
     const { data, onExecute } = this.props;
     const { colors, fonts } = this.props.theme as Theme;
     const options = ['Stop', data.status === 'Running' ? 'Reboot' : 'Start'];
-    if (data.provider === 'vultr') {
-      options.push('Reinstall', 'Delete');
-    } else if (data.provider === 'lightsail') {
-      options.push('Delete');
+    if (data.provider === 'vultr' /* || data.provider === 'digitalocean'*/) {
+      options.push('Reinstall');
     }
+    options.push('Delete');
     const index: number = await new Promise<number>(resolve => {
       ActionSheetIOS.showActionSheetWithOptions(
         {

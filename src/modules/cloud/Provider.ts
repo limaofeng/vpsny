@@ -1,3 +1,5 @@
+import { ProviderType } from './type';
+
 export interface AWSLocation {
   availabilityZone: string;
   region: string;
@@ -346,7 +348,7 @@ export interface Instance {
   /**
    * 服务商
    */
-  provider: 'vultr' | 'lightsail';
+  provider: ProviderType;
   /**
    *  默认 root 密码
    *  defaultPassword： 3Vy.BTwaxk8Xt(z]
@@ -372,6 +374,33 @@ export interface Instance {
    * 防火墙分组
    */
   firewall?: string;
+  networks?: {
+    IPv4?: [
+      {
+        type: string;
+        /**
+         * main_ip = 45.77.22.168
+         */
+        ip: string;
+        /**
+         * netmask_v4 = 255.255.254.0
+         */
+        netmask: string;
+        /**
+         *  gateway_v4 = 45.77.22.1
+         */
+        gateway: string;
+      }
+    ];
+    IPv6?: [
+      {
+        type: string;
+        ip: string;
+        gateway: string;
+        netmask: string;
+      }
+    ];
+  };
   /**
    * Vultr 专有字段
    */
