@@ -29,7 +29,7 @@ steps:
     inputs:
       hostName: ""
       sshPublicKey: ""
-      sshKeySecureFile: "gitlab"
+      sshKeySecureFile: gitlab
   - script: |
       bundle exec fastlane setup_signing
     displayName: "sync code signing"
