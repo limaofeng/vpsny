@@ -25,6 +25,10 @@ steps:
   - script: |
       yarn install
     displayName: "yarn install"
+  - task: InstallSSHKey@0
+    inputs:
+      hostName: limaofeng@homeworld.life
+      sshKeySecureFile: "SSH Key for Gitlab"
   - script: |
       bundle exec fastlane setup_signing
     displayName: "sync code signing"
