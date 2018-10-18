@@ -17,7 +17,7 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "test": "jest --detectOpenHandles",
+    "test": "jest",
     "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "dependencies": {
