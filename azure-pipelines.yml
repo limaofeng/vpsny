@@ -33,5 +33,5 @@ steps:
     displayName: "Publish code coverage from coverage/cobertura-coverage.xml"
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: "from coverage/cobertura-coverage.xml"
+      summaryFileLocation: "coverage/cobertura-coverage.xml"
       reportDirectory: "coverage"
