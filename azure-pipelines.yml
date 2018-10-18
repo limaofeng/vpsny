@@ -12,7 +12,7 @@ steps:
 
   - script: |
       yarn global add codacy-coverage
-      yarn test --ci --reporters=default --reporters=jest-junit --testFailureExitCode=0
+      yarn test --ci --reporters=default --reporters=jest-junit --testFailureExitCode=0 --coverage
       cat ./coverage/lcov.info | codacy-coverage -t a4b375679625458e83026a0469e18cb7 -n vpsny
     displayName: "yarn test"
     env:
@@ -22,3 +22,10 @@ steps:
     displayName: "Publish Test Results artifacts/junit.xml"
     inputs:
       testResultsFiles: artifacts/junit.xml
+
+  - task: PublishCodeCoverageResults@1
+    displayName: "Publish code coverage from coverage/cobertura-coverage.xml"
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: "from coverage/cobertura-coverage.xml"
+      reportDirectory: "coverage"
