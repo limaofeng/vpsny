@@ -131,7 +131,7 @@
       "src/**/*.{ts,tsx}"
     ],
     "coverageDirectory": "./coverage/",
-    "collectCoverage": false,
+    "collectCoverage": true,
     "coveragePathIgnorePatterns": [
       "<rootDir>/config/jest/setupTests.js"
     ],
