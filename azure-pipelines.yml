@@ -25,12 +25,12 @@ steps:
       JEST_JUNIT_OUTPUT: ./artifacts/junit.xml
 
   - task: PublishTestResults@2
-    displayName: "Publish Test Results artifacts/junit.xml"
+    displayName: "Publish Test Results"
     inputs:
       testResultsFiles: artifacts/junit.xml
 
   - task: PublishCodeCoverageResults@1
-    displayName: "Publish code coverage from coverage/cobertura-coverage.xml"
+    displayName: "Publish code coverage"
     inputs:
       codeCoverageTool: Cobertura
       summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/*coverage.xml"
