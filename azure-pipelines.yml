@@ -11,7 +11,7 @@ steps:
     displayName: "yarn install"
 
   - script: |
-      yarn global add react-native
+      yarn global add react-native-cli
       mkdir ./output
       react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ./output/index.ios.jsbundle --assets-dest ./output
     displayName: "react-native bundle for ios"
