@@ -136,6 +136,10 @@
     "coveragePathIgnorePatterns": [
       "<rootDir>/config/jest/setupTests.js"
     ],
+    "coverageReporters": [
+      "text",
+      "cobertura"
+    ],
     "modulePathIgnorePatterns": [
       "/node_modules/.*/react-native/",
       "/node_modules/.*/react/"

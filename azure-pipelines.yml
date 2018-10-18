@@ -1,46 +1,24 @@
-# Xcode
-# Build, test, and archive an Xcode workspace on macOS.
-# Add steps that install certificates, test, sign, and distribute an app, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/xcode
-
 pool:
   vmImage: "macOS 10.13"
-strategy:
-  matrix:
-    node_8_x:
-      node_version: 8.x
+
 steps:
   - task: NodeTool@0
+    displayName: "Use Node 8.x"
     inputs:
-      versionSpec: $(node_version)
-  # - task: Xcode@5
-  #   inputs:
-  #     sdk: "iphoneos"
-  #     configuration: "Release"
-  #     xcodeVersion: "10"
-  - script: |
-      gem install bundler
-      bundle install --retry=3 --jobs=4
-    displayName: "bundle install"
-  - script: |
-      yarn install
+      versionSpec: 8.x
+
+  - script: "yarn install"
     displayName: "yarn install"
-  - task: InstallSSHKey@0
-    inputs:
-      hostName: "gitlab.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFSMqzJeV9rUzU4kWitGjeR4PWSa29SPqJ1fVkhtj3Hw9xjLVXVYrU9QlYWrOLXBpQ6KWjbjTDTdDkoohFzgbEY="
-      sshPublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDidfiEKUTQ+eltZmFLK74FqbKAOTVps01FZAw2VEfAIvi+emTfmI3Ogzn61iZ8RTIGTT0BioOYfKAe9o2c8wAJJvjSzfqJiN7PfeW3rZRwDSQsapwkGQKD2gcHUIpT3hGqkgi+zEUFzFyRt2I3Uuv2T3+j/Xi6YNmzpfvp/6i2yrdKjjDHmayLyEGI8BVHtwEvLvv01+7Na6oJO9Mbp5gmTGxZOKKNj7bmI+iplHNdwjiDDlXifZLNGvitG1xjzqblYnBdp5vnAKzPSrJdvgp9/tOyaMMRLCIAob2RDrU2ft032ICLGiu4cAzfd+59Yp3VfGMnfNSxxIPxpimFS4cyFzjZycGDqbMjokSGNHf8jYc14n1t2WGAXq7Eq+5U1qku8MpLEaV1rSXRWlNmEUJhHf3h3b4ig4/iDUtSdupxgSkFNGIHLbnqWHjU4r8g/QfyPbRl4VkV/Gm89MsUkD9GxNstq49g0U/ftxFJHwwzhDVJIb1cEn6toIDn3G2LIRlP1U+MQEpXncNMrRGGssI97fpWknAqurFT6RNYxyatfik8e4Wq9D+qTRnAr2ALOe4JacYdL/IrgG/65x9MLGRX7aUeRxttYUR4RaK4S+ofAk1mq3ktIAloRIyY0FlZkem+9Cz7FG2bcF1OxdJNemSfPkD43Zdg9HhYeiXpjelltQ== limaofeng@homeworld.life"
-      sshKeySecureFile: gitlab
+
   - script: |
-      bundle exec fastlane setup_signing
-    displayName: "sync code signing"
-  # - script: |
-  #     bundle exec fastlane beta skip_metadata:true only_build:true
-  #   displayName: "fastlane beta"
-  # - task: Xcode@5
-  #   inputs:
-  #     actions: 'build'
-  #     scheme: ''
-  #     sdk: 'iphoneos'
-  #     configuration: 'Release'
-  #     xcWorkspacePath: '**/*.xcodeproj/project.xcworkspace'
-  #     xcodeVersion: 'default' # Options: 8, 9, default, specifyPath
+      yarn global add codacy-coverage
+      yarn test --ci --reporters=default --reporters=jest-junit --testFailureExitCode=0
+      cat ./coverage/lcov.info | codacy-coverage -t a4b375679625458e83026a0469e18cb7 -n vpsny
+    displayName: "yarn test"
+    env:
+      JEST_JUNIT_OUTPUT: ./artifacts/junit.xml
+
+  - task: PublishTestResults@2
+    displayName: "Publish Test Results artifacts/junit.xml"
+    inputs:
+      testResultsFiles: artifacts/junit.xml
