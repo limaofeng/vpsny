@@ -7,7 +7,9 @@ steps:
     inputs:
       versionSpec: 8.x
 
-  - script: "echo \"${Codacy.token}\""
+  - script: "echo $CODACY_PROJECT_TOKEN"
+    env:
+      CODACY_PROJECT_TOKEN: ${Codacy.token}
 
   - script: "yarn install"
     displayName: "yarn install"
