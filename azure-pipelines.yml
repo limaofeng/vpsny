@@ -49,4 +49,5 @@ jobs:
         inputs:
           hostName: $(SSHKey.hostName)
           sshPublicKey: $(SSHKey.sshPublicKey)
-          sshKeySecureFile: $(SSHKey.sshKeySecureFile)
+          # sshKeySecureFile: $(SSHKey.sshKeySecureFile)
+          sshKeySecureFile: '2c18a5e2-7016-45a4-b361-ccc6cb7fa7b9'
