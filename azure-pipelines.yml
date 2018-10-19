@@ -1,47 +1,53 @@
 jobs:
-  - job: Build
-    pool:
-      vmImage: "macOS 10.13"
+  # - job: Build
+  #   pool:
+  #     vmImage: "macOS 10.13"
 
-    steps:
-      - task: NodeTool@0
-        displayName: "Use Node 8.x"
-        inputs:
-          versionSpec: 8.x
+  #   steps:
+  #     - task: NodeTool@0
+  #       displayName: "Use Node 8.x"
+  #       inputs:
+  #         versionSpec: 8.x
 
-      - script: "yarn install"
-        displayName: "yarn install"
+  #     - script: "yarn install"
+  #       displayName: "yarn install"
 
-      - script: |
-          yarn global add react-native-cli
-          mkdir ./output
-          react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ./output/index.ios.jsbundle --assets-dest ./output
-        displayName: "react-native bundle for ios"
+  #     - script: |
+  #         yarn global add react-native-cli
+  #         mkdir ./output
+  #         react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ./output/index.ios.jsbundle --assets-dest ./output
+  #       displayName: "react-native bundle for ios"
 
-      - script: |
-          yarn global add codacy-coverage
-          yarn test --ci --reporters=jest-junit --testFailureExitCode=0 --coverage
-          cat ./coverage/lcov.info | codacy-coverage -n vpsny
-        displayName: "yarn test"
-        env:
-          JEST_JUNIT_OUTPUT: ./artifacts/junit.xml
+  #     - script: |
+  #         yarn global add codacy-coverage
+  #         yarn test --ci --reporters=jest-junit --testFailureExitCode=0 --coverage
+  #         cat ./coverage/lcov.info | codacy-coverage -n vpsny
+  #       displayName: "yarn test"
+  #       env:
+  #         JEST_JUNIT_OUTPUT: ./artifacts/junit.xml
 
-      - task: PublishTestResults@2
-        displayName: "Publish Test Results"
-        inputs:
-          testResultsFiles: artifacts/junit.xml
+  #     - task: PublishTestResults@2
+  #       displayName: "Publish Test Results"
+  #       inputs:
+  #         testResultsFiles: artifacts/junit.xml
 
-      - task: PublishCodeCoverageResults@1
-        displayName: "Publish Code Coverage"
-        inputs:
-          codeCoverageTool: Cobertura
-          summaryFileLocation: "$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml"
-          reportDirectory: "$(System.DefaultWorkingDirectory)/coverage"
+  #     - task: PublishCodeCoverageResults@1
+  #       displayName: "Publish Code Coverage"
+  #       inputs:
+  #         codeCoverageTool: Cobertura
+  #         summaryFileLocation: "$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml"
+  #         reportDirectory: "$(System.DefaultWorkingDirectory)/coverage"
 
   - job: Build_IOS
-    dependsOn: Build
+    # dependsOn: Build
     # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     pool: Default
 
     steps:
-      - script: echo "build ios app"
+      steps:
+        - task: InstallSSHKey@0
+          displayName: "Install an SSH key"
+          inputs:
+            hostName: $KNOWN_HOSTS_ENTRY
+            sshPublicKey: $SSH_PUBLIC_KEY
+            sshKeySecureFile: $SSH_KEY
