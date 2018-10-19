@@ -47,6 +47,6 @@ jobs:
       - task: InstallSSHKey@0
         displayName: "Install an SSH key"
         inputs:
-          hostName: $KNOWN_HOSTS_ENTRY
-          sshPublicKey: $SSH_PUBLIC_KEY
-          sshKeySecureFile: $SSH_KEY
+          hostName: ${KNOWN_HOSTS_ENTRY}
+          sshPublicKey: ${SSH_PUBLIC_KEY}
+          sshKeySecureFile: ${SSH_KEY}
