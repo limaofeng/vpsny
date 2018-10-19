@@ -43,5 +43,7 @@ jobs:
           bundle exec fastlane setup_signing
         displayName: "Install Certificate"
       - script: |
+          # 防止 fastlane/keys 不存在, 导致失败。
+          touch fastlane/keys
           bundle exec fastlane beta skip_metadata:true only_build:true
         displayName: "Build IOS"
