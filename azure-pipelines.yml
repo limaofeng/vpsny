@@ -49,4 +49,4 @@ jobs:
         inputs:
           hostName: '$(Parameters.SSHKey.sshPublicKey)'
           sshPublicKey: '$(Parameters.SSHKey.sshPublicKey)'
-          sshKeySecureFile: '$(Parameters.sshKeySecureFile)'
+          sshKeySecureFile: '$(Parameters.SSHKey.sshKeySecureFile)'
