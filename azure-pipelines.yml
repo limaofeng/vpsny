@@ -40,4 +40,5 @@ jobs:
           bundle install --retry=3 --jobs=4
         displayName: "bundle install"
       - script: |
-        displayName: "bundle exec fastlane setup_signing"
+          bundle exec fastlane setup_signing
+        displayName: "Install Certificate"
