@@ -16,7 +16,7 @@ steps:
   - script: |
       yarn global add codacy-coverage
       env
-      echo $CODACY_PROJECT_TOKEN
+      echo $SECRET_CODACY_PROJECT_TOKEN
       # yarn test --ci --reporters=jest-junit --testFailureExitCode=0 --coverage
       # cat ./coverage/lcov.info | codacy-coverage -t $CODACY_PROJECT_TOKEN -n vpsny
     displayName: "yarn test"
