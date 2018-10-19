@@ -1,7 +1,6 @@
 jobs:
   - job: Test
-    pool:
-      vmImage: "Ubuntu 16.04"
+    pool: Default
     steps:
       - task: NodeTool@0
         displayName: "Use Node 8.x"
@@ -28,8 +27,7 @@ jobs:
           reportDirectory: "$(System.DefaultWorkingDirectory)/coverage"
 
   - job: Build
-    pool:
-      vmImage: "macOS 10.13"
+    pool: Default
     steps:
       - task: NodeTool@0
         displayName: "Use Node 8.x"
