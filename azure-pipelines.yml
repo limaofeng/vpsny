@@ -1,6 +1,6 @@
 jobs:
   - job: Test
-    pool: 
+    pool:
       vmImage: "macOS 10.13"
     steps:
       - task: NodeTool@0
@@ -37,7 +37,8 @@ jobs:
       - script: "yarn install"
         displayName: "yarn install"
       - script: |
-          yarn global add react-native-cli
-          mkdir ./output
-          react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ./output/index.ios.jsbundle --assets-dest ./output
-        displayName: "react-native bundle for ios"
+          gem install bundler
+          bundle install --retry=3 --jobs=4
+        displayName: "bundle install"
+      - script: |
+        displayName: "bundle exec fastlane setup_signing"
