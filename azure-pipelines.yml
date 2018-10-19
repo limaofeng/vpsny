@@ -39,6 +39,7 @@ jobs:
           reportDirectory: "$(System.DefaultWorkingDirectory)/coverage"
 
   - job: Build_IOS
+    dependsOn: Build
     pool: Default
     steps:
       - script: echo "build ios app"
