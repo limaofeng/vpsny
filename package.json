@@ -136,6 +136,7 @@
       "<rootDir>/config/jest/setupTests.js"
     ],
     "coverageReporters": [
+      "html",
       "lcov",
       "cobertura"
     ],
