@@ -7,13 +7,6 @@ steps:
     inputs:
       versionSpec: 8.x
 
-  - script: |
-      env
-      echo "${Codacy.token}"
-      echo $CODACY_PROJECT_TOKEN
-    env:
-      CODACY_PROJECT_TOKEN: ${Codacy.token}
-
   - script: "yarn install"
     displayName: "yarn install"
 
@@ -26,7 +19,7 @@ steps:
   - script: |
       yarn global add codacy-coverage
       yarn test --ci --reporters=jest-junit --testFailureExitCode=0 --coverage
-      cat ./coverage/lcov.info | codacy-coverage -t ${Codacy.token} -n vpsny
+      cat ./coverage/lcov.info | codacy-coverage -n vpsny
     displayName: "yarn test"
     env:
       JEST_JUNIT_OUTPUT: ./artifacts/junit.xml
