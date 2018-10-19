@@ -23,12 +23,7 @@ default_platform :ios
 platform :ios do
   before_all do
     git_pull(only_tags: true)
-    ENV['DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS'] = '-t DAV'
-    ENV['FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT'] = '1'
-  end
-
-  after_all do
-    push_git_tags
+    ENV["CERTIFICATES_GIT_URL"] = "git@gitlab.com:homeworld.life/certificates.git"
   end
 
   def load_keys
@@ -62,8 +57,9 @@ platform :ios do
   lane :setup_signing do
     keychain_name = ENV['KEYCHAIN_NAME']
     keychain_password = ENV['KEYCHAIN_PASSWORD']
+    git_url = ENV['CERTIFICATES_GIT_URL']
     sync_code_signing(
-      git_url: 'git@gitlab.com:homeworld.life/certificates.git',
+      git_url: git_url,
       app_identifier: 'life.homeworld.app.vpser',
       keychain_name: keychain_name,
       keychain_password: keychain_password,
@@ -72,7 +68,7 @@ platform :ios do
       readonly: true
     )
     sync_code_signing(
-      git_url: 'git@gitlab.com:homeworld.life/certificates.git',
+      git_url: git_url,
       app_identifier: 'life.homeworld.app.vpser',
       keychain_name: keychain_name,
       keychain_password: keychain_password,
@@ -153,6 +149,7 @@ platform :ios do
         )
         git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
         add_git_tag(tag: version_number) if git_version_number != version_number
+        push_git_tags
       end
 
       change_log = change_log_since_last_tag(pre_version_number)
