@@ -47,6 +47,6 @@ jobs:
       - task: InstallSSHKey@0
         displayName: "Install an SSH key"
         inputs:
-          hostName: '$(Parameters.SSHKey.sshPublicKey)'
-          sshPublicKey: '$(Parameters.SSHKey.sshPublicKey)'
-          sshKeySecureFile: '$(Parameters.SSHKey.sshKeySecureFile)'
+          hostName: '$(SSHKey.sshPublicKey)'
+          sshPublicKey: '$(SSHKey.sshPublicKey)'
+          sshKeySecureFile: '$(SSHKey.sshKeySecureFile)'
