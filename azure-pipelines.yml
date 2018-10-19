@@ -38,7 +38,7 @@ jobs:
           summaryFileLocation: "$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml"
           reportDirectory: "$(System.DefaultWorkingDirectory)/coverage"
 
-  - job: "Build IOS"
+  - job: Build_IOS
     pool: Default
     steps:
       - script: echo "build ios app"
