@@ -80,7 +80,7 @@ platform :ios do
 
   desc '自动截图'
   lane :screenshots do
-    load_keys
+    # load_keys
     capture_screenshots
     frame_screenshots
   end

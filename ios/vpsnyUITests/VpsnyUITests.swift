@@ -8,12 +8,13 @@
 
 import XCTest
 
-class VpsnyUITests: XCTestCase {
-
+class vpsnyUITests: XCTestCase {
+    var app: XCUIApplication!
+  
     override func setUp() {
         super.setUp()
 
-        let app = XCUIApplication()
+      app = XCUIApplication()
         setupSnapshot(app)
         app.launch()
     }
@@ -23,15 +24,15 @@ class VpsnyUITests: XCTestCase {
     }
 
     func testExample() {
-      let app = XCUIApplication()
-      snapshot("login")
-      app.buttons["Log in"].tap()
+      sleep(10)
       snapshot("home")
-      app.buttons["Counter"].tap()
-      snapshot("counter")
-      app.buttons["header-back"].tap()
-      app.buttons["Profile"].tap()
-      snapshot("profile")
+    //   app.buttons["Log in"].tap()
+    //   snapshot("home")
+    //   app.buttons["Counter"].tap()
+    //   snapshot("counter")
+    //   app.buttons["header-back"].tap()
+    //   app.buttons["Profile"].tap()
+    //   snapshot("profile")
     }
 
 }
