@@ -39,6 +39,9 @@ jobs:
       - script: |
           bundle install --retry=3 --jobs=4
         displayName: "bundle install"
+      - task: DownloadSecureFile@1
+        inputs:
+          secureFile: "f5892e40-bdec-4732-89c8-800d4a42f32b"
       - script: |
           bundle exec fastlane setup_signing
         displayName: "Install Certificate"
