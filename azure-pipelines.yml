@@ -43,13 +43,10 @@ jobs:
     # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     pool: Default
 
-    #Your build pipeline references an undefined variable named Parameters.SSHKey.hostName’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-    #Your build pipeline references an undefined variable named Parameters.SSHKey.sshPublicKey’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
-    #Your build pipeline references an undefined variable named Parameters.SSHKey.sshKeySecureFile’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
     steps:
       - task: InstallSSHKey@0
         displayName: "Install an SSH key"
         inputs:
-          hostName: '$(Parameters.SSHKey.sshPublicKey)'
-          sshPublicKey: '$(Parameters.SSHKey.sshPublicKey)'
-          sshKeySecureFile: '$(Parameters.SSHKey.sshKeySecureFile)'
+          hostName: $(SSHKey.hostName)
+          sshPublicKey: $(SSHKey.sshPublicKey)
+          sshKeySecureFile: $(SSHKey.sshKeySecureFile)
