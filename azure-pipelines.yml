@@ -1,6 +1,7 @@
 jobs:
   - job: Test
-    pool: Default
+    pool: 
+      vmImage: "macOS 10.13"
     steps:
       - task: NodeTool@0
         displayName: "Use Node 8.x"
