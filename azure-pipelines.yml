@@ -42,3 +42,6 @@ jobs:
       - script: |
           bundle exec fastlane setup_signing
         displayName: "Install Certificate"
+      - script: |
+          bundle exec fastlane beta skip_metadata:true only_build:true
+        displayName: "Build IOS"
