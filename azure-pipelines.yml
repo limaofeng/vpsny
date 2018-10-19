@@ -30,8 +30,8 @@ steps:
       testResultsFiles: artifacts/junit.xml
 
   - task: PublishCodeCoverageResults@1
-    displayName: "Publish code coverage"
+    displayName: "Publish Code Coverage"
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/*coverage.xml"
-      reportDirectory: "$(System.DefaultWorkingDirectory)/**/coverage"
+      summaryFileLocation: "$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml"
+      reportDirectory: "$(System.DefaultWorkingDirectory)/coverage"
