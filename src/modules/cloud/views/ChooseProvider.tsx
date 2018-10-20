@@ -24,6 +24,7 @@ class CloudProvider extends React.Component<CloudProviderProps> {
       headerTitle: 'Connect to Provider',
       headerLeft: (
         <HeaderLeftClose
+          testID="close-newaccount"
           onPress={() => {
             navigation.pop();
           }}
