@@ -99,10 +99,11 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
     const { current } = this.state;
     const serversNumber = current ? instances.filter(node => node.account === current.id).length : instances.length;
     const sshkeysNumber = current ? current.sshkeys.length : 0;
+    const paddingTop = Math.max(30, SafeArea.top);
     return (
       <View style={{ flex: 1, backgroundColor: colors.backgroundColorDeeper }}>
         <View style={{ flex: 1, flexDirection: 'row' }}>
-          <View style={{ width: 70, backgroundColor: '#F0F1F2', paddingTop: SafeArea.top, alignItems: 'center' }}>
+          <View style={{ width: 70, backgroundColor: '#F0F1F2', paddingTop, alignItems: 'center' }}>
             <View style={{ flex: 1 }}>
               <AllAccountLable testID="all-accounts" light={!current} onClick={this.handleLableClick} />
               {accounts.map(a => (
@@ -128,7 +129,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
             </View>
             <View style={{ height: SafeArea.bottom }} />
           </View>
-          <View style={{ paddingTop: SafeArea.top, flex: 1 }}>
+          <View style={{ paddingTop, flex: 1 }}>
             <View
               style={{
                 height: 65,

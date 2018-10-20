@@ -62,7 +62,11 @@ export const SafeArea = (() => {
   const dimen = Dimensions.get('window');
   const height = Math.max(dimen.width, dimen.height);
   switch (height) {
-    case 812:
+    case 812: // iPhone X or iPhone XS
+      data.top = 44;
+      data.bottom = 34;
+      break;
+    case 896: // iPhone XR or iPhone XS Max
       data.top = 44;
       data.bottom = 34;
       break;

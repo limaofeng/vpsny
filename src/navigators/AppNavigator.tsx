@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import * as React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Dimensions, Dimensions } from 'react-native';
 import {
   createBottomTabNavigator,
   createStackNavigator,
@@ -238,7 +238,7 @@ class Application extends React.Component<ApplicationProps> {
           const { routes } = navigation.state;
           return routes.length > 1;
         }}
-        openMenuOffset={330}
+        openMenuOffset={Dimensions.get('window').width * 0.88}
         menu={menu}
       >
         <Stack navigation={navigation} />

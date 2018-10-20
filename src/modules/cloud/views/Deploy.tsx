@@ -186,7 +186,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
     // >
     // </LinearGradient>
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
+      <SafeAreaView forceInset={{bottom: 'never'}} style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
         <ScrollView>
           <List title="Hostname" style={{ marginTop: 13 }}>
             <Item size={50}>
@@ -275,7 +275,12 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             </Item>
           </List>
           <List title="Choose a region">
-            <Item testID="servers-deploy-choose-region" size="medium" push={!!location} onClick={location && this.toLocations}>
+            <Item
+              testID="servers-deploy-choose-region"
+              size="medium"
+              push={!!location}
+              onClick={location && this.toLocations}
+            >
               <View style={{ flex: 1, height: 54 }}>
                 {location ? (
                   <>
@@ -414,7 +419,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
                       </View>
                     </Item>
                   )}
-                <Item value="Private Networking">
+                <Item value="Private Networking" bodyStyle={{ borderBottomWidth: 0 }}>
                   <Note style={{ color: colors.secondary }}>Enable Private Networking</Note>
                 </Item>
               </>

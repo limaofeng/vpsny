@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 
 import Theme, { withTheme } from './Theme';
+import { SafeArea } from '@utils';
 
 interface BottomRegionProps {
   theme?: Theme;
@@ -17,13 +18,14 @@ class BottomRegion extends React.Component<BottomRegionProps> {
   };
   render() {
     const { colors } = this.props.theme!;
-    const { height = 60, children, isVisible = true, backgroundColor = colors.backgroundColor } = this.props;
+    const { children, isVisible = true, backgroundColor = colors.backgroundColorDeeper } = this.props;
+    const height = this.props.height || 60;
     return isVisible ? (
       <View
         style={[
           {
-            marginBottom: -35,
-            height: height + 35,
+            paddingBottom: Math.max(0, SafeArea.bottom - 10),
+            height: height + Math.max(6, SafeArea.bottom - 10),
             backgroundColor
           }
         ]}
@@ -31,7 +33,7 @@ class BottomRegion extends React.Component<BottomRegionProps> {
         <View
           style={[
             {
-              height: height + 10,
+              height: height,
               backgroundColor,
               shadowColor: 'rgba(0, 0, 0, 0.04)',
               shadowOffset: {
