@@ -15,6 +15,7 @@ interface SettingsProps {
   navigation: NavigationScreenProp<any>;
   theme: Theme;
   accounts: Account[];
+  openMenu: (open: boolean) => void;
   instances: Instance[];
 }
 
@@ -65,6 +66,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
   handleJumpSettings = () => {
     const { navigation } = this.props;
     navigation.navigate('Settings');
+    this.props.openMenu(false);
   };
 
   handleJumpToSSHKeys = () => {
@@ -102,7 +104,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
         <View style={{ flex: 1, flexDirection: 'row' }}>
           <View style={{ width: 70, backgroundColor: '#F0F1F2', paddingTop: SafeArea.top, alignItems: 'center' }}>
             <View style={{ flex: 1 }}>
-              <AllAccountLable light={!current} onClick={this.handleLableClick} />
+              <AllAccountLable testID="all-accounts" light={!current} onClick={this.handleLableClick} />
               {accounts.map(a => (
                 <AccountLable
                   key={a.id}
@@ -112,10 +114,12 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                   onClick={this.handleLableClick}
                 />
               ))}
-              <NewAccountLable onClick={this.handleJumpToNewAccount} />
+              <NewAccountLable testID="new-account" onClick={this.handleJumpToNewAccount} />
             </View>
             <View>
               <TouchableOpacity
+                testID="open-settings"
+                accessibilityTraits="button"
                 onPress={this.handleJumpSettings}
                 style={{ width: 70, height: 70, alignItems: 'center', justifyContent: 'center' }}
               >
@@ -185,7 +189,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                     <Text style={[{ color: colors.secondary }, fonts.headline]}>{sshkeysNumber}</Text>
                   </View>
                 </Item>
-                <Item onClick={this.handleJumpToKeyPairs}>
+                <Item testID="keypairs" onClick={this.handleJumpToKeyPairs}>
                   <Icon type="MaterialCommunityIcons" name="key-change" size={16} color={colors.minor} />
                   <Note style={[{ flex: 1 }, fonts.callout]}>Key Pairs</Note>
                 </Item>

@@ -6,7 +6,7 @@ import { Dispatch } from 'redux';
 
 import { getApi, utils } from '../';
 import { AppState } from '../..';
-import { Icon, Item, ItemBody, Label, List } from '../../../components';
+import { Item, ItemBody, Label, List } from '../../../components';
 import ActionButton from '../../../components/ActionButton';
 import Card from '../../../components/Card';
 import Theme, { withTheme } from '../../../components/Theme';
@@ -14,8 +14,8 @@ import { SafeArea, sleep } from '../../../utils';
 import { SSHConnection } from '../../ssh/type';
 import { User } from '../Agent';
 import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
-import { Account, Instance, KeyPair } from '../type';
 import OSLogo from '../components/OSLogo';
+import { Account, Instance, KeyPair } from '../type';
 
 interface InstancesProps {
   navigation: NavigationScreenProp<any>;
@@ -233,6 +233,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
           })}
         </ScrollView>
         <ActionButton
+          testID="servers-deploy"
           position="right"
           radius={80}
           size={50}

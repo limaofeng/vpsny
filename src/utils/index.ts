@@ -17,23 +17,25 @@ export const diff = (lvalue: any, rvalue: any) => {
   return zipObject(keys, values);
 };
 
-export const debounce = (ovalue: any, { isEqual = _isEqual, onlyDiff = false, wait = 1500 }) => {
+export const debounce = (
+  ovalue: any,
+  { isEqual = _isEqual, onlyDiff = false, wait = 1500, callback = (data: any) => {} }
+) => {
   let lvalue = clone(ovalue);
   let timer: any;
-  return (value: any) =>
-    new Promise(resolve => {
-      clearTimeout(timer);
-      if (isEqual(lvalue, value)) {
-        return;
-      }
-      timer = setTimeout(() => {
-        console.log(lvalue, value);
-        const retVal = onlyDiff ? diff(lvalue, value) : value;
-        console.log(`执行更新 ${JSON.stringify(retVal)}`);
-        resolve(retVal);
-        lvalue = clone(value);
-      }, wait);
-    });
+  return (value: any) => {
+    clearTimeout(timer);
+    if (isEqual(lvalue, value)) {
+      return;
+    }
+    timer = setTimeout(() => {
+      console.log(lvalue, value);
+      const retVal = onlyDiff ? diff(lvalue, value) : value;
+      console.log(`执行更新 ${JSON.stringify(retVal)}`);
+      callback(retVal);
+      lvalue = clone(value);
+    }, wait);
+  };
 };
 
 export const template = (template: string, values: { [key: string]: string }) =>

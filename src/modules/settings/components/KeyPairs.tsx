@@ -43,6 +43,7 @@ class KeyPairs extends React.Component<KeyPairsProps, KeyPairsState> {
         {keyPairs.length ? (
           keyPairs.map(keyPair => (
             <Item
+              testID="keypairs-list-item"
               value={keyPair}
               key={keyPair.id}
               onClick={this.handleClick}

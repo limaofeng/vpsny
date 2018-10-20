@@ -42,7 +42,7 @@ class VultrNew extends React.Component<VultrNewProps, VultrNewState> {
       <>
         <List title="API-Key">
           <Item>
-            <Input onValueChange={this.handleAPIKey} defaultValue={apiKey} />
+            <Input testID="vultr-apikey" onValueChange={this.handleAPIKey} defaultValue={apiKey} />
           </Item>
         </List>
         {!!user && (

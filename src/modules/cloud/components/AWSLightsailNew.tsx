@@ -58,12 +58,12 @@ class AWSLightsailNew extends React.Component<AWSLightsailNewProps, AWSLightsail
       <>
         <List title="Access Key">
           <Item>
-            <Input onValueChange={this.handleAccessKey} defaultValue={accessKey} />
+            <Input testID="lightsail-accesskey" onValueChange={this.handleAccessKey} defaultValue={accessKey} />
           </Item>
         </List>
         <List title="Secret Key">
           <Item>
-            <Input onValueChange={this.handleSecretKey} defaultValue={secretKey} />
+            <Input testID="lightsail-secretkey" onValueChange={this.handleSecretKey} defaultValue={secretKey} />
           </Item>
         </List>
         <List title="Default Region">

@@ -126,7 +126,7 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
             <AWSLightsailView navigation={this.props.navigation} update={this.props.update} account={account} />
           )}
           <List title=" ">
-            <Item onClick={this.handleDelete}>
+            <Item testID="account-delete" onClick={this.handleDelete}>
               <View style={{ alignItems: 'center', flex: 1 }}>
                 <Note style={{ color: colors.colorful.red }}>Delete Account</Note>
               </View>

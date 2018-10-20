@@ -4,7 +4,7 @@ import { Image, TouchableHighlight, View } from 'react-native';
 import { Icon } from '../../../components';
 import Theme, { withTheme } from '../../../components/Theme';
 import { format } from '../../../utils';
-import { Account } from '../../cloud/type';
+import { Account, ProviderType } from '../../cloud/type';
 
 export const logos = {
   vpsny: require('../../cloud/assets/logo/vpsny.png'),
@@ -16,8 +16,9 @@ export const logos = {
 interface AccountLableProps {
   theme?: Theme;
   light?: boolean;
+  testID?: string;
   value?: Account;
-  logo: 'vpsny' | 'vultr' | 'lightsail';
+  logo: ProviderType | 'vpsny';
   onClick?: (account?: Account) => void;
 }
 
@@ -46,7 +47,7 @@ class AccountLable extends React.Component<AccountLableProps, AccountLableState>
 
   render() {
     const { colors, fonts } = this.props.theme as Theme;
-    const { logo } = this.props;
+    const { logo, testID } = this.props;
     const { light } = this.state;
     return (
       <View
@@ -75,6 +76,8 @@ class AccountLable extends React.Component<AccountLableProps, AccountLableState>
               borderRadius: 24,
               backgroundColor: colors.backgroundColorDeeper
             }}
+            testID={testID}
+            accessibilityTraits="button"
             underlayColor={format.color(colors.primary, 'rgba', 0.1)}
             onPress={this.handleClick}
           >
@@ -99,12 +102,21 @@ const AccountLableWarp = withTheme(AccountLable);
 
 export default AccountLableWarp;
 
-export const AllAccountLable = ({ light, onClick }: { light: boolean; onClick?: (account?: Account) => void }) => {
-  return <AccountLableWarp logo={'vpsny'} light={light} onClick={onClick} />;
+export const AllAccountLable = ({
+  light,
+  onClick,
+  testID
+}: {
+  testID?: string;
+  light: boolean;
+  onClick?: (account?: Account) => void;
+}) => {
+  return <AccountLableWarp testID={testID} logo={'vpsny'} light={light} onClick={onClick} />;
 };
 
 interface NewAccountLableProps {
   theme?: Theme;
+  testID?: string;
   onClick: () => void;
 }
 
@@ -122,6 +134,8 @@ export const NewAccountLable = withTheme(
           }}
         >
           <TouchableHighlight
+            accessibilityTraits="button"
+            testID={this.props.testID}
             style={{
               width: 48,
               height: 48,

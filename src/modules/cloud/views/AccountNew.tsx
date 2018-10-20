@@ -218,12 +218,13 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
     const { user, bill, regions } = this.state;
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
-        <ScrollView style={{ flex: 1, paddingTop: 13 }}>
+        <ScrollView accessible={false} style={{ flex: 1, paddingTop: 13 }}>
           {provider === 'vultr' && <VultrNew user={user} bill={bill} onChangeAPIKey={this.handleAPIKeyChange} />}
           {provider === 'lightsail' && <AWSLightsailNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
           {provider === 'digitalocean' && <DigitalOceanNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
           <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
             <SubmitButtonWrapper
+              testID="newaccount-save"
               style={{ width: Dimensions.get('window').width - 40 }}
               ref={this.submit}
               reentrant

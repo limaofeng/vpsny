@@ -6,7 +6,7 @@ import {
   createStackNavigator,
   NavigationScreenConfigProps,
   NavigationScreenOptions,
-  NavigationScreenProp,
+  NavigationScreenProp
 } from 'react-navigation';
 
 import { Icon, IconType } from '../components';
@@ -122,6 +122,8 @@ const Stack = createStackNavigator(
           headerTitle: tab.title,
           headerLeft: (
             <TouchableOpacity
+              accessibilityTraits="button"
+              testID="toggle-sidebar"
               onPress={() => {
                 const openMeun = navigation.getParam('openMenu');
                 openMeun && openMeun();
@@ -145,6 +147,7 @@ const Stack = createStackNavigator(
     Locations,
     Pricing,
     Images,
+    SSHPublicKeys,
     // Account
     AccountList,
     // AccountNew: {
@@ -215,14 +218,17 @@ class Application extends React.Component<ApplicationProps> {
     this.timer && clearInterval(this.timer);
   }
   side = React.createRef<SideMenu>();
+  toggleSidebar = (open: boolean) => {
+    const side = this.side.current as SideMenu;
+    side.openMenu(open);
+  };
   render() {
     const { navigation } = this.props;
-    const menu = <Sidebar navigation={navigation} />;
+    const menu = <Sidebar openMenu={this.toggleSidebar} navigation={navigation} />;
     const tabs = navigation.state.routes[0];
     tabs.params = {
       openMenu: () => {
-        const side = this.side.current as SideMenu;
-        side.openMenu(true);
+        this.toggleSidebar(true);
       }
     };
     return (

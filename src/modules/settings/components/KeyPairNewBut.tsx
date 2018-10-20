@@ -44,6 +44,7 @@ class KeyPairNewBut extends React.Component<KeyPairNewButProps> {
     const { colors } = this.props.theme as Theme;
     return (
       <ActionButton
+        testID="keypairs-actions"
         position="right"
         radius={80}
         size={50}
@@ -52,6 +53,7 @@ class KeyPairNewBut extends React.Component<KeyPairNewButProps> {
         buttonColor={colors.primary}
       >
         <ActionButton.Item
+          testID="keypairs-actions-paste"
           onPress={this.handlePasteKeyPai}
           size={45}
           buttonColor={colors.colorful.green}
@@ -64,6 +66,7 @@ class KeyPairNewBut extends React.Component<KeyPairNewButProps> {
           onPress={generateKeyPair}
           buttonColor={colors.colorful.purple}
           title="Generate Key"
+          testID="keypairs-actions-generate"
         >
           <Icon type="MaterialCommunityIcons" name="auto-fix" size={18} color={colors.backgroundColorDeeper} />
         </ActionButton.Item>

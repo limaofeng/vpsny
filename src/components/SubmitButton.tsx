@@ -7,6 +7,7 @@ import { Icon } from './Item';
 import Theme, { withTheme } from './Theme';
 
 interface SubmitButtonProps {
+  testID?: string;
   title: string;
   submittingText?: string;
   doneText?: string;
@@ -70,12 +71,14 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
   };
   render() {
     const { colors, fonts } = this.props.theme as Theme;
-    const { title, doneText, style, buttonStyle, reentrant } = this.props;
+    const { title, doneText, style, buttonStyle, reentrant, testID } = this.props;
     const { submitting, done, submittingText, disabled } = this.state;
     return (
       <TouchableOpacity
-        disabled={submitting || (!reentrant && done)}
+        // disabled={submitting || (!reentrant && done)}
         onPress={this.handleSubmit}
+        testID={testID}
+        accessibilityTraits="button"
         style={[styles.container, { backgroundColor: disabled ? colors.trivial : colors.primary }, style]}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>

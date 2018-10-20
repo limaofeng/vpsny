@@ -205,7 +205,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
           </Text>
           */}
           <List title="Choose a size">
-            <Item size={80} onClick={this.toPricing} push>
+            <Item testID="servers-deploy-choose-size" size={80} onClick={this.toPricing} push>
               <ItemStart>
                 <View style={{ alignItems: 'center' }}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
@@ -275,7 +275,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             </Item>
           </List>
           <List title="Choose a region">
-            <Item size="medium" push={!!location} onClick={location && this.toLocations}>
+            <Item testID="servers-deploy-choose-region" size="medium" push={!!location} onClick={location && this.toLocations}>
               <View style={{ flex: 1, height: 54 }}>
                 {location ? (
                   <>
@@ -321,7 +321,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
           </Text>
         */}
           <List title="Choose an image">
-            <Item size={45} push onClick={this.toImages}>
+            <Item testID="servers-deploy-choose-image" size={45} push onClick={this.toImages}>
               <Note>
                 {image && (image as SystemImage).name} {image && ((image as SystemImage).version as ImageVersion).name}
               </Note>
@@ -346,7 +346,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             </Item>
           </List>
           <List title="Add your SSH keys">
-            <Item onClick={this.toSSHKeys} push>
+            <Item testID="servers-deploy-choose-sshkeys" onClick={this.toSSHKeys} push>
               <View style={{ flexDirection: 'column', flex: 1 }}>
                 <View style={[{ flexDirection: 'row', alignItems: 'center', flex: 1 }]}>
                   <View pointerEvents="box-only" style={{ flex: 1, flexDirection: 'column' }}>

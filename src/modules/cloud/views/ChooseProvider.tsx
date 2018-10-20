@@ -1,7 +1,12 @@
 import { Card, HeaderLeftClose, Theme, withTheme } from '@components';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { NavigationScreenConfigProps, NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
+import {
+  NavigationScreenConfigProps,
+  NavigationScreenOptions,
+  NavigationScreenProp,
+  SafeAreaView
+} from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
@@ -32,8 +37,7 @@ class CloudProvider extends React.Component<CloudProviderProps> {
     const { navigation } = this.props;
     navigation.navigate('AccountNew', {
       provider,
-      callback: (user: User) => {
-      }
+      callback: (user: User) => {}
     });
   };
 
@@ -78,6 +82,8 @@ class CloudProvider extends React.Component<CloudProviderProps> {
             {providers.map(data => (
               <Card key={data.id}>
                 <TouchableOpacity
+                  accessibilityTraits="button"
+                  testID={`newaccount-choose-provider-${data.id}`}
                   onPress={this.next(data.id)}
                   style={{ flexDirection: 'row', height: 120, alignItems: 'center' }}
                 >

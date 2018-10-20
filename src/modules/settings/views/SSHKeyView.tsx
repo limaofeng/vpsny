@@ -1,17 +1,14 @@
+import forge from 'node-forge';
 import React from 'react';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions } from 'react-navigation';
-import { StyleSheet, ScrollView, Text, View, Alert, Clipboard, TouchableOpacity, Dimensions } from 'react-native';
+import { Alert, Clipboard, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import forge from 'node-forge';
-import { isEqual } from 'lodash';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import BottomRegion from '../../../components/BottomRegion';
-import { List, Item, Label, Input, ItemBody, ItemDivider, Icon } from '../../../components';
-import Theme, { withTheme } from '../../../components/Theme';
 
+import { Icon, Input, Item, ItemDivider, Label, List } from '../../../components';
+import Theme, { withTheme } from '../../../components/Theme';
 import { KeyPair } from '../../cloud/type';
-import { SafeArea } from '../../../utils';
+import { SafeArea, debounce } from '@utils';
 
 interface SSHKeyViewProps {
   navigation: NavigationScreenProp<any>;
@@ -24,7 +21,6 @@ interface SSHKeyViewProps {
 interface SSHKeyViewState {
   name?: string;
   passphrase?: string;
-  mode: 'edit' | 'view';
 }
 
 class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
@@ -36,13 +32,23 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
   handleChangePassphrase: (value: string) => void;
   handleChangeName: (value: string) => void;
   handlePublicKey: (value: string) => void;
+  handleSave: (value: any) => void;
   constructor(props: SSHKeyViewProps) {
     super(props);
     const { name, passphrase } = this.props.keyPair;
     this.handleChangeName = this.handleChange('name');
     this.handleChangePassphrase = this.handleChange('passphrase');
     this.handlePublicKey = this.handleChange('publicKey');
-    this.state = { name, passphrase, mode: 'view' };
+    this.handleSave = debounce(
+      { name, passphrase },
+      {
+        wait: 500,
+        callback: data => {
+          props.updateKeyPair(data);
+        }
+      }
+    );
+    this.state = { name, passphrase };
   }
 
   select = (plan: any) => {
@@ -53,22 +59,10 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
     };
   };
 
-  handleChange = (field: string) => (value: string) => {
-    const {
-      keyPair: { name, passphrase },
-      updateKeyPair
-    } = this.props;
-    const keyPair = { name, passphrase };
+  handleChange = (field: string) => async (value: string) => {
     const current = { name: this.state.name, passphrase: this.state.passphrase, [field]: value };
-
-    this.setState({ mode: isEqual(keyPair, current) ? 'view' : 'edit', [field]: value });
-  };
-
-  handleSave = () => {
-    const { updateKeyPair } = this.props;
-    const { name, passphrase } = this.state;
-    updateKeyPair({ name, passphrase });
-    this.setState({ mode: 'view' });
+    this.setState({ [field]: value });
+    this.handleSave(current);
   };
 
   handleCopyPublicKeyToOpenSSH = () => {
@@ -111,7 +105,6 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
 
   render() {
     const { colors, fonts } = this.props.theme as Theme;
-    const { mode } = this.state;
     const { keyPair } = this.props;
     return (
       <SafeAreaView
@@ -125,7 +118,7 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
                 <Icon type="FontAwesome5" name="copy" size={16} color={colors.primary} />
                 <Label style={{ color: colors.primary }}>Copy public key</Label>
               </Item>
-              <Item onClick={this.handleDeleteKeyPair}>
+              <Item testID="keypairs-delete" onClick={this.handleDeleteKeyPair}>
                 <Icon type="EvilIcons" name="trash" color={colors.colorful.red} size={24} />
                 <Label style={{ color: colors.colorful.red }}>Delete</Label>
               </Item>
@@ -134,11 +127,12 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
             <List title="Settings">
               <Item>
                 <Label>Name</Label>
-                <Input onValueChange={this.handleChangeName} defaultValue={keyPair.name} />
+                <Input testID="keypairs-view-name" onValueChange={this.handleChangeName} defaultValue={keyPair.name} />
               </Item>
               <Item>
                 <Label>Password</Label>
                 <Input
+                  testID="keypairs-view-password"
                   onValueChange={this.handleChangePassphrase}
                   secureTextEntry
                   defaultValue={keyPair.passphrase}
@@ -171,36 +165,6 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
           </View>
           <View style={{ height: SafeArea.bottom }} />
         </ScrollView>
-        <BottomRegion isVisible={mode === 'edit'}>
-          <TouchableOpacity
-            style={{
-              height: 40,
-              width: Dimensions.get('window').width - 40,
-              borderRadius: 2,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: colors.primary,
-              borderColor: 'green',
-              borderStyle: 'solid',
-              paddingBottom: 2
-            }}
-            onPress={this.handleSave}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text
-                style={[
-                  {
-                    textAlign: 'center',
-                    color: colors.backgroundColorDeeper
-                  },
-                  fonts.callout
-                ]}
-              >
-                Save
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </BottomRegion>
       </SafeAreaView>
     );
   }

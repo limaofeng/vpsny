@@ -1,15 +1,15 @@
 import React from 'react';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions } from 'react-navigation';
-import { StyleSheet, ScrollView, Text, View, Picker, TouchableHighlight, Clipboard, Alert, Image } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import DeviceInfo from 'react-native-device-info';
 
-import Theme, { withTheme } from '../../../components/Theme';
-import { List, Item, Note, ItemStart, ItemBody, Icon } from '../../../components';
-import HeaderRight from '../../../components/HeaderRight';
-import { Account } from '../../cloud/type';
+import { Icon, Item, ItemStart, List, Note } from '../../../components';
 import HeaderLeftClose from '../../../components/HeaderLeftClose';
+import HeaderRight from '../../../components/HeaderRight';
+import Theme, { withTheme } from '../../../components/Theme';
+import { Account } from '../../cloud/type';
 import { logos } from '../components/AccountLable';
 
 type Mode = 'choose' | 'manage';
@@ -36,6 +36,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
       headerBackTitle: 'Back',
       headerLeft: (
         <HeaderLeftClose
+          testID="close-settings"
           onPress={() => {
             navigation.pop();
           }}
@@ -106,7 +107,14 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
             title="Accounts"
           >
             {accounts.map(a => (
-              <Item size={62} key={`account-${a.id}`} value={a} onClick={this.handleJumpToAccountView} push>
+              <Item
+                testID="account-list-item"
+                size={62}
+                key={`account-${a.id}`}
+                value={a}
+                onClick={this.handleJumpToAccountView}
+                push
+              >
                 <ItemStart>
                   <Image source={logos[a.provider]} resizeMode="contain" style={{ height: 32, width: 32 }} />
                 </ItemStart>
@@ -116,14 +124,14 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                 </View>
               </Item>
             ))}
-            <Item size={44} skip onClick={this.handleJumpToNewAccount}>
+            <Item testID="new-account" size={44} skip onClick={this.handleJumpToNewAccount}>
               <View style={{ alignItems: 'center', flex: 1 }}>
                 <Note style={[fonts.callout, { color: colors.primary }]}>Add Account</Note>
               </View>
             </Item>
           </List>
           <List>
-            <Item onClick={this.handleJumpToKeyPairs} push>
+            <Item testID="settings-keypairs" onClick={this.handleJumpToKeyPairs} push>
               <Icon type="MaterialCommunityIcons" name="key-change" size={16} color="#4180EE" />
               <Note>Key Pairs</Note>
             </Item>

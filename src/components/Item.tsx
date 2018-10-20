@@ -12,7 +12,7 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   View,
-  ViewStyle,
+  ViewStyle
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
@@ -171,6 +171,7 @@ export const Input = withTheme(
       return (
         <TextInput
           {...this.props}
+          accessibilityTraits="text"
           autoCapitalize={autoCapitalize}
           placeholder={placeholder}
           onChangeText={onValueChange}
@@ -326,6 +327,7 @@ interface ItemProps {
   last?: boolean;
   visible?: boolean;
   theme?: Theme;
+  testID?: string;
 }
 
 export default withTheme(
@@ -347,7 +349,7 @@ export default withTheme(
         return [];
       }
       const { colors } = this.props.theme as Theme;
-      const { size = 'normal', last, mode, checked, style, bodyStyle, push, arrowStyle } = this.props;
+      const { size = 'normal', last, mode, checked, style, bodyStyle, push, arrowStyle, testID } = this.props;
       const children: React.ReactElement<any>[] = React.Children.toArray(this.props.children) as React.ReactElement<
         any
       >[];
@@ -459,7 +461,13 @@ export default withTheme(
         </View>
       );
       return push || handleClick ? (
-        <TouchableHighlight underlayColor={colors.colorful.iron} onLongPress={this.handleClick} onPress={handleClick}>
+        <TouchableHighlight
+          testID={testID}
+          accessibilityTraits="button"
+          underlayColor={colors.colorful.iron}
+          onLongPress={this.handleClick}
+          onPress={handleClick}
+        >
           {item}
         </TouchableHighlight>
       ) : (
