@@ -23,7 +23,7 @@ class AWSLightsailNew extends React.Component<AWSLightsailNewProps, AWSLightsail
     this.state = {
       accessKey: '',
       secretKey: '',
-      defaultRegion: 'us-east-1'
+      defaultRegion: 'ap-northeast-1'
     };
   }
   handleAccessKey = (accessKey: string) => {
