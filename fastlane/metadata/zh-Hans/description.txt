@@ -1,1 +1,1 @@
-
+vpsny 是一款在 iPhone 上帮助管理虚拟服务器的应用。它现在已经支持 Vultr / AWS Lightsail / DigitalOcean 。
