@@ -231,6 +231,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
               </Card>
             );
           })}
+          <Text style={{ color: 'transparent' }}>test-refresh</Text>
         </ScrollView>
         <ActionButton
           testID="servers-deploy"

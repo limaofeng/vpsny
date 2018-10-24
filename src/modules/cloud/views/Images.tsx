@@ -83,7 +83,7 @@ class Images extends React.Component<ImagesProps, ImagesState> {
   render() {
     const {
       images,
-      theme: { colors, fonts }
+      theme: { colors }
     } = this.props;
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>

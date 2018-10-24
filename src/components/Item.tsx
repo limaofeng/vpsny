@@ -221,7 +221,14 @@ export const Password = withTheme(
             />
           </View>
           <TouchableOpacity
-            style={{ width: 28, height: '100%', justifyContent: 'center', alignItems: 'center' }}
+            style={{
+              width: 40,
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              right: 0
+            }}
             onPress={this.toggle}
             activeOpacity={1}
           >

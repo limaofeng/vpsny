@@ -1,4 +1,4 @@
-import { Input, Item, Label, List, Note, Theme, withTheme, Password } from '@components';
+import { Item, Label, List, Note, Theme, withTheme } from '@components';
 import { format } from '@utils';
 import React from 'react';
 import { StyleSheet } from 'react-native';

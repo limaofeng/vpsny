@@ -1,11 +1,10 @@
+import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
+import { format } from '@utils';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Input, Item, List, Label, Note } from '../../../components';
-import Theme, { withTheme } from '../../../components/Theme';
-import { APIKey, User, Bill } from '../Agent';
+import { APIKey, Bill, User } from '../Agent';
 import { DigitalOceanAPIKey } from '../agents/DigitalOceanAgent';
-import { format } from '../../../utils/index';
 
 interface DigitalOceanNewProps {
   theme?: Theme;

@@ -1,9 +1,9 @@
+import { Input, Item, Label, List, Note, Select, Theme, withTheme } from '@components';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { APIKey, User } from '../Agent';
-import { AWSAPIKey, AWSRegions, AWSOptions } from '../AWSProvider';
-import { Theme, List, Item, Input, Select, Label, Note, withTheme } from '@components';
+import { AWSAPIKey, AWSOptions, AWSRegions } from '../AWSProvider';
 
 interface AWSLightsailNewProps {
   theme?: Theme;

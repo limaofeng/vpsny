@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
-import { Input, Item, List, Label, Note } from '../../../components';
+import { Input, Item, Label, List, Note } from '../../../components';
 import Theme, { withTheme } from '../../../components/Theme';
-import { APIKey, User, Bill } from '../Agent';
+import { format } from '../../../utils';
+import { APIKey, Bill, User } from '../Agent';
 import { VultrAPIKey } from '../VultrProvider';
-import { format } from '../../../utils/index';
 
 interface VultrNewProps {
   theme?: Theme;
