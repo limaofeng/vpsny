@@ -12,6 +12,7 @@ devices([
 ])
 
 languages([
+  "en-US",
   "zh-Hans"
 ])
 
