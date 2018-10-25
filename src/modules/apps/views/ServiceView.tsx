@@ -1,37 +1,20 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { NavigationScreenOptions, SafeAreaView, NavigationScreenProp } from 'react-navigation';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-  Dimensions,
-  Switch,
-  Animated,
-  Easing,
-  LayoutChangeEvent,
-  Image
-} from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
-import { Dispatch } from 'redux';
+import { Animated, Easing, Image, LayoutChangeEvent, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 import Spinner from 'react-native-spinkit';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 
-import { sleep } from '../../../utils';
-import { List, Item, Label, Input, Note, ItemDivider, Select, Icon, ItemBody, ItemStart } from '../../../components';
-import { Service, Port, Volume, Link, Env, generateCommand } from '..';
-import BottomRegion from '../../../components/BottomRegion';
+import { Env, generateCommand, Link, Port, Service, Volume } from '..';
+import { Icon, Input, Item, ItemDivider, Label, List, Note, Select } from '../../../components';
+import TabBar from '../../../components/TabBar';
 import Theme, { withTheme } from '../../../components/Theme';
-import SubmitButton from '../../../components/SubmitButton';
-import DockerImageInput from '../components/DockerImageInput';
+import { sleep } from '../../../utils';
+import { Instance } from '../../cloud/type';
+import ScrollableTab from '../../home/components/ScrollableTab';
 import DockerToolbar, { Tool } from '../components/DockerToolbar';
 import MultiInput from '../components/MultiInput';
-import { Instance } from '../../cloud/type';
-import TabBar from '../../../components/TabBar';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
-import ScrollableTab from '../../home/components/ScrollableTab';
 
 interface StretchProps {
   disableSlider?: boolean;

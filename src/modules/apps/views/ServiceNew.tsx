@@ -1,32 +1,31 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { NavigationScreenOptions, SafeAreaView } from 'react-navigation';
 import {
+  Animated,
+  Dimensions,
+  Easing,
+  LayoutChangeEvent,
   StyleSheet,
+  Switch,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
-  Dimensions,
-  Switch,
-  Animated,
-  Easing,
-  LayoutChangeEvent
+  View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
+import { NavigationScreenOptions, SafeAreaView } from 'react-navigation';
+import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { sleep } from '../../../utils';
-import { List, Item, Label, Input, Note, ItemDivider, Select, Icon, ItemBody, ItemStart } from '../../../components';
-import { Service, Port, Volume, Link, Env, generateCommand } from '../index';
+import { Env, generateCommand, Link, Port, Service, Volume } from '..';
+import { Icon, Input, Item, ItemBody, ItemDivider, Label, List, Select } from '../../../components';
 import BottomRegion from '../../../components/BottomRegion';
-import Theme, { withTheme } from '../../../components/Theme';
 import SubmitButton from '../../../components/SubmitButton';
+import Theme, { withTheme } from '../../../components/Theme';
+import { sleep } from '../../../utils';
+import { Instance } from '../../cloud/type';
 import DockerImageInput from '../components/DockerImageInput';
 import DockerToolbar, { Tool } from '../components/DockerToolbar';
 import MultiInput from '../components/MultiInput';
-import { Instance } from '../../cloud/type';
 
 interface StretchProps {
   disableSlider?: boolean;

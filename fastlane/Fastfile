@@ -24,6 +24,8 @@ platform :ios do
   before_all do
     git_pull(only_tags: true)
     ENV["CERTIFICATES_GIT_URL"] = "git@gitlab.com:homeworld.life/certificates.git"
+    ENV['DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS'] = "-t DAV"
+    ENV['FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT'] = "1"
   end
 
   def load_keys
