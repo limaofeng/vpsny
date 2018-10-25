@@ -420,7 +420,7 @@ export class VultrAgent implements Agent {
         continue;
       }
       const image = getImage('os', version.family, images);
-      image.versions.push({
+      image.versions!.push({
         id: parseInt(vid),
         name: version.name
           .replace(image.name, '')

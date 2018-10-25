@@ -165,7 +165,7 @@ export interface SystemImage {
   id: number;
   type: string; // os | app
   name: string;
-  versions: ImageVersion[];
+  versions?: ImageVersion[];
   version?: ImageVersion;
 }
 

@@ -31,6 +31,7 @@ type State = {
   hiddenMenuOffsetPercentage: number;
   hiddenMenuOffset: number;
   left: Animated.Value;
+  moving: boolean;
 };
 
 const deviceScreen: WindowDimensions = Dimensions.get('window');
@@ -46,7 +47,7 @@ interface SideMenuProps {
   toleranceY: number;
   menuPosition: 'left' | 'right';
   onChange: (open: boolean) => void;
-  onMove: () => void;
+  onMove?: (value: number) => void;
   children: any;
   menu: any;
   openMenuOffset: number;
@@ -55,6 +56,7 @@ interface SideMenuProps {
   disableGestures?: () => void | boolean;
   animationFunction?: (prop: Animated.Value, value: number) => Animated.CompositeAnimation;
   onAnimationComplete?: () => void;
+  onSliding?: (value: number) => void;
   onStartShouldSetResponderCapture?: () => void;
   isOpen: boolean;
   bounceBackOnOverdraw: boolean;
@@ -101,6 +103,10 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
   };
   responder: PanResponderInstance;
   analytics?: RNFirebase.Analytics;
+  onMoveShouldSetPanResponder: any;
+  onPanResponderMove: any;
+  onPanResponderRelease: any;
+  onPanResponderTerminate: any;
   constructor(props: SideMenuProps) {
     super(props);
 
@@ -143,7 +149,7 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
     };
 
     this.state.left.addListener(({ value }) =>
-      this.props.onSliding(
+      this.props.onSliding!(
         Math.abs((value - this.state.hiddenMenuOffset) / (this.state.openMenuOffset - this.state.hiddenMenuOffset))
       )
     );
@@ -232,7 +238,7 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
         if (!this.state.moving) {
           this.setState({ moving: true });
         }
-        this.props.onMove(newLeft);
+        this.props.onMove!(newLeft);
         this.state.left.setValue(newLeft);
       }
     }
