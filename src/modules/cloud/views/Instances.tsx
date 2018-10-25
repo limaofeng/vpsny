@@ -16,6 +16,7 @@ import { User } from '../Agent';
 import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
 import OSLogo from '../components/OSLogo';
 import { Account, Instance, KeyPair } from '../type';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface InstancesProps {
   navigation: NavigationScreenProp<any>;
@@ -45,11 +46,17 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
   static defaultProps = {
     onChange: () => {}
   };
+  analytics?: RNFirebase.Analytics;
   constructor(props: InstancesProps) {
     super(props);
     this.state = { instantStates: [], refreshing: false };
   }
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('Servers', 'Instances.tsx');
+  }
   handleRefresh = async (display: boolean = true) => {
+    this.analytics!.logEvent('Refresh');
     const { refresh } = this.props;
     display && this.setState({ refreshing: true });
     await refresh();
@@ -102,6 +109,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
 
   handleJumpToDeploy = () => {
     const { navigation, isNoAccount } = this.props;
+    this.analytics!.logEvent('Press_Deploy');
     if (isNoAccount) {
       navigation.navigate('ChooseProvider', {
         callback: () => {

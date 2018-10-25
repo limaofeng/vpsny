@@ -1,10 +1,11 @@
+import axios, { AxiosInstance } from 'axios';
 import Bluebird from 'bluebird';
-import { Provider, Plan, Region, OS, App, SystemImage, SSHKey, Instance, Features, ImageVersion } from './Provider';
-import axios from 'axios';
 import querystring from 'querystring';
-import forge from 'node-forge';
-import { Agent, Bill, User, APIKey } from './Agent';
-import { format, md5, getPublicKeyFingerprint } from '../../utils';
+import firebase, { RNFirebase } from 'react-native-firebase';
+
+import { getPublicKeyFingerprint, md5 } from '../../utils';
+import { Agent, APIKey, Bill, User } from './Agent';
+import { Features, ImageVersion, Instance, Plan, Region, SSHKey, SystemImage } from './Provider';
 
 const invisible = [
   {
@@ -276,24 +277,48 @@ export interface VultrAPIKey extends APIKey {
 export class VultrAgent implements Agent {
   id: string;
   apiKey: string;
+  http: AxiosInstance;
   constructor({ apiKey }: VultrAPIKey) {
     this.apiKey = apiKey;
     this.id = apiKey === 'vultr' ? 'vultr' : md5('vultr:' + apiKey, ':');
-  }
-  options(post: boolean = false) {
-    const options: any = {
+    this.http = axios.create({
+      baseURL: 'https://api.vultr.com',
       headers: {
-        'API-Key': this.apiKey
+        ...(apiKey ? { 'API-Key': apiKey } : {}),
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
       }
-    };
-    if (post) {
-      options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
-    }
-    return options;
+    });
+    this.http.interceptors.request.use(
+      async config => {
+        const metric = firebase
+          .perf()
+          .newHttpMetric(config.baseURL + config.url!, config.method!.toUpperCase() as RNFirebase.perf.HttpMethod);
+        await metric.start();
+        const store = config as any;
+        store.metric = metric;
+        return config;
+      },
+      error => {
+        return Promise.reject(error);
+      }
+    );
+    this.http.interceptors.response.use(
+      async response => {
+        const store = response.config as any;
+        const metric: RNFirebase.perf.HttpMetric = store.metric;
+        await metric.setHttpResponseCode(response.status);
+        await metric.setResponseContentType(response.headers['content-type']);
+        await metric.stop();
+        return response;
+      },
+      error => {
+        return Promise.reject(error);
+      }
+    );
   }
 
   async regions(): Promise<Region[]> {
-    const { data } = await axios.get('https://api.vultr.com/v1/regions/list');
+    const { data } = await this.http.get('/v1/regions/list');
     const regions: Region[] = [];
     for (const id of Object.keys(data)) {
       const region = data[id];
@@ -322,11 +347,11 @@ export class VultrAgent implements Agent {
       all: { data },
       baremetal: { data: baremetal }
     } = await Bluebird.props({
-      all: axios.get(`https://api.vultr.com/v1/plans/list?type=all`),
-      baremetal: axios.get('https://api.vultr.com/v1/plans/list_baremetal')
+      all: this.http.get(`/v1/plans/list?type=all`),
+      baremetal: this.http.get('/v1/plans/list_baremetal')
     });
 
-    const { data: regions } = await axios.get('https://api.vultr.com/v1/regions/list');
+    const { data: regions } = await this.http.get('/v1/regions/list');
 
     for (const plan of invisible) {
       data[plan.VPSPLANID] = { ...plan, available_locations: Object.keys(regions).map(region => parseInt(region)) };
@@ -388,7 +413,7 @@ export class VultrAgent implements Agent {
   async images(): Promise<SystemImage[]> {
     const images: SystemImage[] = [];
 
-    const { data: oslist } = await axios.get('https://api.vultr.com/v1/os/list');
+    const { data: oslist } = await this.http.get('/v1/os/list');
     for (const vid of Object.keys(oslist)) {
       const version = oslist[vid];
       if (['iso', 'snapshot', 'backup', 'application'].some(val => val === version.family)) {
@@ -406,7 +431,7 @@ export class VultrAgent implements Agent {
       });
     }
 
-    // const { data: applist } = await axios.get('https://api.vultr.com/v1/os/list');
+    // const { data: applist } = await this.http.get('https://api.vultr.com/v1/os/list');
     // for (const vid of Object.keys(applist)) {
     //   const version = applist[vid];
 
@@ -447,8 +472,8 @@ export class VultrAgent implements Agent {
         hostname
       })
     );
-    const { data } = await axios.post(
-      'https://api.vultr.com/v1/server/create',
+    const { data } = await this.http.post(
+      '/v1/server/create',
       querystring.stringify({
         DCID: region.id,
         VPSPLANID: plan.id,
@@ -459,19 +484,14 @@ export class VultrAgent implements Agent {
         ddos_protection: features.DDOSProtection ? 'yes' : 'no',
         auto_backups: features.AutoBackups ? 'yes' : 'no',
         hostname
-      }),
-      this.options(true)
+      })
     );
     console.log('server deploy!', data);
     return data.SUBID;
   }
 
   async user(): Promise<User> {
-    const { data }: any = await axios.get('https://api.vultr.com/v1/auth/info', {
-      headers: {
-        'API-Key': this.apiKey
-      }
-    });
+    const { data }: any = await this.http.get('/v1/auth/info');
     const vultrAPIKey: VultrAPIKey = {
       apiKey: this.apiKey
     };
@@ -484,18 +504,14 @@ export class VultrAgent implements Agent {
     };
   }
   async bill(): Promise<Bill> {
-    const { data }: any = await axios.get('https://api.vultr.com/v1/account/info', this.options());
+    const { data }: any = await this.http.get('/v1/account/info');
     return {
       balance: Math.abs(parseFloat(data.balance)),
       pendingCharges: parseFloat(data.pending_charges)
     };
   }
   async sshkeys(): Promise<SSHKey[]> {
-    const { data }: any = await axios.get('https://api.vultr.com/v1/sshkey/list', {
-      headers: {
-        'API-Key': this.apiKey
-      }
-    });
+    const { data }: any = await this.http.get('/v1/sshkey/list');
     const sshkeys = Object.keys(data).map((id: string) => ({
       id,
       name: data[id].name,
@@ -506,56 +522,38 @@ export class VultrAgent implements Agent {
     return sshkeys;
   }
   async createSSHKey(data: SSHKey): Promise<void> {
-    const { data: info }: any = await axios.post(
-      'https://api.vultr.com/v1/sshkey/create',
+    const { data: info }: any = await this.http.post(
+      '/v1/sshkey/create',
       querystring.stringify({
         name: data.name,
         ssh_key: data.publicKey
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-          'API-Key': this.apiKey
-        }
-      }
+      })
     );
     console.log('createSSHKey', info);
   }
   async updateSSHKey(data: SSHKey): Promise<void> {
-    const { data: info }: any = await axios.post(
-      'https://api.vultr.com/v1/sshkey/update',
+    const { data: info }: any = await this.http.post(
+      '/v1/sshkey/update',
       querystring.stringify({
         SSHKEYID: data.id,
         name: data.name,
         ssh_key: data.publicKey
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-          'API-Key': this.apiKey
-        }
-      }
+      })
     );
     console.log('updateSSHKey', info);
   }
   async destroySSHKey(id: string): Promise<void> {
-    const { data: info }: any = await axios.post(
-      'https://api.vultr.com/v1/sshkey/destroy',
+    const { data: info }: any = await this.http.post(
+      '/v1/sshkey/destroy',
       querystring.stringify({
         SSHKEYID: id
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-          'API-Key': this.apiKey
-        }
-      }
+      })
     );
     console.log('destroySSHKey', info);
   }
   instance = {
     list: async (): Promise<Instance[]> => {
-      const { data }: any = await axios.get('https://api.vultr.com/v1/server/list', this.options());
+      const { data }: any = await this.http.get('/v1/server/list');
       const list = [];
       for (const id of Object.keys(data)) {
         list.push(parseInstance(this.id as string, data[id]));
@@ -564,12 +562,11 @@ export class VultrAgent implements Agent {
     },
     get: async (id: string): Promise<Instance> => {
       try {
-        const { data }: any = await axios.get(
-          'https://api.vultr.com/v1/server/list?' +
+        const { data }: any = await this.http.get(
+          '/v1/server/list?' +
             querystring.stringify({
               SUBID: id
-            }),
-          this.options()
+            })
         );
         return parseInstance(this.id as string, data);
       } catch (error) {
@@ -583,22 +580,20 @@ export class VultrAgent implements Agent {
       }
     },
     stop: async (id: string): Promise<void> => {
-      const { data }: any = await axios.post(
-        'https://api.vultr.com/v1/server/halt',
+      const { data }: any = await this.http.post(
+        '/v1/server/halt',
         querystring.stringify({
           SUBID: id
-        }),
-        this.options(true)
+        })
       );
       console.log('instance start', data);
     },
     start: async (id: string): Promise<void> => {
-      const { data }: any = await axios.post(
-        'https://api.vultr.com/v1/server/start',
+      const { data }: any = await this.http.post(
+        '/v1/server/start',
         querystring.stringify({
           SUBID: id
-        }),
-        this.options(true)
+        })
       );
       console.log('instance start', data);
     },
@@ -606,32 +601,29 @@ export class VultrAgent implements Agent {
       await this.instance.start(id);
     },
     reboot: async (id: string): Promise<void> => {
-      const { data }: any = await axios.post(
-        'https://api.vultr.com/v1/server/reboot',
+      const { data }: any = await this.http.post(
+        '/v1/server/reboot',
         querystring.stringify({
           SUBID: id
-        }),
-        this.options(true)
+        })
       );
       console.log('instance reboot', data);
     },
     destroy: async (id: string): Promise<void> => {
-      const { data }: any = await axios.post(
-        'https://api.vultr.com/v1/server/destroy',
+      const { data }: any = await this.http.post(
+        '/v1/server/destroy',
         querystring.stringify({
           SUBID: id
-        }),
-        this.options(true)
+        })
       );
       console.log('instance destroy', data);
     },
     reinstall: async (id: string): Promise<void> => {
-      const { data }: any = await axios.post(
-        'https://api.vultr.com/v1/server/reinstall',
+      const { data }: any = await this.http.post(
+        '/v1/server/reinstall',
         querystring.stringify({
           SUBID: id
-        }),
-        this.options(true)
+        })
       );
       console.log('instance reinstall', data);
     }

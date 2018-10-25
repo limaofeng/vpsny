@@ -1,12 +1,12 @@
 import { merge } from 'lodash';
 import * as React from 'react';
-import { TouchableOpacity, Dimensions, Dimensions } from 'react-native';
+import { Dimensions, TouchableOpacity } from 'react-native';
 import {
   createBottomTabNavigator,
   createStackNavigator,
   NavigationScreenConfigProps,
   NavigationScreenOptions,
-  NavigationScreenProp
+  NavigationScreenProp,
 } from 'react-navigation';
 
 import { Icon, IconType } from '../components';

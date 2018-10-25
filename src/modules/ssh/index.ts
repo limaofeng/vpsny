@@ -1,16 +1,13 @@
-import { KeyPair } from './../cloud/type';
-import { SSHClient, Credential } from './SSHClient';
-import React from 'react';
-import Bluebird from 'bluebird';
+import { AnyAction, Dispatch, Store } from 'redux';
 import { Feature, InAction } from 'walkuere-rn';
 
-import { sleep, uuid } from '../../utils';
-import Terminal from './views/Terminal';
-import SSHConnect from './components/SSHConnect';
-import { SSHConnection, Command } from './type';
-import { Dispatch, Store, AnyAction } from 'redux';
-import { SettingState } from '../settings';
 import { AppState } from '..';
+import { sleep, uuid } from '../../utils';
+import { KeyPair } from './../cloud/type';
+import SSHConnect from './components/SSHConnect';
+import { Credential, SSHClient } from './SSHClient';
+import { Command, SSHConnection } from './type';
+import Terminal from './views/Terminal';
 
 const clients = new Map<string, SSHClient>();
 

@@ -20,6 +20,7 @@ import { AppState } from '@modules';
 import { Region } from '../Provider';
 import DigitalOceanNew from '../components/DigitalOceanNew';
 import { DigitalOceanAgent, DigitalOceanAPIKey } from '../agents/DigitalOceanAgent';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface AccountNewProps {
   dispatch: Dispatch;
@@ -55,6 +56,7 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
     };
   };
   submit = React.createRef<SubmitButton>();
+  analytics?: RNFirebase.Analytics;
   constructor(props: AccountNewProps) {
     super(props);
     this.state = {
@@ -67,6 +69,8 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
 
   componentDidMount() {
     this.submit.current!.disable();
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('AccountNew_' + this.props.provider, 'AccountNew.tsx');
   }
 
   handleValueChange = (value: string) => {

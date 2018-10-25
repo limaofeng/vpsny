@@ -22,7 +22,6 @@ import {
   TouchableOpacity
 } from 'react-native';
 // import { docco } from 'react-syntax-highlighter/styles/hljs';
-import { Answers } from 'react-native-fabric';
 import { Dispatch } from 'redux';
 import { AppState } from '../..';
 import { getSSHClient, getShellSupervisor } from '..';
@@ -269,7 +268,7 @@ class Terminal extends React.Component<TerminalProps, TerminalState> {
     this.closeShell();
     this.keyboardWillShowListener && this.keyboardWillShowListener.remove();
     this.keyboardWillHideListener && this.keyboardWillHideListener.remove();
-    Answers.logContentView('Close Terminal', 'Terminal', this.props.client.target);
+    // Answers.logContentView('Close Terminal', 'Terminal', this.props.client.target);
   }
   keyboardShow = async (e: any) => {
     const end = e.endCoordinates;
@@ -363,7 +362,6 @@ class Terminal extends React.Component<TerminalProps, TerminalState> {
     const { cols, rows } = await this.sendMessage('handshake');
     await this.startShell(cols, rows);
     this.togglekeyboard();
-    Answers.logContentView('Open Terminal', 'Terminal', this.props.client.target);
   };
 
   handleShell = async (event: 'output' | 'close', body: string) => {

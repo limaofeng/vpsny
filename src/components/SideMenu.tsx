@@ -6,8 +6,11 @@ import {
   Dimensions,
   Animated,
   TouchableWithoutFeedback,
-  StyleSheet
+  StyleSheet,
+  StyleProp,
+  ViewStyle
 } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 type WindowDimensions = { width: number; height: number };
 
@@ -48,9 +51,9 @@ interface SideMenuProps {
   menu: any;
   openMenuOffset: number;
   hiddenMenuOffset: number;
-  animationStyle?: () => void;
+  animationStyle?: (value: Animated.Value) => StyleProp<ViewStyle>;
   disableGestures?: () => void | boolean;
-  animationFunction?: () => void;
+  animationFunction?: (prop: Animated.Value, value: number) => Animated.CompositeAnimation;
   onAnimationComplete?: () => void;
   onStartShouldSetResponderCapture?: () => void;
   isOpen: boolean;
@@ -78,15 +81,14 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
     onMove: () => {},
     onChange: () => {},
     onSliding: () => {},
-    animationStyle: value => ({
+    animationStyle: (value: number) => ({
       transform: [
         {
           translateX: value
         }
       ]
     }),
-    animationFunction: (prop: Animated.Value, value) => {
-      console.log('animationFunction', prop._value, value);
+    animationFunction: (prop: Animated.Value, value: number) => {
       return Animated.spring(prop, {
         toValue: value,
         friction: 8
@@ -98,6 +100,7 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
     autoClosing: true
   };
   responder: PanResponderInstance;
+  analytics?: RNFirebase.Analytics;
   constructor(props: SideMenuProps) {
     super(props);
 
@@ -156,16 +159,16 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
     }
   }
 
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('Sidebar', 'SideMenu.tsx');
+  }
+
   onLayoutChange = (e: Event) => {
     const { width, height } = e.nativeEvent.layout;
     const openMenuOffset = width * this.state.openOffsetMenuPercentage;
     const hiddenMenuOffset = width * this.state.hiddenMenuOffsetPercentage;
     this.setState({ width, height, openMenuOffset, hiddenMenuOffset });
-  };
-
-  onMenuLayout = (e: Event) => {
-    const { width, height } = e.nativeEvent.layout;
-    this.setState({ mleft: width });
   };
 
   /**
@@ -207,7 +210,8 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
   moveLeft(offset: number) {
     const newOffset = this.menuPositionMultiplier() * offset;
 
-    this.props.animationFunction(this.state.left, newOffset).start(this.props.onAnimationComplete);
+    this.analytics!.logEvent('Sidebar_' + ((newOffset === 0) ? 'close' : 'open'));
+    this.props.animationFunction!(this.state.left, newOffset).start(this.props.onAnimationComplete);
 
     this.prevLeft = newOffset;
   }
@@ -289,12 +293,12 @@ export default class SideMenu extends React.Component<SideMenuProps, SideMenuSta
         : { right: this.state.width - this.state.openMenuOffset };
     // boundryStyle
     const menu = (
-      <View style={[styles.menu, { width: this.props.openMenuOffset }]} onLayout={this.onMenuLayout}>
+      <View style={[styles.menu, { width: this.props.openMenuOffset }]}>
         {this.props.menu}
       </View>
     );
 
-    const animationStyle = this.props.animationStyle(this.state.left);
+    const animationStyle = this.props.animationStyle!(this.state.left);
 
     // const left = this.state.mleft;
     return (

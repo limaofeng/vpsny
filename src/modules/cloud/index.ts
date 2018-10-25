@@ -1,7 +1,7 @@
 import Bluebird from 'bluebird';
 import { isEqual } from 'lodash';
 import { Alert } from 'react-native';
-import { Answers, Crashlytics } from 'react-native-fabric';
+import { crashlytics } from 'react-native-firebase';
 import { AnyAction, Dispatch, Store } from 'redux';
 import { Feature, InAction } from 'walkuere-rn';
 import { sleep } from '../../utils';
@@ -10,7 +10,7 @@ import { AppState } from './../index';
 import { Agent, Bill, User } from './Agent';
 import AgentAdapter from './AgentAdapter';
 import { AWSAPIKey, AWSLightsailAgent } from './AWSProvider';
-import { Plan, SSHKey, SystemImage } from './Provider';
+import { Plan, SSHKey } from './Provider';
 import { Account, Instance, Provider, Region } from './type';
 import AccountList from './views/AccountList';
 import AccountNew from './views/AccountNew';
@@ -25,7 +25,6 @@ import Locations from './views/Locations';
 import Pricing from './views/Pricing';
 import SSHPublicKeys from './views/SSHPublicKeys';
 import { VultrAgent, VultrAPIKey } from './VultrProvider';
-import { SystemControl } from 'aws-sdk/clients/ecs';
 import { DigitalOceanAPIKey, DigitalOceanAgent } from './agents/DigitalOceanAgent';
 
 export const getApi = (key: 'vultr' | 'adapter' | string): Agent => {
@@ -116,10 +115,6 @@ export interface CloudState {
   providers: Provider[];
   pricing: Plan[];
   regions: Region[];
-}
-
-interface AccountAction {
-  payload: Account;
 }
 
 interface TrackPayload {
@@ -292,7 +287,7 @@ export default new Feature({
           yield put({ type: 'instance', payload: { operate: 'delete', instance: { id } } });
         }
         console.warn(error);
-        Crashlytics.log(error.message);
+        crashlytics().log(error.message);
       }
     },
     *instances({ payload: { uid, instances } }: AllInstanceAction, { put, select }: any) {
@@ -376,10 +371,6 @@ export default new Feature({
     },
     *addAccount({ payload }: InAction<Account>, { put, call }: any) {
       yield put({ type: 'saveAccount', payload: { ...payload } });
-      Answers.logContentView('Account Save', 'Account', payload.id, {
-        provider: payload.provider,
-        email: payload.email!
-      });
     },
     *updateAccountApiKey({ payload }: InAction<Account>, { put, call }: any) {
       const { apiKey, id } = payload;
@@ -433,7 +424,7 @@ export default new Feature({
       }
       console.log('setup agents ->', Array.from(agents.keys()));
       // 加载默认数据
-      agents.set('vultr', new VultrAgent({ apiKey: 'wrong' }));
+      agents.set('vultr', new VultrAgent({ apiKey: '' }));
       // TODO: AWS 请求数据需要一个 KEY , 不想写死在代码中。可以从服务端获取。
       // agents.set(
       //   'aws',

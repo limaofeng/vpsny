@@ -32,7 +32,7 @@
     "react": "^16.3.2",
     "react-native": "^0.55.4",
     "react-native-device-info": "^0.22.5",
-    "react-native-fabric": "^0.5.2",
+    "react-native-firebase": "^5.0.0",
     "react-native-i18n": "^2.0.12",
     "react-native-keyboard-aware-scroll-view": "^0.7.2",
     "react-native-linear-gradient": "^2.4.0",

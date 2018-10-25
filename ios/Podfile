@@ -44,12 +44,13 @@ target 'vpsny' do
   pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
   # React-native-sound
   pod 'RNSound', :path => '../node_modules/react-native-sound'
-  # RNFabric
-  pod 'ReactNativeFabric', :path => '../node_modules/react-native-fabric'
+  # RNFirebase
+  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
   # NMSSH
   pod 'NMSSH'
-  # Fabric
+  # Firebase
+  pod 'Firebase/Core', '~> 5.9.0'
+  pod 'Firebase/Performance', '~> 5.9.0'
   pod 'Fabric'
   pod 'Crashlytics'
-
 end

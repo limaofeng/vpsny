@@ -1,12 +1,8 @@
 import { Card, HeaderLeftClose, Theme, withTheme } from '@components';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import {
-  NavigationScreenConfigProps,
-  NavigationScreenOptions,
-  NavigationScreenProp,
-  SafeAreaView
-} from 'react-navigation';
+import firebase, { RNFirebase } from 'react-native-firebase';
+import { NavigationScreenConfigProps, NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
@@ -33,14 +29,19 @@ class CloudProvider extends React.Component<CloudProviderProps> {
       headerBackTitle: 'Back'
     };
   };
-
+  analytics?: RNFirebase.Analytics;
   next = (provider: string) => () => {
     const { navigation } = this.props;
+    this.analytics!.logEvent('ChooseProvider', { provider });
     navigation.navigate('AccountNew', {
       provider,
       callback: (user: User) => {}
     });
   };
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('AccountNew_ChooseProvider', 'ChooseProvider.tsx');
+  }
 
   render() {
     const { colors, fonts } = this.props.theme as Theme;

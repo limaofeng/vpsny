@@ -8,6 +8,7 @@
  */
 
 #import "AppDelegate.h"
+#import <Firebase.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import <Crashlytics/Answers.h>
@@ -32,6 +33,7 @@
     UIViewController *rootViewController = [UIViewController new];
     rootViewController.view = rootView;
     self.window.rootViewController = rootViewController;
+    [FIRApp configure];
     [Fabric with:@[[Crashlytics class]]];
     [Fabric with:@[[Answers class]]];
     [self.window makeKeyAndVisible];

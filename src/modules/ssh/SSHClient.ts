@@ -1,5 +1,5 @@
-import { NativeModules, NativeEventEmitter, EmitterSubscription } from 'react-native';
-import { sleep } from '../../utils';
+import { EmitterSubscription, NativeEventEmitter, NativeModules } from 'react-native';
+
 import { Observable } from '../../utils/Observable';
 
 const { RNSSH } = NativeModules;

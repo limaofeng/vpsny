@@ -11,6 +11,7 @@ import HeaderRight from '../../../components/HeaderRight';
 import Theme, { withTheme } from '../../../components/Theme';
 import { Account } from '../../cloud/type';
 import { logos } from '../components/AccountLable';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 type Mode = 'choose' | 'manage';
 
@@ -54,11 +55,17 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
       )
     };
   };
+  analytics?: RNFirebase.Analytics;
 
   constructor(props: SettingsProps) {
     super(props);
     this.state = { value: props.value };
     Settings.handleClickHeaderRight = this.handleDone;
+  }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('Settings', 'Settings.tsx');
   }
 
   handleChange = (value: Account) => {
@@ -71,16 +78,24 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
   };
 
   handleJumpToNewAccount = () => {
+    this.analytics!.logEvent('Press_AddAccount');
     const { navigation } = this.props;
     navigation.navigate('AccountNew');
   };
 
-  handleJumpToAccountView = (value: any) => {
+  handleJumpToAccountView = (value: Account) => {
+    this.analytics!.logEvent('Press_AccountView', {
+      id: value.id,
+      provider: value.provider,
+      name: value.name,
+      email: value.email
+    });
     const { navigation } = this.props;
     navigation.navigate('AccountView', { data: value });
   };
 
   handleJumpToKeyPairs = () => {
+    this.analytics!.logEvent('Press_KeyPairs');
     const { navigation } = this.props;
     navigation.navigate('KeyPairs');
   };
