@@ -1,0 +1,1 @@
+vpsny is an app that helps manage virtual servers on the iPhone. It now supports Vultr / AWS Lightsail / DigitalOcean.

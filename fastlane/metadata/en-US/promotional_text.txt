@@ -1,0 +1,1 @@
+Vultr / AWS Lightsail / DigitalOcean is now supported
