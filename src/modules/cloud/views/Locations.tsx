@@ -1,3 +1,4 @@
+import { AppState } from '@modules';
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
@@ -12,6 +13,7 @@ import { ItemDivider, ItemGroup } from '../../../components/List';
 import Theme, { withTheme } from '../../../components/Theme';
 import Country from '../components/Country';
 import { Region } from '../Provider';
+import { ProviderType } from '../type';
 
 type Mode = 'choose' | 'manage';
 
@@ -82,7 +84,12 @@ class Locations extends React.Component<LocationsProps, LocationsState> {
     this.setState({ refreshing: false });
   };
 
-  static getFeatureText({ features: { ddosProtection, blockStorage } }: Region) {
+  static getFeatureText(region: Region) {
+    const regionProvider = region.providers.find(p => p.type === 'vultr');
+    if (!regionProvider) {
+      return '';
+    }
+    const { ddosProtection, blockStorage } = regionProvider.features!;
     const defaultTxt = 'Private Networking, Backups, IPv6';
     if (ddosProtection || blockStorage) {
       return (
@@ -158,13 +165,21 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { regions } }: any, { navigation }: LocationsProps) => {
+const mapStateToProps = ({ cloud: { regions } }: AppState, { navigation }: LocationsProps) => {
   const onChange = navigation.getParam('callback');
   const value = navigation.getParam('value');
-  const range = navigation.getParam('range');
+  const provider = navigation.getParam('provider') as ProviderType;
+  const range = navigation.getParam('range') as number[];
   const mode: Mode = !!onChange ? 'choose' : 'manage';
+  let regionsFor: Region[] = regions.filter(r => r.providers.some(p => p.type === provider));
+  if (provider === 'vultr') {
+    regionsFor = regionsFor.filter((region: Region) => {
+      const id = region.providers.find(p => p.type === provider)!.id;
+      return range.some(r => r === parseInt(id));
+    });
+  }
   return {
-    regions: regions.filter((region: Region) => range.includes(region.id)),
+    regions: regionsFor,
     mode,
     range,
     value,

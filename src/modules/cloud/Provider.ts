@@ -91,7 +91,7 @@ export interface Plan {
 export interface RegionProvider {
   id: string;
   name?: string;
-  type: 'vultr' | 'lightsail';
+  type: ProviderType;
   availabilityZones?: AvailabilityZone[];
   features?: {
     ddosProtection: string;

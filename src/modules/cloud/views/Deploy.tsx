@@ -71,8 +71,9 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   }
 
   toLocations = () => {
-    const { plan, location: value } = this.state;
+    const { plan, location: value, provider } = this.state;
     this.props.navigation.navigate('Locations', {
+      provider,
       range: plan.regions,
       value,
       callback: (location: Region) => {
@@ -123,7 +124,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
       location,
       callback: (plan: Plan) => {
         const state: any = { plan, provider: plan.provider };
-        if (!location || !plan.regions.some(id => id === location.id)) {
+        if (!location || !plan.regions.some(id => location.providers.find(p => p.type === plan.provider)!.id === id)) {
           state.location = getDefaultRegion(plan);
         }
         this.setState(state);
@@ -515,7 +516,7 @@ const mapStateToProps = ({ settings: { keyPairs }, cloud: { accounts, regions, p
     },
     getDefaultImage: () => {
       const image = provider.images.find(image => image.name === 'Ubuntu') as SystemImage;
-      image.version = image.versions[image.versions.length - 1];
+      image.version = image.versions![image.versions!.length - 1];
       return image;
     },
     getDefaultAccount: () => {

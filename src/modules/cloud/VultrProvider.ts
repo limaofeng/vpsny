@@ -459,33 +459,19 @@ export class VultrAgent implements Agent {
     sshkeys: SSHKey[],
     features: Features
   ): Promise<string> {
-    console.log(
-      querystring.stringify({
-        DCID: region.providers.find(p => p.type === 'vultr')!.id,
-        VPSPLANID: plan.id,
-        OSID: (image.version as ImageVersion).id,
-        SSHKEYID: sshkeys.map(sshkey => sshkey.id),
-        enable_ipv6: features.IPv6 ? 'yes' : 'no',
-        enable_private_network: features.PrivateNetwork ? 'yes' : 'no',
-        ddos_protection: features.DDOSProtection ? 'yes' : 'no',
-        auto_backups: features.AutoBackups ? 'yes' : 'no',
-        hostname
-      })
-    );
-    const { data } = await this.http.post(
-      '/v1/server/create',
-      querystring.stringify({
-        DCID: region.id,
-        VPSPLANID: plan.id,
-        OSID: (image.version as ImageVersion).id,
-        SSHKEYID: sshkeys.map(sshkey => sshkey.id),
-        enable_ipv6: features.IPv6 ? 'yes' : 'no',
-        enable_private_network: features.PrivateNetwork ? 'yes' : 'no',
-        ddos_protection: features.DDOSProtection ? 'yes' : 'no',
-        auto_backups: features.AutoBackups ? 'yes' : 'no',
-        hostname
-      })
-    );
+    const body = querystring.stringify({
+      DCID: region.providers.find(p => p.type === 'vultr')!.id,
+      VPSPLANID: plan.id,
+      OSID: (image.version as ImageVersion).id,
+      SSHKEYID: sshkeys.map(sshkey => sshkey.id),
+      enable_ipv6: features.IPv6 ? 'yes' : 'no',
+      enable_private_network: features.PrivateNetwork ? 'yes' : 'no',
+      ddos_protection: features.DDOSProtection ? 'yes' : 'no',
+      auto_backups: features.AutoBackups ? 'yes' : 'no',
+      hostname
+    });
+    console.log(body);
+    const { data } = await this.http.post('/v1/server/create', body);
     console.log('server deploy!', data);
     return data.SUBID;
   }
