@@ -182,6 +182,7 @@ platform :ios do
 
     unless only_build
       testflight(
+        ipa: './ios/build/vpsny.ipa',
         changelog: change_log,
         skip_submission: true,
         distribute_external: false,
