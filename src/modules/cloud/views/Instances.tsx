@@ -274,7 +274,8 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: InstancesProps) 
       return account ? account.id : null;
     },
     get api() {
-      return this.accountId ? getApi(this.accountId) : getApi('adapter');
+      const api = this.accountId ? getApi(this.accountId) : false;
+      return api || getApi('adapter');
     }
   };
   navigation.state.params = {

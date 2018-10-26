@@ -28,18 +28,7 @@ import { VultrAgent, VultrAPIKey } from './VultrProvider';
 import { DigitalOceanAPIKey, DigitalOceanAgent } from './agents/DigitalOceanAgent';
 
 export const getApi = (key: 'vultr' | 'adapter' | string): Agent => {
-  const agent = agents.get(key);
-  if (!agent) {
-    const handler = {
-      get: function(target: any, name: string) {
-        const lazy: any = agents.get(key);
-        const val = lazy[name];
-        return typeof val === 'function' ? val.bind(lazy) : val;
-      }
-    };
-    return new Proxy({}, handler);
-  }
-  return agent;
+  return agents.get(key)!;
 };
 
 export const setApi = (key: string, api: Agent) => {
