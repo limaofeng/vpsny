@@ -106,7 +106,7 @@ platform :ios do
     load_keys
 
     only_build = options[:only_build]
-
+    skip_build = options[:skip_build]
     # ensure_git_branch(
     #   branch: '(master|release\\S+|hotfix\\S+)'
     # )
@@ -170,15 +170,17 @@ platform :ios do
       clear_derived_data
     end
 
-    cocoapods(podfile: './ios/Podfile')
-    build_app(
-      scheme: 'vpsny',
-      workspace: './ios/vpsny.xcworkspace',
-      configuration: 'Release',
-      output_directory: './ios/build',
-      silent: true,
-      clean: true
-    )
+    unless skip_build
+      cocoapods(podfile: './ios/Podfile')
+      build_app(
+        scheme: 'vpsny',
+        workspace: './ios/vpsny.xcworkspace',
+        configuration: 'Release',
+        output_directory: './ios/build',
+        silent: true,
+        clean: true
+      )
+    end
 
     unless only_build
       testflight(
