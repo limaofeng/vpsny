@@ -1,12 +1,13 @@
+import { Item, ItemBody, Label, List } from '@components';
 import React from 'react';
-import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { getApi, utils } from '../';
 import { AppState } from '../..';
-import { Item, ItemBody, Label, List } from '../../../components';
 import ActionButton from '../../../components/ActionButton';
 import Card from '../../../components/Card';
 import Theme, { withTheme } from '../../../components/Theme';
@@ -16,7 +17,6 @@ import { User } from '../Agent';
 import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
 import OSLogo from '../components/OSLogo';
 import { Account, Instance, KeyPair } from '../type';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface InstancesProps {
   navigation: NavigationScreenProp<any>;
@@ -135,6 +135,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
   render() {
     const {
       instances,
+      isNoAccount,
       theme: { colors, fonts }
     } = this.props;
     return (
@@ -240,6 +241,20 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
             );
           })}
           <Text style={{ color: 'transparent' }}>test-refresh</Text>
+          {isNoAccount && (
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: Dimensions.get('window').height - SafeArea.bottom - SafeArea.top - 70
+              }}
+            >
+              <Text style={[fonts.callout, { color: colors.secondary, height: 50 }]}>
+                No Servers Here, Yet.
+              </Text>
+            </View>
+          )}
         </ScrollView>
         <ActionButton
           testID="servers-deploy"

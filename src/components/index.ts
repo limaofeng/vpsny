@@ -9,3 +9,4 @@ export { default as Card } from './Card';
 export { default as HeaderLeftClose } from './HeaderLeftClose';
 export { default as HeaderRight } from './HeaderRight';
 export { default as OperationConfirm, OperationConfirm as OperationConfirmType } from './OperationConfirm';
+export { default as SubmitButton, SubmitButton as SubmitButtonType } from './SubmitButton';
