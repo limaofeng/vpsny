@@ -109,60 +109,62 @@ platform :ios do
     skip_build = options[:skip_build]
 
     unless only_build
+      unless skip_build
 
-      ensure_git_status_clean
+        ensure_git_status_clean
 
-      verify_xcode_version
+        verify_xcode_version
 
-      pre_version_number = get_version_number(xcodeproj: './ios/vpsny.xcodeproj')
-      pre_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
-      pre_complete_version_number = version_string(pre_version_number, pre_build_number)
+        pre_version_number = get_version_number(xcodeproj: './ios/vpsny.xcodeproj')
+        pre_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
+        pre_complete_version_number = version_string(pre_version_number, pre_build_number)
 
-      version_number = options[:version_number]
+        version_number = options[:version_number]
 
-      if version_number.nil?
-        # Get the recent tags of the branch as the version number
-        version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
-      end
+        if version_number.nil?
+          # Get the recent tags of the branch as the version number
+          version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
+        end
 
-      increment_version_number(
-        version_number: version_number,
-        xcodeproj: './ios/vpsny.xcodeproj'
-      )
-      # Get testflight build_number + 1
-      # initial_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
-      build_number = latest_testflight_build_number(
-        version: version_number
-        # initial_build_number: initial_build_number
-      ) + 1
-      increment_build_number(
-        build_number: build_number,
-        xcodeproj: './ios/vpsny.xcodeproj'
-      )
-      complete_version_number = version_string(version_number, build_number)
-
-      if pre_complete_version_number != complete_version_number
-        commit_version_bump(
-          message: "Version bump to #{complete_version_number}",
+        increment_version_number(
+          version_number: version_number,
           xcodeproj: './ios/vpsny.xcodeproj'
         )
-        git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
-        add_git_tag(tag: version_number) if git_version_number != version_number
-        push_git_tags
+        # Get testflight build_number + 1
+        # initial_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
+        build_number = latest_testflight_build_number(
+          version: version_number
+          # initial_build_number: initial_build_number
+        ) + 1
+        increment_build_number(
+          build_number: build_number,
+          xcodeproj: './ios/vpsny.xcodeproj'
+        )
+        complete_version_number = version_string(version_number, build_number)
+
+        if pre_complete_version_number != complete_version_number
+          commit_version_bump(
+            message: "Version bump to #{complete_version_number}",
+            xcodeproj: './ios/vpsny.xcodeproj'
+          )
+          git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
+          add_git_tag(tag: version_number) if git_version_number != version_number
+          push_git_tags
+        end
+
+        change_log = change_log_since_last_tag(pre_version_number)
+
+        skip_metadata = options[:skip_metadata]
+
+        if skip_metadata == true
+          UI.message('Skipping taking screenshots and uploading metadata'.green)
+        else
+          clear_derived_data
+          screenshots
+          update_metadata
+        end
+
       end
-
-      change_log = change_log_since_last_tag(pre_version_number)
-
-      skip_metadata = options[:skip_metadata]
-
-      if skip_metadata == true
-        UI.message('Skipping taking screenshots and uploading metadata'.green)
-      else
-        clear_derived_data
-        screenshots
-        update_metadata
-      end
-
     end
 
     unless skip_build
