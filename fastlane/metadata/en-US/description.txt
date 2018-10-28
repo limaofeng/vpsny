@@ -1,1 +1,13 @@
-vpsny is an app that helps manage virtual servers on the iPhone. It now supports Vultr / AWS Lightsail / DigitalOcean.
+vpsny is a third-party cloud platform server management tool. Realize the running status monitoring, start and stop operations of the cloud server.
+
+* Before using, you must obtain the accessible credentials at the corresponding cloud service provider.
+
+Features:
+- Supported cloud providers Vultr, AWS Lightsail, DigitalOcean
+- It is convenient to view your billing information on the cloud platform (only Vultr is supported for the time being due to API restrictions)
+- Can deploy new servers quickly, temporarily only supporting Vultr
+- SSH-Key can be generated within the app and synced to the cloud service provider
+
+Additional instructions:
+- If you don't have any experience with cloud server usage, it may not be for you.
+- There are no charges for the app. The amount that appears in the app, just shows your spending information in the cloud service provider
