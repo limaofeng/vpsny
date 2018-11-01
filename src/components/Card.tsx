@@ -17,6 +17,7 @@ interface CardProps {
   theme?: Theme;
   width?: number;
   style?: StyleProp<ViewStyle>;
+  onPress?: () => void;
 }
 
 class Card extends React.Component<CardProps> {
@@ -45,7 +46,13 @@ class Card extends React.Component<CardProps> {
             borderRadius: 4
           }}
         >
-          {children}
+          {this.props.onPress ? (
+            <TouchableOpacity activeOpacity={0.8} onPress={this.props.onPress}>
+              {children}
+            </TouchableOpacity>
+          ) : (
+            children
+          )}
         </View>
       </View>
     );

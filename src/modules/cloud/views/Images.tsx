@@ -10,6 +10,7 @@ import HeaderRight from '../../../components/HeaderRight';
 import { ItemDivider, ItemGroup } from '../../../components/List';
 import Theme, { withTheme } from '../../../components/Theme';
 import { ImageVersion, SystemImage } from '../Provider';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 type Mode = 'choose' | 'manage';
 
@@ -49,11 +50,17 @@ class Images extends React.Component<ImagesProps, ImagesState> {
       )
     };
   };
+  analytics?: RNFirebase.Analytics;
 
   constructor(props: ImagesProps) {
     super(props);
     this.state = { value: props.value, refreshing: false };
     Images.handleClickHeaderRight = this.handleDone;
+  }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('Images', 'Images.tsx');
   }
 
   handleChange = (value: SystemImage) => {

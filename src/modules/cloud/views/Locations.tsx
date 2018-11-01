@@ -14,6 +14,7 @@ import Theme, { withTheme } from '../../../components/Theme';
 import Country from '../components/Country';
 import { Region } from '../Provider';
 import { ProviderType } from '../type';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 type Mode = 'choose' | 'manage';
 
@@ -55,6 +56,7 @@ class Locations extends React.Component<LocationsProps, LocationsState> {
       )
     };
   };
+  analytics?: RNFirebase.Analytics;
 
   constructor(props: LocationsProps) {
     super(props);
@@ -64,6 +66,12 @@ class Locations extends React.Component<LocationsProps, LocationsState> {
     };
     Locations.handleClickHeaderRight = this.handleDone;
   }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('Regions', 'Regions.tsx');
+  }
+
   handleChange = (value: Region) => {
     this.setState({ value });
     if (!this.props.value || this.props.value.id !== value.id) {

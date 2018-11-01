@@ -1,22 +1,20 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import { SafeAreaView, NavigationScreenProp, NavigationScreenOptions } from 'react-navigation';
+import { RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Spinner from 'react-native-spinkit';
-import { Dispatch } from 'redux';
+import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
-import { getPublicKeyFingerprint } from '../../../utils';
-import { Icon, List, Item, Note, Label, ItemBody } from '../../../components';
-import { Account, KeyPair } from '../type';
-import { SSHKey } from '../Provider';
-import Theme, { withTheme } from '../../../components/Theme';
-import HeaderLeftClose from '../../../components/HeaderLeftClose';
+import { Dispatch } from 'redux';
 
+import { getApi } from '..';
+import { Icon, Item, Label, List, Note } from '../../../components';
+import HeaderLeftClose from '../../../components/HeaderLeftClose';
+import HeaderRight from '../../../components/HeaderRight';
+import Theme, { withTheme } from '../../../components/Theme';
 import KeyPairNewBut from '../../settings/components/KeyPairNewBut';
 import KeyPairs from '../../settings/components/KeyPairs';
-
-import HeaderRight from '../../../components/HeaderRight';
-import { getApi } from '..';
+import { SSHKey } from '../Provider';
+import { Account, KeyPair } from '../type';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 type Mode = 'choose' | 'manage';
 interface SSHPublicKeysProps {
@@ -75,10 +73,15 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
   static defaultProps = {
     mode: 'manage'
   };
+  analytics?: RNFirebase.Analytics;
   constructor(props: SSHPublicKeysProps) {
     super(props);
     this.state = { loadingId: undefined, loadingType: undefined, refreshing: false, values: props.values };
     SSHPublicKeys.handleClickHeaderRight = this.handleDone;
+  }
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('SSHKeys', 'SSHKeys.tsx');
   }
   handleDelete = (data: SSHKey) => () => {
     const { deleteSSHKey } = this.props;

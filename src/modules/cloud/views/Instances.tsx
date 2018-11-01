@@ -159,7 +159,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
             const status = this.getStatusText(data);
             const statusColor = utils.getStatusColor(status, colors);
             return (
-              <Card key={`node-${data.id}`}>
+              <Card key={`node-${data.id}`} onPress={this.handleJumpToView(data)}>
                 <List
                   style={{ marginBottom: 0 }}
                   itemStyle={{
@@ -183,9 +183,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                         <OSLogo name={data.os} size={40} />
                       </View>
                       <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center' }}>
-                        <TouchableOpacity activeOpacity={0.8} onPress={this.handleJumpToView(data)}>
-                          <Text style={[{ color: colors.primary, lineHeight: 25 }, fonts.title]}>{data.name}</Text>
-                        </TouchableOpacity>
+                        <Text style={[{ color: colors.primary, lineHeight: 25 }, fonts.title]}>{data.name}</Text>
                       </View>
                       <View
                         style={{
@@ -250,9 +248,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                 height: Dimensions.get('window').height - SafeArea.bottom - SafeArea.top - 70
               }}
             >
-              <Text style={[fonts.callout, { color: colors.secondary, height: 50 }]}>
-                No Servers Here, Yet.
-              </Text>
+              <Text style={[fonts.callout, { color: colors.secondary, height: 50 }]}>No Servers Here, Yet.</Text>
             </View>
           )}
         </ScrollView>

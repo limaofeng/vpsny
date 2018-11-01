@@ -5,6 +5,7 @@ import { Dispatch } from 'redux';
 
 import { KeyPair } from '../../cloud/type';
 import { ActionButton, Theme, Icon, withTheme } from '@components';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface KeyPairNewButProps {
   findKeyPairByPrivateKey: (privateKey: string) => KeyPair;
@@ -14,6 +15,12 @@ interface KeyPairNewButProps {
 }
 
 class KeyPairNewBut extends React.Component<KeyPairNewButProps> {
+  analytics?: RNFirebase.Analytics;
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+  }
+
   handlePasteKeyPai = async () => {
     const { pasteKeyPai, findKeyPairByPrivateKey } = this.props;
     const content = await Clipboard.getString();
@@ -36,11 +43,17 @@ class KeyPairNewBut extends React.Component<KeyPairNewButProps> {
       );
       return;
     }
+    this.analytics!.logEvent('KeyPairs_Paste');
     pasteKeyPai(content);
   };
 
-  render() {
+  handleGenerateKeyPair = () => {
     const { generateKeyPair } = this.props;
+    this.analytics!.logEvent('KeyPairs_Generate');
+    generateKeyPair();
+  }
+
+  render() {
     const { colors } = this.props.theme as Theme;
     return (
       <ActionButton
@@ -63,7 +76,7 @@ class KeyPairNewBut extends React.Component<KeyPairNewButProps> {
         </ActionButton.Item>
         <ActionButton.Item
           size={45}
-          onPress={generateKeyPair}
+          onPress={this.handleGenerateKeyPair}
           buttonColor={colors.colorful.purple}
           title="Generate Key"
           testID="keypairs-actions-generate"

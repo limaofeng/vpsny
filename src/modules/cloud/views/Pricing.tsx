@@ -14,6 +14,7 @@ import MultiSelection from '../../../components/MultiSelection';
 import Theme, { withTheme } from '../../../components/Theme';
 import { fileSize } from '../../../utils/format';
 import { Plan, Provider, Region } from '../Provider';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 const { Option } = MultiSelection;
 
@@ -252,6 +253,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
       )
     };
   };
+  analytics?: RNFirebase.Analytics;
 
   constructor(props: PricingProps) {
     super(props);
@@ -277,6 +279,11 @@ class Pricing extends React.Component<PricingProps, PricingState> {
       refreshing: false
     };
     Pricing.handleClickHeaderRight = this.handleDone;
+  }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('Plans', 'Plans.tsx');
   }
 
   view = (id: string) => {

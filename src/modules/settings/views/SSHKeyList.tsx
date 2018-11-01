@@ -9,6 +9,7 @@ import { KeyPair } from '../../cloud/type';
 import KeyPairNewBut from '../components/KeyPairNewBut';
 import KeyPairs from '../components/KeyPairs';
 import { AppState } from '@modules';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 export type Mode = 'choose' | 'manage';
 
@@ -45,9 +46,15 @@ class KeyPairList extends React.Component<KeyPairListProps, KeyPairListState> {
     return options;
   };
 
+  analytics?: RNFirebase.Analytics;
   constructor(props: KeyPairListProps) {
     super(props);
     this.state = { value: props.value };
+  }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('KeyPairs', 'KeyPairs.tsx');
   }
 
   handleChange = (value: KeyPair) => {

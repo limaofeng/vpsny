@@ -9,6 +9,7 @@ import { Icon, Input, Item, ItemDivider, Label, List } from '../../../components
 import Theme, { withTheme } from '../../../components/Theme';
 import { KeyPair } from '../../cloud/type';
 import { SafeArea, debounce } from '@utils';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface SSHKeyViewProps {
   navigation: NavigationScreenProp<any>;
@@ -33,6 +34,7 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
   handleChangeName: (value: string) => void;
   handlePublicKey: (value: string) => void;
   handleSave: (value: any) => void;
+  analytics?: RNFirebase.Analytics;
   constructor(props: SSHKeyViewProps) {
     super(props);
     const { name, passphrase } = this.props.keyPair;
@@ -49,6 +51,11 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
       }
     );
     this.state = { name, passphrase };
+  }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('KeyPairView', 'KeyPairView.tsx');
   }
 
   select = (plan: any) => {

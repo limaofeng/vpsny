@@ -13,6 +13,7 @@ import { Instance } from '../Provider';
 import { Account } from '../type';
 import { getApi } from '..';
 import { AWSLightsailAgent } from '../AWSProvider';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 export type UpdateAccount = (key: 'title' | 'alias' | 'apiKey' | 'defaultRegion', value: string | APIKey) => void;
 
@@ -40,7 +41,7 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
       headerTitle: 'Account Details'
     };
   };
-
+  analytics?: RNFirebase.Analytics;
   constructor(props: AccountViewProps) {
     super(props);
     const { account } = this.props;
@@ -50,6 +51,11 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
       alias: account.alias || account.name,
       refreshing: false
     };
+  }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('AccountView_' + this.props.account.provider, 'AccountView.tsx');
   }
 
   toSSHKey = (id: string) => {

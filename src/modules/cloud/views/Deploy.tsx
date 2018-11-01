@@ -13,6 +13,7 @@ import { format, sleep } from '../../../utils';
 import Country from '../components/Country';
 import { Features, ImageVersion, Plan, Provider, Region, SSHKey, SystemImage } from '../Provider';
 import { Account, KeyPair } from '../type';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface DeployProps {
   navigation: NavigationScreenProp<any>;
@@ -50,6 +51,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
     headerBackTitle: ' '
   };
   timer?: NodeJS.Timer;
+  analytics?: RNFirebase.Analytics;
   constructor(props: DeployProps) {
     super(props);
     const account = props.getDefaultAccount() as Account;
@@ -64,6 +66,11 @@ class Deploy extends React.Component<DeployProps, DeployState> {
       sshkeys: [],
       features: []
     };
+  }
+
+  componentDidMount() {
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('Deploy', 'Deploy.tsx');
   }
 
   componentWillUnmount() {

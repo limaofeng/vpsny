@@ -16,6 +16,7 @@ import { InstantState } from '../../home/type';
 import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
 import OSLogo from '../components/OSLogo';
 import { Instance } from '../type';
+import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface InstanceViewProps {
   navigation: NavigationScreenProp<any>;
@@ -39,6 +40,7 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
 
   docker = React.createRef<Docker>();
   program = React.createRef<Program>();
+  analytics?: RNFirebase.Analytics;
   constructor(props: InstanceViewProps) {
     super(props);
     this.state = {
@@ -49,6 +51,8 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
 
   componentDidMount() {
     this.handleRefresh(true);
+    this.analytics = firebase.analytics();
+    this.analytics.setCurrentScreen('ServerView', 'ServerView.tsx');
   }
 
   handleOpenTerminal = () => {

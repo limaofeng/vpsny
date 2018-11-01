@@ -1,6 +1,6 @@
+import firebase from 'react-native-firebase';
 import SplashScreen from 'react-native-splash-screen';
 import walkuere from 'walkuere-rn';
-import firebase from 'react-native-firebase';
 import DeviceInfo from 'react-native-device-info';
 
 import modules from './modules';
@@ -13,9 +13,13 @@ export default walkuere({
   navigator: AppNavigator,
   onLoad: async () => {
     const analytics = firebase.analytics();
-    analytics.setUserId(DeviceInfo.getDeviceId());
-    analytics.setUserProperty('name', DeviceInfo.getDeviceName());
     await firebase.auth().signInAnonymously();
+    const user = firebase.auth().currentUser;
+    await user!.updateProfile({
+      displayName: DeviceInfo.getDeviceName()
+    });
+    debugger;
+    analytics.setUserId(user!.uid);
     SplashScreen.hide();
   }
 });
