@@ -1,17 +1,15 @@
+import { HeaderLeftClose, Icon, Item, ItemStart, List, Note, Theme, withTheme } from '@components';
+import { sleep } from '@utils';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { Icon, Item, ItemStart, List, Note } from '../../../components';
-import HeaderLeftClose from '../../../components/HeaderLeftClose';
-import HeaderRight from '../../../components/HeaderRight';
-import Theme, { withTheme } from '../../../components/Theme';
 import { Account } from '../../cloud/type';
 import { logos } from '../components/AccountLable';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 type Mode = 'choose' | 'manage';
 
@@ -29,8 +27,7 @@ interface SettingsState {
 }
 
 class Settings extends React.Component<SettingsProps, SettingsState> {
-  static headerRight = React.createRef<any>();
-  static handleClickHeaderRight: any;
+  static handleClose: any;
   static navigationOptions = ({ navigation }: SettingsProps): NavigationScreenOptions => {
     return {
       headerTitle: 'Settings',
@@ -39,51 +36,57 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
         <HeaderLeftClose
           testID="close-settings"
           onPress={() => {
-            navigation.pop();
+            Settings.handleClose();
           }}
-        />
-      ),
-      headerRight: (
-        <HeaderRight
-          onClick={() => {
-            Settings.handleClickHeaderRight();
-          }}
-          visible={false}
-          ref={Settings.headerRight}
-          title="Done"
         />
       )
     };
   };
   analytics?: RNFirebase.Analytics;
+  isFocused: boolean = false;
 
   constructor(props: SettingsProps) {
     super(props);
     this.state = { value: props.value };
-    Settings.handleClickHeaderRight = this.handleDone;
+    Settings.handleClose = this.handleClose;
   }
 
   componentDidMount() {
     this.analytics = firebase.analytics();
     this.analytics.setCurrentScreen('Settings', 'Settings.tsx');
+    this.props.navigation.addListener('didBlur', () => {
+      this.isFocused = false;
+    });
+    this.props.navigation.addListener('didFocus', () => {
+      this.isFocused = true;
+    });
   }
 
-  handleChange = (value: Account) => {
-    this.setState({ value });
-    if (this.props.value.id !== value.id) {
-      Settings.headerRight.current.show();
-    } else {
-      Settings.headerRight.current.hide();
-    }
-  };
+  handleClose = async () => {
+    const { navigation } = this.props;
+    await this.waitFocused();
+    navigation.pop();
+  }
 
-  handleJumpToNewAccount = () => {
+  async waitFocused(timeout: number = 5000) {
+    const time = Date.now();
+    while (!this.isFocused) {
+      console.log('waitFocused...');
+      await sleep(100);
+      if (Date.now() - time >= timeout) {
+        throw 'await focused error';
+      }
+    }
+  }
+
+  handleJumpToNewAccount = async () => {
     this.analytics!.logEvent('Press_AddAccount');
     const { navigation } = this.props;
+    await this.waitFocused();
     navigation.navigate('AccountNew');
   };
 
-  handleJumpToAccountView = (value: Account) => {
+  handleJumpToAccountView = async (value: Account) => {
     this.analytics!.logEvent('Press_AccountView', {
       id: value.id,
       provider: value.provider,
@@ -91,12 +94,14 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
       email: value.email
     });
     const { navigation } = this.props;
+    await this.waitFocused();
     navigation.navigate('AccountView', { data: value });
   };
 
-  handleJumpToKeyPairs = () => {
+  handleJumpToKeyPairs = async () => {
     this.analytics!.logEvent('Press_KeyPairs');
     const { navigation } = this.props;
+    await this.waitFocused();
     navigation.navigate('KeyPairs');
   };
 
@@ -116,7 +121,6 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
           <List
             value={this.state.value}
             valueKey="id"
-            onChange={this.handleChange}
             style={{ marginTop: 13 }}
             type={isSelection ? 'radio-group' : 'list'}
             title="Accounts"

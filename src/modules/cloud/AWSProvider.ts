@@ -325,24 +325,6 @@ export class AWSLightsailAgent implements Agent {
 
   async images(): Promise<SystemImage[]> {
     const images: SystemImage[] = [];
-
-    const { data: oslist } = await axios.get('https://api.vultr.com/v1/os/list');
-    for (const vid of Object.keys(oslist)) {
-      const version = oslist[vid];
-      if (['iso', 'snapshot', 'backup', 'application'].some(val => val === version.family)) {
-        continue;
-      }
-      const image = getImage('os', version.family, images);
-      image.versions.push({
-        id: parseInt(vid),
-        name: version.name
-          .replace(image.name, '')
-          .replace('(jessie)', '')
-          .replace('(stretch)', '')
-          .trim(),
-        arch: version.arch
-      });
-    }
     return images;
   }
 

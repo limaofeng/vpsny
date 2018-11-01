@@ -45,14 +45,7 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
   static handleGoBack: () => void;
   static navigationOptions = ({ navigation }: AccountNewProps): NavigationScreenOptions => {
     return {
-      headerTitle: 'Add Account',
-      headerLeft: (
-        <HeaderLeftClose
-          onPress={() => {
-            navigation.popToTop();
-          }}
-        />
-      )
+      headerTitle: 'Add Account'
     };
   };
   submit = React.createRef<SubmitButton>();

@@ -5,7 +5,6 @@ import DeviceInfo from 'react-native-device-info';
 
 import modules from './modules';
 import AppNavigator from './navigators/AppNavigator';
-import { sleep } from './utils';
 
 console.disableYellowBox = true;
 
@@ -16,7 +15,7 @@ export default walkuere({
     const analytics = firebase.analytics();
     analytics.setUserId(DeviceInfo.getDeviceId());
     analytics.setUserProperty('name', DeviceInfo.getDeviceName());
-    await sleep(200);
+    await firebase.auth().signInAnonymously();
     SplashScreen.hide();
   }
 });
