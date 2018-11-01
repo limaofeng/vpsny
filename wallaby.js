@@ -24,9 +24,5 @@ module.exports = wallaby => ({
   },
   filesWithNoCoverageCalculated: ['config/**/*.js'],
   reportUnhandledPromises: false,
-  workers: {
-    initial: 6,
-    regular: 2
-  },
   debug: true
 });

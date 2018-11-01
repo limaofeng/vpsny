@@ -1,1 +1,1 @@
-vpsny
+Vpsny - Virtual Private Server Manager
