@@ -148,6 +148,7 @@ const Stack = createStackNavigator(
     Pricing,
     Images,
     SSHPublicKeys,
+    SSHKeyView,
     // Account
     AccountList,
     // AccountNew: {

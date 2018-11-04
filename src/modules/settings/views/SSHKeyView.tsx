@@ -80,7 +80,7 @@ class SSHKeyView extends React.Component<SSHKeyViewProps, SSHKeyViewState> {
         const forgePrivateKey = privateKey.includes('ENCRYPTED')
           ? forge.pki.decryptRsaPrivateKey(privateKey, keyPair.passphrase)
           : forge.pki.privateKeyFromPem(privateKey);
-        const forgePublicKey = forge.pki.setRsaPublicKey(forgePrivateKey.n, forgePrivateKey.e);
+        const forgePublicKey = (forge.pki as any).setRsaPublicKey(forgePrivateKey.n, forgePrivateKey.e);
         const publicKey = forge.ssh.publicKeyToOpenSSH(forgePublicKey);
         this.handlePublicKey(publicKey);
         Clipboard.setString(publicKey + keyPair.name);

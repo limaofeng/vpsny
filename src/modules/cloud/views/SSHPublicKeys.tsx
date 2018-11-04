@@ -57,7 +57,8 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
           ref={SSHPublicKeys.headerRight}
           title="Done"
         />
-      )
+      ),
+      headerBackTitle: 'Back'
     };
     if (dangerous.dangerouslyGetParent().state.routeName === 'SSHPublicKeys') {
       options.headerLeft = (
@@ -105,9 +106,7 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
     navigation.navigate('SSHKeyView', { id: value.id });
   };
   loading = () => {
-    const {
-      theme: { colors, fonts }
-    } = this.props;
+    const { colors } = this.props.theme;
     return (
       <View style={styles.iconContainer}>
         <Spinner isVisible size={18} type="Arc" color={colors.primary} />
@@ -130,11 +129,11 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
     if (loadingId === value.id && loadingType === 'keyPair') {
       return this.loading();
     }
-    const sshkey = sshkeys.find(sshkey => sshkey.publicKey.includes(value.publicKey as string));
+    const sshkey = sshkeys.find(sshkey => sshkey.publicKey!.includes(value.publicKey as string));
     if (sshkey) {
       if (sshkey.name !== value.name) {
         return (
-          <TouchableOpacity onPress={this.handleKeyPairSyncSSHKey(sshkey.id, value)} style={styles.iconContainer}>
+          <TouchableOpacity onPress={this.handleKeyPairSyncSSHKey(sshkey.id!, value)} style={styles.iconContainer}>
             <Icon type="MaterialCommunityIcons" name="cloud-sync" color={colors.primary} size={18} />
           </TouchableOpacity>
         );
@@ -166,12 +165,8 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
     onChange(values || this.state.values);
   };
   render() {
-    const {
-      sshkeys,
-      keyPairs,
-      theme: { colors, fonts },
-      mode
-    } = this.props;
+    const { colors, fonts } = this.props.theme;
+    const { sshkeys, keyPairs, mode } = this.props;
     const { loadingId, loadingType } = this.state;
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>

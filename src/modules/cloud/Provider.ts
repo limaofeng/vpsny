@@ -5,10 +5,10 @@ export interface AWSLocation {
   region: string;
 }
 export interface SSHKey {
-  id: string;
+  id?: string;
   name: string;
   createdAt?: Date;
-  fingerprint: string;
+  fingerprint?: string;
   /**
    * AWS.Lightsail API 不提供查看 publicKey 的接口
    */

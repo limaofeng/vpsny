@@ -18,7 +18,6 @@ export default walkuere({
     await user!.updateProfile({
       displayName: DeviceInfo.getDeviceName()
     });
-    debugger;
     analytics.setUserId(user!.uid);
     SplashScreen.hide();
   }
