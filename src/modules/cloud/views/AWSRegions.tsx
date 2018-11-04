@@ -1,3 +1,5 @@
+import { HeaderLeftClose, HeaderRight, Item, ItemDivider, ItemGroup, List, Note, Theme, withTheme } from '@components';
+import { AppState } from '@modules';
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import Spinner from 'react-native-spinkit';
@@ -5,12 +7,9 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
 import KeyPairNewBut from '../../settings/components/KeyPairNewBut';
-import { SSHKey, Region, RegionProvider } from '../Provider';
-import { Account, KeyPair } from '../type';
-import { AppState } from '@modules';
-import { List, ItemGroup, ItemDivider, Item, Note, Theme, HeaderRight, HeaderLeftClose, withTheme } from '@components';
+import { RegionProvider, SSHKey } from '../Provider';
+import { KeyPair } from '../type';
 
 interface SSHPublicKeysProps {
   navigation: NavigationScreenProp<any>;
@@ -97,7 +96,7 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
     onChange(values || this.state.values);
   };
   render() {
-    const { colors, fonts } = this.props.theme!;
+    const { colors } = this.props.theme!;
     const { regions } = this.props;
     // data.providers.find(p => p.type === 'lightsail')!.name!
     const groups = [
@@ -181,7 +180,6 @@ const mapStateToProps = ({ cloud: { regions } }: AppState, { navigation }: SSHPu
 };
 
 const mapDispatchToProps = (dispatch: Dispatch, { navigation }: SSHPublicKeysProps) => {
-  const api = getApi('aws');
   return {};
 };
 

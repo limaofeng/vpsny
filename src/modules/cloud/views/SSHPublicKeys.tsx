@@ -1,5 +1,6 @@
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import Spinner from 'react-native-spinkit';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
@@ -14,7 +15,6 @@ import KeyPairNewBut from '../../settings/components/KeyPairNewBut';
 import KeyPairs from '../../settings/components/KeyPairs';
 import { SSHKey } from '../Provider';
 import { Account, KeyPair } from '../type';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 type Mode = 'choose' | 'manage';
 interface SSHPublicKeysProps {
@@ -123,9 +123,7 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
   additional = (value: KeyPair) => {
     const { sshkeys } = this.props;
     const { loadingId, loadingType } = this.state;
-    const {
-      theme: { colors, fonts }
-    } = this.props;
+    const { colors } = this.props.theme;
     if (loadingId === value.id && loadingType === 'keyPair') {
       return this.loading();
     }

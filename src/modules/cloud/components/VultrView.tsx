@@ -1,7 +1,6 @@
 import { Item, Label, List, Note, Theme, withTheme } from '@components';
 import { format } from '@utils';
 import React from 'react';
-import { StyleSheet } from 'react-native';
 
 import { APIKey } from '../Agent';
 import { Account } from '../type';
@@ -89,11 +88,5 @@ class VultrView extends React.Component<VultrViewProps, VultrViewState> {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});
 
 export default withTheme(VultrView);
