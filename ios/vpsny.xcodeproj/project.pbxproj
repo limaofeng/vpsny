@@ -13,7 +13,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		1DD03527AC6C867D04320518 /* libPods-vpsny.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B925F31AA0C73EDACCE3D09B /* libPods-vpsny.a */; };
 		BF1A7869205614C3007D27CA /* vpsny-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF1A7868205614C3007D27CA /* vpsny-icons.ttf */; };
-		BFD23F112180B22E00594CBB /* vpsny/GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFD23F102180B22E00594CBB /* vpsny/GoogleService-Info.plist */; };
+		BFD23F112180B22E00594CBB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFD23F102180B22E00594CBB /* GoogleService-Info.plist */; };
 		BFD3DC6A200F4C6100ED2CDD /* vpsnyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC69200F4C6100ED2CDD /* vpsnyUITests.swift */; };
 		BFD3DC72200F4DC900ED2CDD /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */; };
 		BFE219752144EF8400578B45 /* Aldrichregular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BFE219742144EF8400578B45 /* Aldrichregular.ttf */; };
@@ -46,7 +46,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = vpsny/main.m; sourceTree = "<group>"; };
 		B925F31AA0C73EDACCE3D09B /* libPods-vpsny.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vpsny.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF1A7868205614C3007D27CA /* vpsny-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "vpsny-icons.ttf"; sourceTree = "<group>"; };
-		BFD23F102180B22E00594CBB /* vpsny/GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vpsny/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		BFD23F102180B22E00594CBB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vpsny/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BFD3DC67200F4C6100ED2CDD /* vpsnyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vpsnyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD3DC69200F4C6100ED2CDD /* vpsnyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vpsnyUITests.swift; sourceTree = "<group>"; };
 		BFD3DC6B200F4C6100ED2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -89,7 +89,7 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				BFD23F102180B22E00594CBB /* vpsny/GoogleService-Info.plist */,
+				BFD23F102180B22E00594CBB /* GoogleService-Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				BFF5048A2173600A005E8B84 /* RNAudio.m */,
@@ -268,7 +268,7 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				BFD23F112180B22E00594CBB /* vpsny/GoogleService-Info.plist in Resources */,
+				BFD23F112180B22E00594CBB /* GoogleService-Info.plist in Resources */,
 				BF1A7869205614C3007D27CA /* vpsny-icons.ttf in Resources */,
 				BFE219752144EF8400578B45 /* Aldrichregular.ttf in Resources */,
 			);
@@ -305,6 +305,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-vpsny/Pods-vpsny-resources.sh",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
@@ -322,6 +323,7 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",

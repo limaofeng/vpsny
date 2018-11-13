@@ -22,7 +22,6 @@ default_platform :ios
 
 platform :ios do
   before_all do
-    git_pull(only_tags: true)
     ENV['CERTIFICATES_GIT_URL'] = 'git@gitlab.com:homeworld.life/certificates.git'
     ENV['DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS'] = '-t DAV'
     ENV['FASTLANE_ITUNES_TRANSPORTER_USE_SHELL_SCRIPT'] = '1'
@@ -35,12 +34,13 @@ platform :ios do
     raise exception
   end
 
-  def change_log_since_last_tag(version_number)
+  def change_log_since_last_tag
     # http://git-scm.com/docs/pretty-formats
     # <short hash> <commit title>
+    last_tag = sh("git describe --abbrev=0 --tags").strip!
     changelog_from_git_commits(
       pretty: '%h %s',
-      commits_count: sh("git cherry #{version_number} | wc -l").to_i,
+      commits_count: [sh("git cherry #{last_tag} | wc -l").to_i, 10].min,
       date_format: 'short',
       match_lightweight_tag: false,
       merge_commit_filtering: 'exclude_merges'
@@ -111,13 +111,7 @@ platform :ios do
     unless only_build
       unless skip_build
 
-        ensure_git_status_clean
-
-        verify_xcode_version
-
         pre_version_number = get_version_number(xcodeproj: './ios/vpsny.xcodeproj')
-        pre_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
-        pre_complete_version_number = version_string(pre_version_number, pre_build_number)
 
         version_number = options[:version_number]
 
@@ -132,27 +126,14 @@ platform :ios do
         )
         # Get testflight build_number + 1
         # initial_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
-        build_number = latest_testflight_build_number(
-          version: version_number
-          # initial_build_number: initial_build_number
-        ) + 1
+        build_number = latest_testflight_build_number + 1
         increment_build_number(
           build_number: build_number,
           xcodeproj: './ios/vpsny.xcodeproj'
         )
         complete_version_number = version_string(version_number, build_number)
 
-        if pre_complete_version_number != complete_version_number
-          commit_version_bump(
-            message: "Version bump to #{complete_version_number}",
-            xcodeproj: './ios/vpsny.xcodeproj'
-          )
-          git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
-          add_git_tag(tag: version_number) if git_version_number != version_number
-          push_git_tags
-        end
-
-        change_log = change_log_since_last_tag(pre_version_number)
+        change_log = change_log_since_last_tag
 
         skip_metadata = options[:skip_metadata]
 
