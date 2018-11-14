@@ -1,1 +1,1 @@
-
+Fix crash in settings page
