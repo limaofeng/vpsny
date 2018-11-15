@@ -256,7 +256,7 @@ export default createStackNavigator(
       screen: createStackNavigator(
         {
           ChooseProvider,
-          AccountNew
+          AccountBuild: AccountNew
         },
         {
           initialRouteName: 'ChooseProvider',
@@ -332,6 +332,6 @@ export default createStackNavigator(
   {
     mode: 'modal',
     headerMode: 'none',
-    initialRouteName: 'Stack'
+    initialRouteName: 'AccountNew'
   }
 );

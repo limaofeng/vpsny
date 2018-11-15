@@ -75,17 +75,17 @@ export interface Agent {
      */
     stop(id: string): Promise<void>;
     /**
+     * 强制停止实例
+     */
+    kill(id: string): Promise<void>;
+    /**
      * 启动实例
      */
     start(id: string): Promise<void>;
     /**
-     * 重新启动实例
+     * 重新启动实例 等同 reboot
      */
     restart(id: string): Promise<void>;
-    /**
-     * 重启
-     */
-    reboot(id: string): Promise<void>;
     /**
      * 重新安装
      */

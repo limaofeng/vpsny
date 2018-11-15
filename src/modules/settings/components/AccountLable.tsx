@@ -8,6 +8,7 @@ import { Account, ProviderType } from '../../cloud/type';
 
 export const logos = {
   vpsny: require('../../cloud/assets/logo/vpsny.png'),
+  bandwagonhost: require('../../cloud/assets/logo/bandwagonhost.png'),
   vultr: require('../../cloud/assets/logo/vultr.png'),
   lightsail: require('../../cloud/assets/logo/lightsail.png'),
   digitalocean: require('../../cloud/assets/logo/digitalocean.png')

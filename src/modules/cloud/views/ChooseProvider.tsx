@@ -33,7 +33,7 @@ class CloudProvider extends React.Component<CloudProviderProps> {
   next = (provider: string) => () => {
     const { navigation } = this.props;
     this.analytics!.logEvent('ChooseProvider', { provider });
-    navigation.navigate('AccountNew', {
+    navigation.navigate('AccountBuild', {
       provider,
       callback: (user: User) => {}
     });
@@ -45,8 +45,13 @@ class CloudProvider extends React.Component<CloudProviderProps> {
 
   render() {
     const { colors, fonts } = this.props.theme as Theme;
-    const { back } = this.props as any;
     const providers = [
+      {
+        id: 'bandwagonhost',
+        logo: require('../assets/logo/bandwagonhost.png'),
+        name: 'Bandwagon Host',
+        summary: 'Self-Managed SSD VPS'
+      },
       {
         id: 'vultr',
         logo: require('../assets/logo/vultr.png'),

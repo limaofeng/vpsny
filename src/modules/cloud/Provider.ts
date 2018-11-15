@@ -291,17 +291,23 @@ export interface Instance {
      *  installingbooting -> Resizeing
      */
     serverState?: 'none' | 'ok' | 'locked' | 'installingbooting' | 'isomounting';
+    /**
+     *  服务暂停标记
+     *  支持的平台：
+     *        搬瓦工有效
+     */
+    suspended: boolean;
   };
   /**
    * 已产生的费用
    * pending_charges: 0.24
    */
-  pendingCharges: number;
+  pendingCharges?: number;
   /**
    * 每月成本
    *  cost_per_month: 5.00
    */
-  costPerMonth: number;
+  costPerMonth?: number;
   /**
    * 带宽信息
    */
@@ -316,6 +322,10 @@ export interface Instance {
      * 允许额度
      */
     allowed: number;
+    /**
+     * 下次流量重置日期
+     */
+    resets?: string;
   };
   /**
    * 内部IP
@@ -443,7 +453,57 @@ export interface Instance {
    * 创建时间
    *  date_created: 2018-09-15 22:24:07
    */
-  createdAt: Date;
+  createdAt?: Date;
+  /**
+   * BandwagonHost 字段
+   */
+  liveInfo?: {
+    /**
+     * Running or Stopped
+     */
+    ve_status: string;
+    /**
+     * MAC address of primary network interface
+     */
+    ve_mac1: string;
+    /**
+     * Occupied (mapped) disk space in bytes
+     */
+    ve_used_disk_space_b: number;
+    /**
+     * Actual size of disk image in GB
+     */
+    ve_disk_quota_gb: number;
+    /**
+     * 0 = CPU is not throttled, 1 = CPU is throttled due to high usage. Throttling resets automatically every 2 hours.
+     */
+    is_cpu_throttled: number;
+    /**
+     *  SSH port of the VPS (returned only if VPS is running)
+     */
+    ssh_port: number;
+    /**
+     * Result of "hostname" command executed inside VPS
+     */
+    live_hostname: string;
+    /**
+     * Raw load average string
+     */
+    load_average: string;
+    /**
+     * Amount of available RAM in KB
+     */
+    mem_available_kb: number;
+    /**
+     * Total amount of Swap in KB
+     */
+    swap_total_kb: number;
+    /**
+     * Amount of available Swap in KB
+     */
+    swap_available_kb: number;
+  };
+  lastUpdateTime: number;
 }
 
 /**

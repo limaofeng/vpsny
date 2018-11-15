@@ -1,26 +1,27 @@
+import { AppState } from '@modules';
 import { isEqual } from 'lodash';
 import React from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, View } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { setApi } from '..';
-import BottomRegion from '../../../components/BottomRegion';
-import HeaderLeftClose from '../../../components/HeaderLeftClose';
 import SubmitButtonWrapper, { SubmitButton } from '../../../components/SubmitButton';
 import Theme, { withTheme } from '../../../components/Theme';
-import { APIKey, User, Bill } from '../Agent';
+import { APIKey, Bill, User } from '../Agent';
+import { DigitalOceanAgent, DigitalOceanAPIKey } from '../agents/DigitalOceanAgent';
 import { AWSAPIKey, AWSLightsailAgent, AWSOptions } from '../AWSProvider';
+import BandwagonHostNew from '../bandwagon/BandwagonHostNew';
 import AWSLightsailNew from '../components/AWSLightsailNew';
+import DigitalOceanNew from '../components/DigitalOceanNew';
 import VultrNew from '../components/VultrNew';
+import { Region } from '../Provider';
 import { Account, ProviderType } from '../type';
 import { VultrAgent, VultrAPIKey } from '../VultrProvider';
-import { AppState } from '@modules';
-import { Region } from '../Provider';
-import DigitalOceanNew from '../components/DigitalOceanNew';
-import { DigitalOceanAgent, DigitalOceanAPIKey } from '../agents/DigitalOceanAgent';
-import firebase, { RNFirebase } from 'react-native-firebase';
+import BandwagonHostAgent, { BandwagonHostAPIKey } from '../agents/BandwagonHostAgent';
+import { uuid } from '@utils';
 
 interface AccountNewProps {
   dispatch: Dispatch;
@@ -110,6 +111,8 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
         await this.handleSaveForVultr();
       } else if (provider === 'digitalocean') {
         await this.handleSaveForDigitalOcean();
+      } else if (provider === 'bandwagonhost') {
+        await this.handleSaveForBandwagonHost();
       }
     } catch (error) {
       this.setState({ status: 'initialize' });
@@ -120,6 +123,41 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
         throw error;
       }
     }
+  };
+
+  handleSaveForBandwagonHost = async () => {
+    const { addAccount, dispatch } = this.props;
+    const apiKey = this.state.apiKey as BandwagonHostAPIKey;
+    const account = this.state.options as any;
+    const submit = this.submit.current as SubmitButton;
+    apiKey.id = account.id || uuid();
+    const api = new BandwagonHostAgent(apiKey!);
+    const data = await api.instance.get(apiKey.vpses[apiKey.vpses.length - 1].veid);
+    console.log(data);
+    /*
+    addAccount({
+      id: user.id,
+      title: 'Vultr',
+      apiKey: user.apiKey,
+      name: user.name,
+      email: user.email,
+      provider: 'vultr',
+      sshkeys: []
+    });
+    setApi(api.id, api);
+    this.setState({ user });
+    submit.submittingText('Pulling Bill');
+    const bill = await api.bill();
+    await dispatch({ type: 'cloud/bill', payload: { id: user.id, bill } });
+    this.setState({ bill });
+    submit.submittingText('Pulling SSH Keys');
+    const sshkeys = await api.sshkeys();
+    await dispatch({ type: 'cloud/sshkeys', payload: { id: user.id, sshkeys } });
+    submit.submittingText('Pulling Instances');
+    const instances = await api.instance.list();
+    await dispatch({ type: 'cloud/instances', payload: { instances } });
+    this.setState({ status: 'success' });
+    */
   };
 
   handleSaveForLightsail = async () => {
@@ -219,6 +257,7 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
           {provider === 'vultr' && <VultrNew user={user} bill={bill} onChangeAPIKey={this.handleAPIKeyChange} />}
           {provider === 'lightsail' && <AWSLightsailNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
           {provider === 'digitalocean' && <DigitalOceanNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
+          {provider === 'bandwagonhost' && <BandwagonHostNew user={user} onChangeAPIKey={this.handleAPIKeyChange} />}
           <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
             <SubmitButtonWrapper
               testID="newaccount-save"
@@ -230,7 +269,7 @@ class AccountNew extends React.Component<AccountNewProps, AccountNewState> {
             />
           </View>
         </ScrollView>
-        <BottomRegion />
+        {/*<BottomRegion />*/}
       </SafeAreaView>
     );
   }
