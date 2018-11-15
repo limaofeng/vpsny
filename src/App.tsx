@@ -12,13 +12,6 @@ export default walkuere({
   modules,
   navigator: AppNavigator,
   onLoad: async () => {
-    const analytics = firebase.analytics();
-    await firebase.auth().signInAnonymously();
-    const user = firebase.auth().currentUser;
-    await user!.updateProfile({
-      displayName: DeviceInfo.getDeviceName()
-    });
-    analytics.setUserId(user!.uid);
     SplashScreen.hide();
   }
 });
