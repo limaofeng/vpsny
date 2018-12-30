@@ -332,6 +332,6 @@ export default createStackNavigator(
   {
     mode: 'modal',
     headerMode: 'none',
-    initialRouteName: 'AccountNew'
+    initialRouteName: 'Stack'
   }
 );

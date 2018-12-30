@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { Account } from '../../cloud/type';
-import { logos } from '../components/AccountLable';
+import { CloudManager } from '@modules/cloud/providers';
 
 type Mode = 'choose' | 'manage';
 
@@ -135,7 +135,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                 push
               >
                 <ItemStart>
-                  <Image source={logos[a.provider]} resizeMode="contain" style={{ height: 32, width: 32 }} />
+                  <Image source={CloudManager.getProvider(a.provider).logo} resizeMode="contain" style={{ height: 32, width: 32 }} />
                 </ItemStart>
                 <View style={{ flex: 1 }}>
                   <Note style={[{ color: colors.major, textAlignVertical: 'bottom' }, fonts.callout]}>{a.title}</Note>

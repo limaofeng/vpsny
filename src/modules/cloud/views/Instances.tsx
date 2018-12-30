@@ -14,11 +14,13 @@ import Theme, { withTheme } from '../../../components/Theme';
 import { SafeArea, sleep } from '../../../utils';
 import { SSHConnection } from '../../ssh/type';
 import { User } from '../Agent';
-import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
+import InstanceActions, { OperateStatus } from '../components/InstanceActions';
 import OSLogo from '../components/OSLogo';
 import { Account, Instance, KeyPair } from '../type';
+import { format } from '@utils';
 
 interface InstancesProps {
+  dispatch: Dispatch;
   navigation: NavigationScreenProp<any>;
   instances: Instance[];
   keyPairs: KeyPair[];
@@ -63,32 +65,18 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
     display && this.setState({ refreshing: false });
   };
 
-  handleActionExecute = async (operate: Operate, status: OperateStatus, data: Instance) => {
-    const { instantStates } = this.state;
+  handleActionExecute = async (operate: string, status: OperateStatus, data: Instance) => {
     const { track } = this.props;
-    console.log(operate, status);
-    if (status == 'start') {
-      switch (operate) {
-        case 'stop':
-          instantStates.push({
-            id: data.id,
-            status: 'Stopping'
-          });
-          break;
-        case 'reinstall':
-        case 'start':
-        case 'reboot':
-        case 'delete':
-        default:
-          instantStates.push({
-            id: data.id,
-            status: 'Pending'
-          });
-      }
+    const { instantStates } = this.state;
+    if (status != 'Complete') {
+      instantStates.push({
+        id: data.id,
+        status
+      });
       this.setState({ instantStates });
     } else {
       track(data);
-      await sleep(1000);
+      await sleep(200);
       this.setState({ instantStates: instantStates.filter(state => state.id !== data.id) });
     }
   };
@@ -207,14 +195,20 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                           <Icon name="terminal" color="#4180EE" size={18} />
                         </TouchableOpacity>
                         */}
-                        <InstanceActions data={data} onExecute={this.handleActionExecute} />
+                        <InstanceActions
+                          data={data}
+                          theme={this.props.theme}
+                          dispatch={this.props.dispatch}
+                          navigation={this.props.navigation}
+                          onExecute={this.handleActionExecute}
+                        />
                       </View>
                     </ItemBody>
                   </Item>
                   <Item>
                     <Label>
-                      {data.ram} RAM、 {data.vcpu} vCPU
-                      {data.vcpu > 1 ? 's' : ''}、 {data.disk}
+                      {data.ram.size} MB RAM、 {data.vcpu} vCPU
+                      {data.vcpu > 1 ? 's' : ''}、{format.fileSize(data.disk.size, 'GB')} {data.disk.type}
                     </Label>
                   </Item>
                   <Item>
@@ -224,7 +218,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                     <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
                       <View style={{ height: 16 }}>
                         <Text style={{ fontSize: 12, color: colors.secondary, textAlign: 'right' }}>
-                          {data.hostname}
+                          {data.publicIP}
                         </Text>
                       </View>
                       <View style={{ height: 14 }}>
@@ -295,6 +289,7 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: InstancesProps) 
     }
   };
   return {
+    dispatch,
     async get(id: string) {
       return await source.api.instance.get(id);
     },

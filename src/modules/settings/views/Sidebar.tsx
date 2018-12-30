@@ -7,6 +7,7 @@ import { NavigationScreenOptions, NavigationScreenProp } from 'react-navigation'
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
+import { CloudManager } from '../../cloud/providers';
 import { Account, Instance } from '../../cloud/type';
 import AccountLable, { AllAccountLable, NewAccountLable } from '../components/AccountLable';
 
@@ -110,7 +111,7 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                 <AccountLable
                   key={a.id}
                   light={current === a}
-                  logo={a.provider}
+                  logo={CloudManager.getProvider(a.provider).logo}
                   value={a}
                   onClick={this.handleLableClick}
                 />

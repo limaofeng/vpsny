@@ -13,7 +13,7 @@ import { Docker } from '../../home/components/Docker';
 import Overview from '../../home/components/Overview';
 import { Program } from '../../home/components/Program';
 import { InstantState } from '../../home/type';
-import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
+import InstanceActions, { OperateStatus } from '../components/InstanceActions';
 import OSLogo from '../components/OSLogo';
 import { Instance } from '../type';
 import firebase, { RNFirebase } from 'react-native-firebase';
@@ -23,6 +23,7 @@ interface InstanceViewProps {
   refresh: () => Promise<Instance>;
   track: (node: Instance) => Promise<void>;
   instance: Instance;
+  dispatch: Dispatch;
   theme: Theme;
 }
 
@@ -65,28 +66,13 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
     navigation.navigate('Deploy');
   };
 
-  handleActionExecute = async (operate: Operate, status: OperateStatus, data: Instance) => {
-    const { instantState } = this.state;
-    const { track, navigation } = this.props;
-    console.log(operate, status);
-    if (status == 'start') {
-      switch (operate) {
-        case 'stop':
-          this.setState({ instantState: { status: 'Stopping' } });
-          break;
-        case 'reinstall':
-        case 'start':
-        case 'reboot':
-        case 'delete':
-        default:
-          this.setState({ instantState: { status: 'Pending' } });
-      }
+  handleActionExecute = async (operate: string, status: OperateStatus, data: Instance) => {
+    const { track } = this.props;
+    if (status != 'Complete') {
+      this.setState({ instantState: { status } });
     } else {
       track(data);
       await sleep(200);
-      if (operate === 'delete') {
-        navigation.goBack();
-      }
       this.setState({ instantState: undefined });
     }
   };
@@ -94,7 +80,7 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
   handleRefresh = async (ignore?: boolean) => {
     const { refresh } = this.props;
     !ignore && this.setState({ refreshing: true });
-    const instance = await refresh();
+    await refresh();
     !ignore && this.setState({ refreshing: false });
     // const client = getSSHClient(instance.id);
     // await client.connect();
@@ -116,9 +102,10 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
   render() {
     const {
       instance: data,
+      dispatch,
+      navigation,
       theme: { colors, fonts }
     } = this.props;
-
     const { refreshing } = this.state;
 
     const isRunning = data.status === 'running';
@@ -127,15 +114,11 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
     const isPending = status !== 'Running' && status !== 'Stopped';
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} forceInset={{ bottom: 'never' }}>
         <ScrollView
           style={{ flex: 1 }}
           refreshControl={
-            <RefreshControl
-              refreshing={this.state.refreshing}
-              onRefresh={this.handleRefresh}
-              tintColor={colors.minor}
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={this.handleRefresh} tintColor={colors.minor} />
           }
         >
           <View
@@ -164,7 +147,7 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
                     paddingRight: 10
                   }}
                 >
-                {/* TODO: 先隐藏 Terminal 功能
+                  {/* TODO: 先隐藏 Terminal 功能
                   <TouchableOpacity
                     style={{
                       width: 30,
@@ -177,7 +160,13 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
                     <Icon name="terminal" color="#4180EE" size={18} />
                   </TouchableOpacity>
                   */}
-                  <InstanceActions data={data} onExecute={this.handleActionExecute} />
+                  <InstanceActions
+                    theme={this.props.theme!}
+                    data={data}
+                    dispatch={dispatch}
+                    navigation={navigation}
+                    onExecute={this.handleActionExecute}
+                  />
                 </View>
               </View>
               <View style={{ height: 24, flexDirection: 'row', alignItems: 'center' }}>
@@ -216,7 +205,7 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
               </View>
             </View>
           </View>
-          <Overview data={data} tabLabel="Overview" />
+          <Overview data={data} tabLabel="Overview" navigation={navigation} />
           {/* <ScrollableTabView
             style={{ flex: 1 }}
             renderTabBar={() => (
@@ -305,7 +294,8 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: InstanceViewProp
     },
     async track(node: Instance) {
       dispatch({ type: 'cloud/track', payload: { node } });
-    }
+    },
+    dispatch
   };
 };
 

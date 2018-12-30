@@ -166,7 +166,7 @@ export class DigitalOceanAgent implements Agent {
     console.log('createSSHKey', sshkey.fingerprint);
   }
   async updateSSHKey(data: SSHKey): Promise<void> {
-    const sshkey = await this.digitalOcean.SSHKey.update(data.id, {
+    const sshkey = await this.digitalOcean.SSHKey.update(data.id!, {
       name: data.name,
       public_key: data.publicKey
     }).toPromise();

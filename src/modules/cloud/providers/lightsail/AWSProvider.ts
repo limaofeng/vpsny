@@ -3,8 +3,18 @@ import { IAM, Lightsail } from 'aws-sdk/dist/aws-sdk-react-native';
 import axios from 'axios';
 import querystring from 'querystring';
 
-import { Agent, APIKey, Bill, Continent, Country, User } from './Agent';
-import { Features, ImageVersion, Instance, InstanceNetworking, Plan, Region, SSHKey, SystemImage } from './Provider';
+import { Agent, APIKey, Bill, Continent, Country, User, Snapshot } from '../../Agent';
+import {
+  Features,
+  ImageVersion,
+  Instance,
+  InstanceNetworking,
+  Plan,
+  Region,
+  SSHKey,
+  SystemImage
+} from '../../Provider';
+import { OperationList } from 'aws-sdk/clients/lightsail';
 
 export const AWSRegions: {
   [key: string]: {
@@ -161,6 +171,7 @@ function getStatus(name: string) {
 }
 
 function parseInstance(data: Lightsail.Instance, account: string): Instance {
+  const datacenter = AWSRegions[data.location!.regionName!];
   const instance: Instance = {
     id: `${data.location!.regionName}:${data.name}`,
     name: data.name!,
@@ -170,9 +181,15 @@ function parseInstance(data: Lightsail.Instance, account: string): Instance {
       status: data.state!.name!
     },
     hostname: data.publicIpAddress!,
+    publicIP: data.publicIpAddress!,
     os: data.blueprintName!,
-    ram: format.fileSize(data.hardware!.ramSizeInGb! * 1024, 'MB') as string,
-    disk: (format.fileSize(data.hardware!.disks![0].sizeInGb!, 'GB') as string) + ' SSD',
+    ram: {
+      size: data.hardware!.ramSizeInGb! * 1024
+    },
+    disk: {
+      size: data.hardware!.disks![0].sizeInGb!,
+      type: 'SSD'
+    },
     vcpu: data.hardware!.cpuCount!,
     disks: data.hardware!.disks!.map(data => ({
       name: data.name!,
@@ -187,7 +204,10 @@ function parseInstance(data: Lightsail.Instance, account: string): Instance {
       createdAt: data.createdAt!
     })),
     location: {
-      title: AWSRegions[data.location!.regionName!].state,
+      title: datacenter.name,
+      continent: datacenter.continent,
+      country: datacenter.country,
+      state: datacenter.state,
       availabilityZone: data.location!.availabilityZone!,
       region: data.location!.regionName!
     },
@@ -519,8 +539,33 @@ export class AWSLightsailAgent implements Agent {
         .promise(); /*? $ */
       console.log('instance destroy', operations![0].id);
     },
+    history: async (id: string): Promise<OperationList> => {
+      const { region, instanceName } = this.parseId(id);
+      const lightsail = await this.getlightsail(region);
+      const { operations } = await lightsail
+        .getOperationsForResource({
+          resourceName: instanceName
+        })
+        .promise();
+      return operations!;
+    },
     reinstall: async (id: string): Promise<void> => {
       throw new Error(`AWS Lightsail(${id}) does not support \`reinstall\` operation`);
     }
+  };
+  snapshot = {
+    list: async (): Promise<Snapshot[]> => {
+      const lightsail = await this.getlightsail(this.options.defaultRegion);
+      const { instanceSnapshots } = await lightsail.getInstanceSnapshots().promise();
+      return instanceSnapshots!.map(item => ({
+        name: item.name!,
+        state: item.state,
+        createdAt: item.createdAt
+      }));
+    },
+    create: async (): Promise<Snapshot> => {
+      return {};
+    },
+    destroy: async (id: string): Promise<void> => {}
   };
 }

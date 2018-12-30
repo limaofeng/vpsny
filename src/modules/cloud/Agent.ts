@@ -42,6 +42,10 @@ export interface Bill {
   pendingCharges: number;
 }
 
+export interface Snapshot {
+  [key: string]: any;
+}
+
 export interface Agent {
   id: string;
   pricing(): Promise<Plan[]>;
@@ -72,12 +76,11 @@ export interface Agent {
     get(id: string): Promise<Instance>;
     /**
      * 停止实例
+     * @param id 实例ID
+     * @param force 是否强制停止
+     *        搬瓦工支持该参数
      */
-    stop(id: string): Promise<void>;
-    /**
-     * 强制停止实例
-     */
-    kill(id: string): Promise<void>;
+    stop(id: string, force?: boolean): Promise<void>;
     /**
      * 启动实例
      */
@@ -93,6 +96,11 @@ export interface Agent {
     /**
      * 销毁实例
      */
+    destroy(id: string): Promise<void>;
+  };
+  snapshot: {
+    list(): Promise<Snapshot[]>;
+    create(): Promise<Snapshot>;
     destroy(id: string): Promise<void>;
   };
 }

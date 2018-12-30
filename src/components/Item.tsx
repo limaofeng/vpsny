@@ -325,7 +325,7 @@ interface ItemProps {
   value?: any;
   checked?: any;
   mode?: 'list' | 'radio' | 'radio-left';
-  size?: 'small' | 'normal' | 'medium' | 'large' | number;
+  size?: 'small' | 'normal' | 'medium' | 'large' | number | 'auto';
   onValueChange?: (value: any) => void;
   onClick?: (e?: GestureResponderEvent | any) => void;
   style?: StyleProp<ViewStyle>;
@@ -523,6 +523,15 @@ const specs = {
     },
     itemBody: {
       height: 132
+    }
+  },
+  auto: {
+    itemStart: {
+      width: 80,
+      height: 'auto'
+    },
+    itemBody: {
+      height: 'auto'
     }
   }
 };

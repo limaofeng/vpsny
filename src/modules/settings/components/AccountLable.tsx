@@ -1,25 +1,16 @@
+import { Icon, Theme, withTheme } from '@components';
+import { format } from '@utils';
 import React from 'react';
-import { Image, TouchableHighlight, View } from 'react-native';
+import { Image, ImageSourcePropType, TouchableHighlight, View } from 'react-native';
 
-import { Icon } from '../../../components';
-import Theme, { withTheme } from '../../../components/Theme';
-import { format } from '../../../utils';
-import { Account, ProviderType } from '../../cloud/type';
-
-export const logos = {
-  vpsny: require('../../cloud/assets/logo/vpsny.png'),
-  bandwagonhost: require('../../cloud/assets/logo/bandwagonhost.png'),
-  vultr: require('../../cloud/assets/logo/vultr.png'),
-  lightsail: require('../../cloud/assets/logo/lightsail.png'),
-  digitalocean: require('../../cloud/assets/logo/digitalocean.png')
-};
+import { Account } from '../../cloud/type';
 
 interface AccountLableProps {
   theme?: Theme;
   light?: boolean;
   testID?: string;
   value?: Account;
-  logo: ProviderType | 'vpsny';
+  logo: ImageSourcePropType;
   onClick?: (account?: Account) => void;
 }
 
@@ -90,7 +81,7 @@ class AccountLable extends React.Component<AccountLableProps, AccountLableState>
                 justifyContent: 'center'
               }}
             >
-              <Image source={logos[logo]} resizeMode="contain" style={{ height: 28, width: 28 }} />
+              <Image source={logo} resizeMode="contain" style={{ height: 28, width: 28 }} />
             </View>
           </TouchableHighlight>
         </View>
@@ -112,7 +103,7 @@ export const AllAccountLable = ({
   light: boolean;
   onClick?: (account?: Account) => void;
 }) => {
-  return <AccountLableWarp testID={testID} logo={'vpsny'} light={light} onClick={onClick} />;
+  return <AccountLableWarp testID={testID} logo={require('../../cloud/assets/logo/vpsny.png')} light={light} onClick={onClick} />;
 };
 
 interface NewAccountLableProps {

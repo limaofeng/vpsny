@@ -203,8 +203,33 @@ export type InstanceNetworking = {
 };
 
 export type Location = {
+  /**
+   * 原始值
+   */
   title: string;
+  /**
+   * 洲
+   */
+  continent: string;
+  /**
+   * 国家
+   */
+  country: string;
+  /**
+   * 州或省
+   */
+  state: string;
+  /**
+   * 城市
+   */
+  city?: string;
+  /**
+   * 可用区
+   */
   availabilityZone?: string;
+  /**
+   * 关联地区编码
+   */
   region: string;
 };
 
@@ -251,12 +276,23 @@ export interface Instance {
    * 内存
    * ram: 1024 MB
    */
-  ram: string;
+  ram: {
+    use?: number;
+    size: number;
+  };
+  swap?: {
+    use: number;
+    size: number;
+  };
   /**
    * 磁盘
    * disk: Virtual 25 GB
    */
-  disk: string;
+  disk: {
+    use?: number;
+    size: number;
+    type: 'SSD' | 'HDD';
+  };
   /**
    * CPU
    * vcpu: 1
@@ -296,7 +332,7 @@ export interface Instance {
      *  支持的平台：
      *        搬瓦工有效
      */
-    suspended: boolean;
+    suspended?: boolean;
   };
   /**
    * 已产生的费用
@@ -327,6 +363,10 @@ export interface Instance {
      */
     resets?: string;
   };
+  /**
+   * 公网IP
+   */
+  publicIP: string;
   /**
    * 内部IP
    * Vultr -> internal_ip
@@ -503,7 +543,7 @@ export interface Instance {
      */
     swap_available_kb: number;
   };
-  lastUpdateTime: number;
+  lastUpdateTime?: number;
 }
 
 /**

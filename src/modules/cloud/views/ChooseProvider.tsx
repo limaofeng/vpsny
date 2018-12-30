@@ -2,9 +2,15 @@ import { Card, HeaderLeftClose, Theme, withTheme } from '@components';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
-import { NavigationScreenConfigProps, NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
+import {
+  NavigationScreenConfigProps,
+  NavigationScreenOptions,
+  NavigationScreenProp,
+  SafeAreaView
+} from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { CloudManager } from '../providers';
 
 import { User } from '../Agent';
 
@@ -33,10 +39,7 @@ class CloudProvider extends React.Component<CloudProviderProps> {
   next = (provider: string) => () => {
     const { navigation } = this.props;
     this.analytics!.logEvent('ChooseProvider', { provider });
-    navigation.navigate('AccountBuild', {
-      provider,
-      callback: (user: User) => {}
-    });
+    navigation.navigate('AccountBuild', { provider });
   };
   componentDidMount() {
     this.analytics = firebase.analytics();
@@ -45,32 +48,7 @@ class CloudProvider extends React.Component<CloudProviderProps> {
 
   render() {
     const { colors, fonts } = this.props.theme as Theme;
-    const providers = [
-      {
-        id: 'bandwagonhost',
-        logo: require('../assets/logo/bandwagonhost.png'),
-        name: 'Bandwagon Host',
-        summary: 'Self-Managed SSD VPS'
-      },
-      {
-        id: 'vultr',
-        logo: require('../assets/logo/vultr.png'),
-        name: 'Vultr',
-        summary: 'Global Cloud Hosting'
-      },
-      {
-        id: 'digitalocean',
-        logo: require('../assets/logo/digitalocean.png'),
-        name: 'DigitalOcean',
-        summary: 'The simplest cloud platform for developers & teams'
-      },
-      {
-        id: 'lightsail',
-        logo: require('../assets/logo/lightsail.png'),
-        name: 'Lightsail',
-        summary: 'Now available worldwide'
-      }
-    ];
+    const providers = CloudManager.getProviders();
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
         <ScrollView>
@@ -99,7 +77,7 @@ class CloudProvider extends React.Component<CloudProviderProps> {
                   </View>
                   <View style={{ flex: 2 }}>
                     <Text style={[{ lineHeight: 30, color: colors.major }, fonts.title]}>{data.name}</Text>
-                    <Text style={[{ lineHeight: 17, color: colors.minor }, fonts.body]}>{data.summary}</Text>
+                    <Text style={[{ lineHeight: 17, color: colors.minor }, fonts.body]}>{data.description}</Text>
                   </View>
                 </TouchableOpacity>
               </Card>

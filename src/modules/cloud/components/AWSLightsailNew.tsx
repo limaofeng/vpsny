@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { APIKey, User } from '../Agent';
-import { AWSAPIKey, AWSOptions, AWSRegions } from '../AWSProvider';
+import { AWSAPIKey, AWSOptions, AWSRegions } from '../providers/lightsail/AWSProvider';
 
 interface AWSLightsailNewProps {
   theme?: Theme;
@@ -38,7 +38,7 @@ class AWSLightsailNew extends React.Component<AWSLightsailNewProps, AWSLightsail
     this.setState({ defaultRegion });
   };
   handleAPIKey(accessKeyId?: string, secretAccessKey?: string) {
-    const { defaultRegion } = this.state;
+    const { defaultRegion } = this.state; 
     const { onChangeAPIKey } = this.props;
     if (accessKeyId && secretAccessKey) {
       const apiKey: AWSAPIKey = { accessKeyId, secretAccessKey };

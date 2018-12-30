@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 
 import { APIKey } from '../Agent';
-import { AWSAPIKey, AWSRegions } from '../AWSProvider';
+import { AWSAPIKey, AWSRegions } from '../providers/lightsail/AWSProvider';
 import { Account } from '../type';
 import { UpdateAccount } from '../views/AccountView';
 
