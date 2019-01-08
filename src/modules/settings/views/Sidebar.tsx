@@ -11,27 +11,28 @@ import { CloudManager } from '../../cloud/providers';
 import { Account, Instance } from '../../cloud/type';
 import AccountLable, { AllAccountLable, NewAccountLable } from '../components/AccountLable';
 
-interface SettingsProps {
+interface SidebarProps {
   dispatch: any;
   navigation: NavigationScreenProp<any>;
   theme: Theme;
   accounts: Account[];
   openMenu: (open: boolean) => void;
+  changeAccount: (account: string) => void;
+  currentAccount: string;
   instances: Instance[];
 }
 
-interface SettingsState {
+interface SidebarState {
   current?: Account;
 }
 
-class Settings extends React.Component<SettingsProps, SettingsState> {
+class Sidebar extends React.Component<SidebarProps, SidebarState> {
   static navigationOptions: NavigationScreenOptions = {
-    tabBarLabel: 'Settings'
+    tabBarLabel: 'Sidebar'
   };
-
-  constructor(props: SettingsProps) {
+  constructor(props: SidebarProps) {
     super(props);
-    this.state = { current: undefined };
+    this.state = { current: props.accounts.find(node => node.id === props.currentAccount) };
   }
 
   handleAccountManager = () => {
@@ -77,21 +78,9 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
   };
 
   handleLableClick = (account?: Account) => {
-    const { navigation, instances } = this.props;
+    const { changeAccount } = this.props;
     this.setState({ current: account });
-    const tabs = navigation.state.routes[0];
-    const server = tabs.routes.find((route: any) => route.routeName === 'server');
-    const {
-      refresh = (uid: string, instances: Instance[]) => {
-        console.warn('servers refresh not available !');
-      }
-    } = server.params;
-    server.params = { ...server.params, data: account };
-    if (account) {
-      refresh(account.id, instances.filter(node => node.account === account!.id));
-    } else {
-      refresh(undefined, instances);
-    }
+    changeAccount(account ? account.id : '');
   };
 
   render() {
@@ -232,14 +221,21 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { accounts, instances } }: AppState, { navigation }: SettingsProps) => {
-  return { accounts, instances };
+const mapStateToProps = (
+  { cloud: { accounts, instances }, settings: { currentAccount } }: AppState,
+  { navigation }: SidebarProps
+) => {
+  return { accounts, instances, currentAccount };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch, { navigation }: SettingsProps) => {
-  return {};
+const mapDispatchToProps = (dispatch: Dispatch, { navigation }: SidebarProps) => {
+  return {
+    changeAccount(account: string) {
+      dispatch({ type: 'settings/current', payload: account });
+    }
+  };
 };
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withTheme(Settings, false));
+)(withTheme(Sidebar, false));

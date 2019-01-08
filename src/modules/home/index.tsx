@@ -1,18 +1,13 @@
 import React from 'react';
-import { createStackNavigator } from 'react-navigation';
-import Bluebird from 'bluebird';
 import { Feature } from 'walkuere-rn';
-import querystring from 'querystring';
 
-import axios from 'axios';
-
-import { uuid, sleep, format } from '../../utils';
-import Servers from './views/Servers';
-import BindHost from './views/ServerNew';
-import ServerEdit from './views/ServerEdit';
+import { format, sleep, uuid } from '../../utils';
 import { KeyPair } from '../cloud/type';
-
-import { createServer } from 'http2';
+import { getSSHClient } from '../ssh';
+import { SSHClient } from '../ssh/SSHClient';
+import ServerEdit from './views/ServerEdit';
+import BindHost from './views/ServerNew';
+import Servers from './views/Servers';
 
 interface Metrics {
   uptime: string;
@@ -96,21 +91,20 @@ interface ServerAction {
   payload: Host;
 }
 
-import { View, Button, Text } from 'react-native';
-import { getSSHClient } from '../ssh';
-import { SSHClient } from '../ssh/SSHClient';
-
 export default new Feature({
   routes: {
     Servers,
     BindHost,
-    ServerEdit,
+    ServerEdit
   },
   namespace: 'server',
   state: {
     hosts: []
   },
   reducers: {
+    current(state: any, { payload: currentAccount }: any) {
+      return { ...state, currentAccount };
+    },
     addServer(state: any, { payload: host }: any) {
       const { hosts } = state;
       host.name = host.name || 'My Server';

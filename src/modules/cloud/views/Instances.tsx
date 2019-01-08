@@ -10,7 +10,7 @@ import { getApi, utils } from '../';
 import { AppState } from '../..';
 import ActionButton from '../../../components/ActionButton';
 import Card from '../../../components/Card';
-import Theme, { withTheme } from '../../../components/Theme';
+import Theme, { withTheme, defaultTheme } from '../../../components/Theme';
 import { SafeArea, sleep } from '../../../utils';
 import { SSHConnection } from '../../ssh/type';
 import { User } from '../Agent';
@@ -28,6 +28,7 @@ interface InstancesProps {
   refresh: () => Promise<void>;
   track: (node: Instance) => Promise<void>;
   isNoAccount: boolean;
+  currentAccount: string;
   theme: Theme;
 }
 
@@ -121,11 +122,9 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
   };
 
   render() {
-    const {
-      instances,
-      isNoAccount,
-      theme: { colors, fonts }
-    } = this.props;
+    const { instances, isNoAccount, currentAccount } = this.props;
+    const { colors, fonts } = defaultTheme;
+    console.log('servers', this.context);
     return (
       <SafeAreaView
         forceInset={{ bottom: 'never' }}
@@ -143,7 +142,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
             />
           }
         >
-          {instances.map(data => {
+          {instances.filter(node => !currentAccount || node.account === currentAccount).map(data => {
             const status = this.getStatusText(data);
             const statusColor = utils.getStatusColor(status, colors);
             return (
@@ -182,22 +181,22 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                         }}
                       >
                         {/*
-                          TODO: 先隐藏 Terminal 功能
-                        <TouchableOpacity
-                          onPress={this.handleOpenTerminal(data)}
-                          style={{
-                            width: 30,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginRight: 5
-                          }}
-                        >
-                          <Icon name="terminal" color="#4180EE" size={18} />
-                        </TouchableOpacity>
-                        */}
+                            TODO: 先隐藏 Terminal 功能
+                          <TouchableOpacity
+                            onPress={this.handleOpenTerminal(data)}
+                            style={{
+                              width: 30,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginRight: 5
+                            }}
+                          >
+                            <Icon name="terminal" color="#4180EE" size={18} />
+                          </TouchableOpacity>
+                          */}
                         <InstanceActions
                           data={data}
-                          theme={this.props.theme}
+                          theme={defaultTheme}
                           dispatch={this.props.dispatch}
                           navigation={this.props.navigation}
                           onExecute={this.handleActionExecute}
@@ -261,13 +260,12 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
 }
 
 const mapStateToProps = (
-  { cloud: { instances, accounts }, ssh: { connections } }: AppState,
+  { cloud: { instances, accounts }, ssh: { connections }, settings: { currentAccount } }: AppState,
   { navigation }: InstancesProps
 ) => {
-  const account = navigation.getParam('data');
   return {
     connections: connections,
-    instances: account ? instances.filter((a: Instance) => a.account === account.id) : instances,
+    instances: currentAccount ? instances.filter((a: Instance) => a.account === currentAccount) : instances,
     isNoAccount: !accounts.length
   };
 };

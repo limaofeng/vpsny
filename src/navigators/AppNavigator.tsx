@@ -1,12 +1,12 @@
 import { merge } from 'lodash';
 import * as React from 'react';
-import { Dimensions, TouchableOpacity } from 'react-native';
+import { Dimensions, TouchableOpacity, Text } from 'react-native';
 import {
   createBottomTabNavigator,
   createStackNavigator,
   NavigationScreenConfigProps,
   NavigationScreenOptions,
-  NavigationScreenProp,
+  NavigationScreenProp
 } from 'react-navigation';
 
 import { Icon, IconType } from '../components';
@@ -233,17 +233,17 @@ class Application extends React.Component<ApplicationProps> {
       }
     };
     return (
-      <SideMenu
-        ref={this.side}
-        disableGestures={() => {
-          const { routes } = navigation.state;
-          return routes.length > 1;
-        }}
-        openMenuOffset={Dimensions.get('window').width * 0.88}
-        menu={menu}
-      >
-        <Stack navigation={navigation} />
-      </SideMenu>
+        <SideMenu
+          ref={this.side}
+          disableGestures={() => {
+            const { routes } = navigation.state;
+            return routes.length > 1;
+          }}
+          openMenuOffset={Dimensions.get('window').width * 0.88}
+          menu={menu}
+        >
+          <Stack navigation={navigation} />
+        </SideMenu>
     );
   }
 }

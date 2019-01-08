@@ -166,13 +166,13 @@ export const defaultTheme: Theme = {
   }
 };
 
-const ThemeContext = React.createContext(defaultTheme);
+export const ThemeContext = React.createContext(defaultTheme);
 
 export class ThemeProvider extends React.Component {
   state = { theme: 'light' };
 
   render() {
-    return <ThemeContext.Provider value={this.state.theme}>{this.props.children}</ThemeContext.Provider>;
+    return <ThemeContext.Provider value={defaultTheme}>{this.props.children}</ThemeContext.Provider>;
   }
 }
 
@@ -193,8 +193,6 @@ export function withTheme<T extends React.Component, P>(
     }
     ThemedComponent[property] = Component[property];
   }
-  // if(ThemedComponent.navigationOptions){
-  // }
   if (forwardRef === undefined || forwardRef === true) {
     return React.forwardRef((props, ref) => <ThemedComponent {...props} forwardedRef={ref} />);
   }

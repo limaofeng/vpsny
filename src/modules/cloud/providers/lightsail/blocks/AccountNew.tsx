@@ -86,6 +86,11 @@ class LightsailNew extends React.Component<LightsailNewProps, LightsailNewState>
     }
   };
 
+  handleJumpToRegions = () => {
+    // const { navigation } = this.props;
+    // navigation.navigate('AWSRegions', {});
+  };
+
   handleSave = async () => {
     const { find, back, save, dispatch } = this.props;
     const { defaultRegion } = this.state;
@@ -173,6 +178,11 @@ class LightsailNew extends React.Component<LightsailNewProps, LightsailNewState>
             </Item>
           </List>
         )}
+        <List visible={false} title="Configuration Region">
+          <Item onClick={this.handleJumpToRegions} push>
+            <Note />
+          </Item>
+        </List>
         <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
           <SubmitButtonWrapper
             testID="newaccount-save"

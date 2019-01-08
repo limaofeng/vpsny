@@ -1,7 +1,7 @@
 import { md5 } from '@utils';
 import Bluebird from 'bluebird';
 import axios, { AxiosInstance } from 'axios';
-import { Agent, APIKey, Bill, User, Continent, Country } from '../Agent';
+import { Agent, APIKey, Bill, User, Continent, Country, Snapshot } from '../Agent';
 import { Features, Instance, Plan, Region, SSHKey, SystemImage } from '../Provider';
 import NetworkError, { ERROR_CODES } from './NetworkError';
 import moment = require('moment');
@@ -343,7 +343,21 @@ export default class BandwagonHostAgent implements Agent {
       const apiKey = this.apiKey.vpses.find(data => data.veid === id.toString())!.token;
       const { data } = await this.request.get(`/getAvailableOS?veid=${id}&api_key=${apiKey}`);
       return data;
+    },
+    getMigrateLocations: async (id: string): Promise<any> => {
+      const apiKey = this.apiKey.vpses.find(data => data.veid === id.toString())!.token;
+      const { data } = await this.request.get(`/migrate/getLocations?veid=${id}&api_key=${apiKey}`);
+      return data;
     }
+  };
+  snapshot = {
+    list: async (): Promise<Snapshot[]> => {
+      return [];
+    },
+    create: async (): Promise<Snapshot> => {
+      return {};
+    },
+    destroy: async (id: string): Promise<void> => {}
   };
   validate(result: any) {
     if (result.error !== 0) {

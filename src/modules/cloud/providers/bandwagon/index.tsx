@@ -11,6 +11,7 @@ import { ComponentName, Provider, ServerAction } from '../';
 import AccountNew from './AccountNew';
 import AccountView from './AccountView';
 import Reinstall from './Reinstall';
+import Migration from './Migration';
 import ServerView from './ServerView';
 import { getTip } from '../utils';
 
@@ -22,7 +23,8 @@ class BandwagonHost implements Provider {
   description = 'Self-Managed SSD VPS';
   routes(): any {
     return {
-      BWG_Reinstall: Reinstall
+      BWG_Reinstall: Reinstall,
+      BWG_Migration: Migration
     };
   }
   actions(data: Instance, theme: Theme, dispatch: Dispatch, navigation: NavigationScreenProp<any>): ServerAction[] {
