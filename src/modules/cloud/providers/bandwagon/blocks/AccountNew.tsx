@@ -37,10 +37,10 @@ class BandwagonHostNew extends React.Component<BandwagonHostNewProps, BandwagonH
     super(props);
     this.state = {
       mode: 'select',
-      veid: '1175697',
+      veid: '',
       title: 'BandwagonHost',
       name: 'Default',
-      token: 'private_LlPrdGOkfgRIvNJ3cPeolqbu',
+      token: '',
       status: 'initialize'
     };
   }

@@ -128,25 +128,22 @@ platform :ios do
         )
         # Get testflight build_number + 1
         # initial_build_number = get_build_number(xcodeproj: './ios/vpsny.xcodeproj')
-        build_number = latest_testflight_build_number(
-          version: version_number
-          # initial_build_number: initial_build_number
-        ) + 1
+        build_number = latest_testflight_build_number + 1
         increment_build_number(
           build_number: build_number,
           xcodeproj: './ios/vpsny.xcodeproj'
         )
         complete_version_number = version_string(version_number, build_number)
 
-        if pre_complete_version_number != complete_version_number
-          commit_version_bump(
-            message: "Version bump to #{complete_version_number}",
-            xcodeproj: './ios/vpsny.xcodeproj'
-          )
-          git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
-          add_git_tag(tag: version_number) if git_version_number != version_number
-          push_git_tags
-        end
+        # if pre_complete_version_number != complete_version_number
+        #   commit_version_bump(
+        #     message: "Version bump to #{complete_version_number}",
+        #     xcodeproj: './ios/vpsny.xcodeproj'
+        #   )
+        #   git_version_number = (sh 'git describe --tags --abbrev=0').gsub(/^[v]/, '').chomp
+        #   add_git_tag(tag: version_number) if git_version_number != version_number
+        #   push_git_tags
+        # end
 
         change_log = change_log_since_last_tag(pre_version_number)
 

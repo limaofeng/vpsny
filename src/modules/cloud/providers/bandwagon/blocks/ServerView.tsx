@@ -6,6 +6,7 @@ import { Instance } from '@modules/cloud/Provider';
 import { Theme, List, Item, Note } from '@components';
 import { withNavigation, NavigationScreenProp } from 'react-navigation';
 import Usage from '@modules/cloud/components/Usage';
+import Hardware from '@modules/cloud/components/Hardware';
 
 interface ServerOverviewProps {
   navigation: NavigationScreenProp<any>;
@@ -40,6 +41,7 @@ class ServerOverview extends Component<ServerOverviewProps> {
       <>
         <Usage theme={theme} data={data} />
         <Basic theme={theme} data={data} />
+        <Hardware theme={theme} data={data} />
         <Bandwidth theme={theme} data={data} />
         <List>
           <Item push onClick={this.handleReinstall}>

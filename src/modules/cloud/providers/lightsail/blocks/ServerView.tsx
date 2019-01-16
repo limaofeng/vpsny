@@ -8,6 +8,7 @@ import { NavigationScreenProp, withNavigation } from 'react-navigation';
 
 import Storage from '../components/Storage';
 import Networking from '../components/Networking';
+import Hardware from '@modules/cloud/components/Hardware';
 
 interface ServerOverviewProps {
   navigation: NavigationScreenProp<any>;
@@ -37,6 +38,7 @@ class ServerOverview extends Component<ServerOverviewProps> {
     return (
       <>
         <Basic theme={theme} data={data} />
+        <Hardware theme={theme} data={data} />
         <Bandwidth theme={theme} data={data} />
         <Storage theme={theme} data={data} />
         <Networking theme={theme} data={data} />
