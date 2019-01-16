@@ -175,12 +175,9 @@ export function fileSize(
   const { scale = 1024, finalUnit = null, precision = null, mode = 'normal', units: alias } = config;
   const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
   let index = units.indexOf(unit);
-  while (size >= scale || finalUnit) {
+  while ((size >= scale || finalUnit) && finalUnit !== units[index]) {
     size = Math.round((size * 10) / scale) / 10;
     index++;
-    if (finalUnit === units[index]) {
-      break;
-    }
   }
   if (precision !== null) {
     size =  parseInt(size.toFixed(precision).split('.')[1]) === 0 ? parseInt(size.toString()) : parseFloat(size.toFixed(precision));

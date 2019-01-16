@@ -25,6 +25,7 @@ interface LocationsProps {
   mode: Mode;
   value: Region;
   onChange: (value: Region) => void;
+  getCountryName: (id: string) => string;
   theme: Theme;
 }
 
@@ -93,20 +94,15 @@ class Locations extends React.Component<LocationsProps, LocationsState> {
   };
 
   static getFeatureText(region: Region) {
-    const regionProvider = region.providers.find(p => p.type === 'vultr');
-    if (!regionProvider) {
-      return '';
-    }
-    const { ddosProtection, blockStorage } = regionProvider.features!;
     const defaultTxt = 'Private Networking, Backups, IPv6';
-    if (ddosProtection || blockStorage) {
+/*     if (ddosProtection || blockStorage) {
       return (
         'Also ' +
         (ddosProtection ? 'DDOS Protection' : '') +
         (ddosProtection && blockStorage ? ',' : '') +
         (blockStorage ? ' Block Storage' : '')
       );
-    }
+    } */
     return defaultTxt;
   }
 
@@ -140,7 +136,7 @@ class Locations extends React.Component<LocationsProps, LocationsState> {
                     {currentRegions.map(region => (
                       <Item key={`regions_${region.id}`} size="medium" value={region}>
                         <ItemStart style={{ width: 100 }}>
-                          <Country value={region.country} size={30} />
+                          <Country value={region.country} size={60} />
                         </ItemStart>
                         <ItemBody style={{ flexDirection: 'row' }}>
                           <View style={{ flex: 1 }}>
@@ -173,21 +169,14 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { regions } }: AppState, { navigation }: LocationsProps) => {
+const mapStateToProps = ({ database: { regions, countrys } }: AppState, { navigation }: LocationsProps) => {
   const onChange = navigation.getParam('callback');
   const value = navigation.getParam('value');
   const provider = navigation.getParam('provider') as ProviderType;
   const range = navigation.getParam('range') as number[];
   const mode: Mode = !!onChange ? 'choose' : 'manage';
-  let regionsFor: Region[] = regions.filter(r => r.providers.some(p => p.type === provider));
-  if (provider === 'vultr') {
-    regionsFor = regionsFor.filter((region: Region) => {
-      const id = region.providers.find(p => p.type === provider)!.id;
-      return range.some(r => r === parseInt(id));
-    });
-  }
   return {
-    regions: regionsFor,
+    regions: regions.filter(region => region.provider === provider),
     mode,
     range,
     value,
@@ -197,7 +186,11 @@ const mapStateToProps = ({ cloud: { regions } }: AppState, { navigation }: Locat
       }
       onChange(value);
       navigation.goBack();
-    }
+    },
+    getCountryName: (id: string) => {
+      const country = countrys.find(country => country.id === id);
+      return country ? country.name : id;
+    },
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => {

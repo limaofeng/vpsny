@@ -1,5 +1,8 @@
+import { AppState } from '@modules';
+import { IRegion } from '@modules/database/type';
 import React from 'react';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
@@ -8,13 +11,11 @@ import { Dispatch } from 'redux';
 
 import { getApi } from '..';
 import { Icon, Item, Label, List, Note } from '../../../components';
-import HeaderRight from '../../../components/HeaderRight';
 import { ItemBody, ItemStart } from '../../../components/Item';
 import MultiSelection from '../../../components/MultiSelection';
 import Theme, { withTheme } from '../../../components/Theme';
 import { fileSize } from '../../../utils/format';
 import { Plan, Provider, Region } from '../Provider';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 const { Option } = MultiSelection;
 
@@ -240,17 +241,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     const title = navigation.getParam('callback') ? 'Choose a size' : 'Instance plans';
     return {
       headerTitle: title,
-      headerBackTitle: ' ',
-      headerRight: (
-        <HeaderRight
-          onClick={() => {
-            Pricing.handleClickHeaderRight();
-          }}
-          visible={false}
-          ref={Pricing.headerRight}
-          title="Done"
-        />
-      )
+      headerBackTitle: ' '
     };
   };
   analytics?: RNFirebase.Analytics;
@@ -260,7 +251,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     const { navigation, plans } = this.props;
     const defaultValue = navigation.getParam('value');
     this.state = {
-      results: props.plans.filter(plan => !!plan.regions.length),
+      results: props.plans, // .filter(plan => !!plan.regions.length),
       conditions: {
         providers: [],
         regions: [],
@@ -278,7 +269,6 @@ class Pricing extends React.Component<PricingProps, PricingState> {
       sort: { id: 'price', sort: 'asc' },
       refreshing: false
     };
-    Pricing.handleClickHeaderRight = this.handleDone;
   }
 
   componentDidMount() {
@@ -294,10 +284,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
   handleChange = async (value: Plan) => {
     this.setState({ value });
     if (this.props.value.id !== value.id) {
-      Pricing.headerRight.current.show();
       this.handleDone(value);
-    } else {
-      Pricing.headerRight.current.hide();
     }
   };
 
@@ -540,7 +527,10 @@ class Pricing extends React.Component<PricingProps, PricingState> {
 
     //  && plan.regions.some(r => r === location.id)
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.backgroundColor }]}
+        forceInset={{ bottom: 'never' }}
+      >
         <Toolbar
           value={sort}
           onChange={this.handleSortChange}
@@ -677,12 +667,15 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { pricing: plans, regions, providers } }: any, { navigation }: PricingProps) => {
+const mapStateToProps = ({ database: { bundles, providers, regions } }: AppState, { navigation }: PricingProps) => {
   const onChange = navigation.getParam('callback');
+  const region = navigation.getParam('region') as IRegion;
   const value = navigation.getParam('value');
   const mode: Mode = !!onChange ? 'choose' : 'manage';
   return {
-    plans: plans.sort((l: Plan, r: Plan) => l.price - r.price),
+    plans: bundles
+      .filter(bundle => bundle.requirements.regions.some(r => r == region.id))
+      .sort((l, r) => l.price - r.price),
     regions,
     providers,
     mode,

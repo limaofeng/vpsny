@@ -124,7 +124,6 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
   render() {
     const { instances, isNoAccount, currentAccount } = this.props;
     const { colors, fonts } = defaultTheme;
-    console.log('servers', this.context);
     return (
       <SafeAreaView
         forceInset={{ bottom: 'never' }}
@@ -263,6 +262,7 @@ const mapStateToProps = (
   { cloud: { instances, accounts }, ssh: { connections }, settings: { currentAccount } }: AppState,
   { navigation }: InstancesProps
 ) => {
+  navigation.state.currentAccount = currentAccount;
   return {
     connections: connections,
     instances: currentAccount ? instances.filter((a: Instance) => a.account === currentAccount) : instances,
@@ -270,11 +270,10 @@ const mapStateToProps = (
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch, { navigation }: InstancesProps) => {
+const mapDispatchToProps = (dispatch: Dispatch, { navigation, instances }: InstancesProps) => {
   const source = {
     get accountId() {
-      const account: Account = navigation.getParam('data');
-      return account ? account.id : null;
+      return navigation.state.currentAccount;
     },
     get api() {
       const api = this.accountId ? getApi(this.accountId) : false;

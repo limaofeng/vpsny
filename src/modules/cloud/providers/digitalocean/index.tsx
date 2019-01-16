@@ -6,9 +6,9 @@ import { Dispatch } from 'redux';
 
 import { ComponentName, Provider } from '../';
 import { getTip } from '../utils';
-import AccountNew from './AccountNew';
-import AccountView from './AccountView';
-import ServerView from './ServerView';
+import AccountNew from './blocks/AccountNew';
+import AccountView from './blocks/AccountView';
+import ServerView from './blocks/ServerView';
 
 class DigitalOcean implements Provider {
   id = 'digitalocean';

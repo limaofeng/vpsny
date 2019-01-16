@@ -1,30 +1,12 @@
+import { IBlueprint, IBundle, IRegion } from '@modules/database/type';
 import { format, md5 } from '@utils';
+import { Snapshot } from 'aws-sdk/clients/directoryservice';
 import { DigitalOcean } from 'dots-wrapper';
-import { IDroplet, IRegion, ISize } from 'dots-wrapper/dist/common/interfaces';
 
 import { Agent, APIKey, Bill, User } from '../Agent';
-import { Features, Instance, Plan, Region, SSHKey, SystemImage } from '../Provider';
+import { Features, Instance, SSHKey } from '../Provider';
+import { IDroplet } from 'dots-wrapper/dist/common/interfaces';
 
-function parsePlan(data: ISize): Plan {
-  const type = 'SSD';
-  return {
-    id: data.bundleId!, // 服务商ID标示
-    isActive: data.isActive!, // 是否可用
-    provider: '', // 服务提供商标示
-    name: data.name!, // 名称
-    vcpu: data.cpuCount!,
-    ram: data.ramSizeInGb!, // 内存
-    disk: data.diskSizeInGb!, // 磁盘大小
-    bandwidth: data.transferPerMonthInGb!, // 带宽
-    type, // 类型： SSD / DEDICATED
-    price: data.price!, // 每月收费 小时费用得自己算
-    regions: [] // 适用地区
-  };
-}
-
-function parseRegion(data: IRegion): Region {
-  return {};
-}
 
 const statusMappings: { [key: string]: string } = { new: 'Installing', active: 'Running', off: 'Stopped' };
 
@@ -109,25 +91,11 @@ export class DigitalOceanAgent implements Agent {
     this.apiKey = apiKey;
     this.digitalOcean = new DigitalOcean(apiKey.token);
   }
-
-  async regions(): Promise<Region[]> {
-    const pager = await this.digitalOcean.Region.list(0, 100).toPromise();
-    return pager.items.map(data => parseRegion(data));
-  }
-  async pricing(): Promise<Plan[]> {
-    const pager = await this.digitalOcean.Size.list(0, 100).toPromise();
-    return pager.items.map(data => parsePlan(data));
-  }
-
-  async images(): Promise<SystemImage[]> {
-    throw 'temporary does not support this operation';
-  }
-
   async deploy(
     hostname: string,
-    plan: Plan,
-    region: Region,
-    image: SystemImage,
+    bundle: IBundle,
+    region: IRegion,
+    blueprint: IBlueprint,
     sshkeys: SSHKey[],
     features: Features
   ): Promise<string> {
@@ -240,4 +208,14 @@ export class DigitalOceanAgent implements Agent {
       console.log('instance restart', action.id, action.status);
     }
   };
+  snapshot = {
+    list: async (): Promise<Snapshot[]> => {
+      return [];
+    },
+    create: async (): Promise<Snapshot> => {
+      return {};
+    },
+    destroy: async (id: string): Promise<void> => {}
+  };
+
 }

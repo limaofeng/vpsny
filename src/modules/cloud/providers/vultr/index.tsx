@@ -6,9 +6,9 @@ import { NavigationScreenProp } from 'react-navigation';
 import { getTip } from '../utils';
 import { getApi } from '@modules/cloud';
 
-import AccountNew from './AccountNew';
-import AccountView from './AccountView';
-import ServerView from './ServerView';
+import AccountNew from './blocks/AccountNew';
+import AccountView from './blocks/AccountView';
+import ServerView from './blocks/ServerView';
 
 class VultrHost implements Provider {
   id = 'vultr';

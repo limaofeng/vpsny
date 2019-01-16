@@ -1,4 +1,4 @@
-import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
+import { Item, ItemDivider, Label, List, Note, Theme, withTheme } from '@components';
 import { BandwagonHostAPIKey } from '@modules/cloud/agents/BandwagonHostAgent';
 import { Account } from '@modules/cloud/type';
 import React from 'react';
@@ -30,15 +30,16 @@ class BandwagonHostView extends React.Component<BandwagonHostViewProps, Bandwago
             <Note>{account.email}</Note>
           </Item>
         </List>
+        <ItemDivider title="API-Key"/>
         {apiKey.vpses.map(data => (
-          <List title="REST API">
+          <List>
             <Item>
               <Label>VEID</Label>
               <Note>{data.veid}</Note>
             </Item>
             <Item>
-              <Label>API KEY</Label>
-              <Input value={data.token} />
+              <Label>Key</Label>
+              <Note>{data.token}</Note>
             </Item>
           </List>
         ))}

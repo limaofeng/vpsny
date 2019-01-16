@@ -17,17 +17,16 @@ export default class Charges extends Component<ChargesProps> {
           onClick={() => {
             this.setState({ visible: true });
           }}
-          style={{ paddingLeft: 15, paddingRight: 15 }}
-          bodyStyle={{ paddingLeft: 6 }}
+          style={{ paddingLeft: 15, paddingRight: 0 }}
         >
           <ItemStart style={{ width: 20 }}>
             <Icon type="FontAwesome" color={colors.minor} name="credit-card-alt" size={12} />
           </ItemStart>
-          <ItemBody style={{ paddingLeft: 6 }}>
+          <ItemBody style={{ paddingLeft: 6, paddingRight: 15 }}>
             <Note style={{ flex: 1 }}>
               ${data.pendingCharges!.toFixed(2)} of ${data.costPerMonth!.toFixed(2)} per month
             </Note>
-            <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>Charges</Label>
+            <Label style={[fonts.subhead, { textAlign: 'right' }]}>Charges</Label>
           </ItemBody>
         </Item>
       </List>

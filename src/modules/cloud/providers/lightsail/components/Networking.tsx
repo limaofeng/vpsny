@@ -69,6 +69,7 @@ export default class Networking extends Component<NetworkingProps> {
                 <List itemStyle={{ paddingLeft: 0 }} style={{ marginBottom: 0, backgroundColor: 'transparent' }}>
                   {data.networking!.firewall.map(rule => (
                     <Item
+                      key={`${rule.protocol}-${rule.fromPort}`}
                       size={20}
                       bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
                     >

@@ -1,5 +1,7 @@
+import { AppState } from '@modules';
 import React from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -11,18 +13,22 @@ import SubmitButton from '../../../components/SubmitButton';
 import Theme, { withTheme } from '../../../components/Theme';
 import { format, sleep } from '../../../utils';
 import Country from '../components/Country';
-import { Features, ImageVersion, Plan, Provider, Region, SSHKey, SystemImage } from '../Provider';
+import { Features, ImageVersion, Plan, Region, SSHKey, SystemImage } from '../Provider';
 import { Account, KeyPair } from '../type';
-import firebase, { RNFirebase } from 'react-native-firebase';
+import { IBundle, IRegion, IBlueprint } from '@modules/database/type';
 
 interface DeployProps {
   navigation: NavigationScreenProp<any>;
   keyPairs: KeyPair[];
   theme: Theme;
-  getDefaultRegion: (plan: Plan) => Region | undefined;
-  getDefaultImage: () => SystemImage;
-  getDefaultPlan: () => Plan;
+  bundles: any[];
+  blueprints: any[];
+  regions: any[];
+  getDefaultRegion: () => IRegion;
+  getDefaultImage: () => IBlueprint;
+  getDefaultPlan: (region: IRegion) => IBundle;
   getDefaultAccount: () => Account;
+  getCountryName: (id: string) => string;
   deploy: (
     hostname: string,
     account: Account,
@@ -37,9 +43,9 @@ interface DeployProps {
 interface DeployState {
   hostname: string;
   provider: string;
-  plan: Plan;
-  location?: Region;
-  image: SystemImage;
+  plan: IBundle;
+  location?: IRegion;
+  image: IBlueprint;
   account: Account;
   sshkeys: SSHKey[];
   features: string[];
@@ -55,12 +61,13 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   constructor(props: DeployProps) {
     super(props);
     const account = props.getDefaultAccount() as Account;
-    const plan = props.getDefaultPlan();
+    const region = props.getDefaultRegion();
+    const plan = props.getDefaultPlan(region);
     this.state = {
       hostname: '',
       provider: plan.provider,
       plan,
-      location: props.getDefaultRegion(plan),
+      location: region,
       image: props.getDefaultImage(),
       account: account,
       sshkeys: [],
@@ -78,12 +85,11 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   }
 
   toLocations = () => {
-    const { plan, location: value, provider } = this.state;
+    const { location: value, provider } = this.state;
     this.props.navigation.navigate('Locations', {
       provider,
-      range: plan.regions,
       value,
-      callback: (location: Region) => {
+      callback: (location: IRegion) => {
         this.setState({ location });
       }
     });
@@ -94,7 +100,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
     this.props.navigation.navigate('Images', {
       provider,
       value: image,
-      callback: (image: SystemImage) => {
+      callback: (image: IBlueprint) => {
         this.setState({ image });
       }
     });
@@ -123,17 +129,13 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   };
 
   toPricing = () => {
-    const { getDefaultRegion } = this.props;
     const { provider, location, plan } = this.state;
     this.props.navigation.navigate('Pricing', {
       value: plan,
       provider,
-      location,
-      callback: (plan: Plan) => {
+      region: location,
+      callback: (plan: IBundle) => {
         const state: any = { plan, provider: plan.provider };
-        if (!location || !plan.regions.some(id => location.providers.find(p => p.type === plan.provider)!.id === id)) {
-          state.location = getDefaultRegion(plan);
-        }
         this.setState(state);
       }
     });
@@ -185,6 +187,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
 
   render() {
     const { colors, fonts } = this.props.theme;
+    const { getCountryName } = this.props;
     const { provider, location, plan, image, account, sshkeys } = this.state;
     // <LinearGradient
     //   start={{ x: 0, y: 1 }}
@@ -194,7 +197,10 @@ class Deploy extends React.Component<DeployProps, DeployState> {
     // >
     // </LinearGradient>
     return (
-      <SafeAreaView forceInset={{bottom: 'never'}} style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
+      <SafeAreaView
+        forceInset={{ bottom: 'never' }}
+        style={[styles.container, { backgroundColor: colors.backgroundColor }]}
+      >
         <ScrollView>
           <List title="Hostname" style={{ marginTop: 13 }}>
             <Item size={50}>
@@ -212,6 +218,49 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             hostname of the server
           </Text>
           */}
+          <List title="Choose a region">
+            <Item
+              testID="servers-deploy-choose-region"
+              size="medium"
+              push={!!location}
+              onClick={location && this.toLocations}
+            >
+              <View style={{ flex: 1, height: 54 }}>
+                {location ? (
+                  <>
+                    <View style={{ height: 30, justifyContent: 'flex-end' }}>
+                      <Note style={fonts.callout}>
+                        {location.name}
+                        <Text style={[{ color: colors.minor }, fonts.caption]}>
+                          {'   '}
+                          {getCountryName(location.country)}
+                        </Text>
+                      </Note>
+                      <Text />
+                    </View>
+                    <View style={{ height: 30, justifyContent: 'center' }}>
+                      {provider === 'vultr' && (
+                        <Text style={[{ color: colors.minor }, fonts.caption]}>Private Networking, Backups, IPv6</Text>
+                      )}
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                      <Note style={fonts.callout}>No available region</Note>
+                    </View>
+                  </>
+                )}
+              </View>
+            </Item>
+          </List>
+          <List title="Choose an image">
+            <Item testID="servers-deploy-choose-image" size={45} push onClick={this.toImages}>
+              <Note>
+                {image && (image as SystemImage).name} {image && ((image as SystemImage).version as ImageVersion).name}
+              </Note>
+            </Item>
+          </List>
           <List title="Choose a size">
             <Item testID="servers-deploy-choose-size" size={80} onClick={this.toPricing} push>
               <ItemStart>
@@ -260,16 +309,6 @@ class Deploy extends React.Component<DeployProps, DeployState> {
                       <Note style={fonts.subhead}>{plan.disk} GB</Note>
                       <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>SSD</Label>
                     </Item>
-                    {/*
-                    <Item
-                      size={20}
-                      bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
-                    >
-                      <Icon type="FontAwesome5" color={colors.minor} name="exchange-alt" size={12} />
-                      <Note style={{ }}>{plan.bandwidth} GB</Note>
-                      <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>Transfer</Label>
-                    </Item>
-                    */}
                   </List>
                 </View>
                 <Icon
@@ -282,75 +321,6 @@ class Deploy extends React.Component<DeployProps, DeployState> {
               </ItemBody>
             </Item>
           </List>
-          <List title="Choose a region">
-            <Item
-              testID="servers-deploy-choose-region"
-              size="medium"
-              push={!!location}
-              onClick={location && this.toLocations}
-            >
-              <View style={{ flex: 1, height: 54 }}>
-                {location ? (
-                  <>
-                    <View style={{ height: 30, justifyContent: 'flex-end' }}>
-                      <Note style={fonts.callout}>
-                        {location.name}
-                        <Text style={[{ color: colors.minor }, fonts.caption]}>
-                          {'   '}
-                          {location.country}
-                        </Text>
-                      </Note>
-                    </View>
-                    <View style={{ height: 30, justifyContent: 'center' }}>
-                      {provider === 'vultr' && (
-                        <Text style={[{ color: colors.minor }, fonts.caption]}>
-                          Private Networking, Backups, IPv6
-                          {location.providers.find(p => p.type === 'vultr')!.features!.ddosProtection &&
-                            ', DDOS Protection'}
-                          {location.providers.find(p => p.type === 'vultr')!.features!.blockStorage &&
-                            ', Block Storage'}
-                        </Text>
-                      )}
-                    </View>
-                  </>
-                ) : (
-                  <>
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                      <Note style={fonts.callout}>No available region</Note>
-                    </View>
-                  </>
-                )}
-              </View>
-            </Item>
-          </List>
-          {/*
-          <Text
-            style={[
-              { color: colors.minor, paddingHorizontal: 15, paddingVertical: 10, flex: 1, lineHeight: 16 },
-              fonts.subhead
-            ]}
-          >
-            Your Droplet Region is the datacenter that your droplet is deployed in
-          </Text>
-        */}
-          <List title="Choose an image">
-            <Item testID="servers-deploy-choose-image" size={45} push onClick={this.toImages}>
-              <Note>
-                {image && (image as SystemImage).name} {image && ((image as SystemImage).version as ImageVersion).name}
-              </Note>
-            </Item>
-          </List>
-          {/*
-          <Text
-            style={[
-              { color: colors.minor, paddingHorizontal: 15, paddingVertical: 10, flex: 1, lineHeight: 16 },
-              fonts.subhead
-            ]}
-          >
-            This includes Linux distribution images, snapshots, backups, one-click applications, and destroyed Droplet
-            images
-          </Text>
-        */}
           <List title="Choose a account">
             <Item push onClick={this.handleJumpToAccounts}>
               <Note>
@@ -414,19 +384,14 @@ class Deploy extends React.Component<DeployProps, DeployState> {
                     </View>
                   </Item>
                 )}
-                {location &&
-                  location.providers.find(p => p.type === 'vultr')!.features!.ddosProtection && (
-                    <Item value="DDOS Protection">
-                      <Note style={{ color: colors.secondary }}>Enable DDOS Protection</Note>
-                      <View style={[styles.additionalCostContainer, { backgroundColor: colors.primary }]}>
-                        <Text
-                          style={[styles.additionalCostText, fonts.subhead, { color: colors.backgroundColorDeeper }]}
-                        >
-                          $10/mo
-                        </Text>
-                      </View>
-                    </Item>
-                  )}
+                <Item visible={false} value="DDOS Protection">
+                  <Note style={{ color: colors.secondary }}>Enable DDOS Protection</Note>
+                  <View style={[styles.additionalCostContainer, { backgroundColor: colors.primary }]}>
+                    <Text style={[styles.additionalCostText, fonts.subhead, { color: colors.backgroundColorDeeper }]}>
+                      $10/mo
+                    </Text>
+                  </View>
+                </Item>
                 <Item value="Private Networking" bodyStyle={{ borderBottomWidth: 0 }}>
                   <Note style={{ color: colors.secondary }}>Enable Private Networking</Note>
                 </Item>
@@ -458,13 +423,13 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             </View>
             <View style={{ flex: 1 }}>
               <View style={{ position: 'absolute' }}>
-                {location && <Country map value={location.country} size={50} fill={colors.trivial} />}
+                {location && <Country map value={location.country} size={60} fill={colors.trivial} />}
               </View>
               <View style={{ paddingTop: 25, paddingLeft: 50, justifyContent: 'flex-end' }}>
                 <View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                   <Text style={[{ color: colors.primary }, fonts.title]}>{location && location.name}</Text>
                   <Text style={[{ paddingLeft: 5, color: colors.minor }, fonts.subhead]}>
-                    {location && location.country}
+                    {location && getCountryName(location.country)}
                   </Text>
                 </View>
               </View>
@@ -501,36 +466,34 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ settings: { keyPairs }, cloud: { accounts, regions, providers, pricing } }: any) => {
-  const dregions = regions as Region[];
-  const plans = pricing as Plan[];
-  const provider = (providers as Provider[]).find(p => p.id === 'vultr') as Provider;
-  const iaccounts = accounts as Account[];
+const mapStateToProps = ({
+  settings: { keyPairs },
+  cloud: { accounts },
+  database: { bundles, blueprints, regions, countrys }
+}: AppState) => {
   return {
-    getDefaultRegion: (plan: Plan) => {
-      const regions = dregions.filter(r => r.providers.some(p => p.type === plan.provider));
-      if (!regions.length) {
-        return undefined;
-      }
-      let defaultRegion = regions.find(r => r.continent === 'Asia');
-      if (!defaultRegion) {
-        defaultRegion = regions.find(r => r.continent === 'North America');
-      }
-      return defaultRegion && regions[regions.length - 1];
+    getDefaultRegion: () => {
+      return regions.find(r => r.provider === 'vultr') as IRegion;
     },
-    getDefaultPlan: () => {
-      return plans.find(plan => plan.provider === 'vultr' && plan.price === 5 && plan.type === 'ssd') as Plan;
+    getDefaultPlan: (region: IRegion) => {
+      return bundles.find(
+        plan =>
+          plan.provider === 'vultr' && plan.type! === 'ssd' && plan.requirements.regions.some(id => id == region.id)
+      ) as IBundle;
     },
     getDefaultImage: () => {
-      const image = provider.images.find(image => image.name === 'Ubuntu') as SystemImage;
-      image.version = image.versions![image.versions!.length - 1];
-      return image;
+      return blueprints.find(
+        blueprint => blueprint.provider === 'vultr' && blueprint.type === 'os' && blueprint.family === 'ubuntu'
+      ) as IBlueprint;
     },
     getDefaultAccount: () => {
-      return iaccounts.find(a => a.provider === 'vultr') as Account;
+      return accounts.find(a => a.provider === 'vultr') as Account;
     },
-    provider,
     keyPairs,
+    getCountryName: (id: string) => {
+      const country = countrys.find(country => country.id === id);
+      return country ? country.name : id;
+    },
     accounts
   };
 };
@@ -540,9 +503,9 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: DeployProps) => 
     async deploy(
       hostname: string,
       account: Account,
-      plan: Plan,
-      region: Region,
-      image: SystemImage,
+      plan: IBundle,
+      region: IRegion,
+      image: IBlueprint,
       sshkeys: SSHKey[],
       features: Features
     ): Promise<void> {
@@ -560,3 +523,41 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(withTheme(Deploy, false));
+
+{
+  /*
+                    <Item
+                      size={20}
+                      bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
+                    >
+                      <Icon type="FontAwesome5" color={colors.minor} name="exchange-alt" size={12} />
+                      <Note style={{ }}>{plan.bandwidth} GB</Note>
+                      <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>Transfer</Label>
+                    </Item>
+                    */
+}
+{
+  /*
+          <Text
+            style={[
+              { color: colors.minor, paddingHorizontal: 15, paddingVertical: 10, flex: 1, lineHeight: 16 },
+              fonts.subhead
+            ]}
+          >
+            Your Droplet Region is the datacenter that your droplet is deployed in
+          </Text>
+        */
+}
+{
+  /*
+          <Text
+            style={[
+              { color: colors.minor, paddingHorizontal: 15, paddingVertical: 10, flex: 1, lineHeight: 16 },
+              fonts.subhead
+            ]}
+          >
+            This includes Linux distribution images, snapshots, backups, one-click applications, and destroyed Droplet
+            images
+          </Text>
+        */
+}

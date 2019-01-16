@@ -3,26 +3,11 @@ import React from 'react';
 import { Icon } from '../../../components';
 import Theme, { withTheme } from '../../../components/Theme';
 
-const images = {
-  centos: require('../assets/os/centos.png'),
-  coreos: require('../assets/os/coreos.png'),
-  debian: require('../assets/os/debian.png'),
-  fedora: require('../assets/os/fedora.png'),
-  freebsd: require('../assets/os/freebsd.png'),
-  openbsd: require('../assets/os/openbsd.png'),
-  ubuntu: require('../assets/os/ubuntu.png')
-};
-
 export function getLogoName(os?: string) {
   if (!os) {
     return 'linux';
   }
-  for (const name of Object.keys(images)) {
-    if (os.includes(name)) {
-      return name;
-    }
-  }
-  return 'linux';
+  return os.split(/[ |-]/g)[0];
 }
 
 interface OSLogoProps {

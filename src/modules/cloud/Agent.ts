@@ -1,4 +1,5 @@
 import { Plan, Region, SystemImage, SSHKey, Instance, Features } from './Provider';
+import { IBundle, IRegion, IBlueprint } from '@modules/database/type';
 
 export enum Country {
   au = 'Australia',
@@ -48,14 +49,11 @@ export interface Snapshot {
 
 export interface Agent {
   id: string;
-  pricing(): Promise<Plan[]>;
-  regions(): Promise<Region[]>;
-  images(): Promise<SystemImage[]>;
   deploy(
     hostname: string,
-    plan: Plan,
-    region: Region,
-    image: SystemImage,
+    bundle: IBundle,
+    region: IRegion,
+    blueprint: IBlueprint,
     sshkeys: SSHKey[],
     features: Features
   ): Promise<string>;

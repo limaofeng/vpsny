@@ -1,5 +1,5 @@
 import { AppState } from '..';
-import { Agent, User, Bill } from './Agent';
+import { Agent, User, Bill, Snapshot } from './Agent';
 import { Features, Instance, Plan, Region, SSHKey, SystemImage } from './type';
 
 type Select = (finder: (state: AppState) => any) => any;
@@ -86,14 +86,20 @@ export default class AgentAdapter implements Agent {
     restart: async (id: string): Promise<void> => {
       await this.current(id).instance.restart(id);
     },
-    reboot: async (id: string): Promise<void> => {
-      await this.current(id).instance.reboot(id);
-    },
     destroy: async (id: string): Promise<void> => {
       await this.current(id).instance.destroy(id);
     },
     reinstall: async (id: string): Promise<void> => {
       await this.current(id).instance.reinstall(id);
     }
+  };
+  snapshot = {
+    list: async (): Promise<Snapshot[]> => {
+      return [];
+    },
+    create: async (): Promise<Snapshot> => {
+      return {};
+    },
+    destroy: async (id: string): Promise<void> => {}
   };
 }

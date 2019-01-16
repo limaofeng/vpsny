@@ -5,11 +5,11 @@ import { Alert, Dimensions, View } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setApi } from '../..';
-import SubmitButtonWrapper, { SubmitButton } from '../../../../components/SubmitButton';
-import { User } from '../../Agent';
-import BandwagonHostAgent, { BandwagonHostAPIKey } from '../../agents/BandwagonHostAgent';
-import { Account } from '../../type';
+import { setApi } from '../../..';
+import SubmitButtonWrapper, { SubmitButton } from '../../../../../components/SubmitButton';
+import { User } from '../../../Agent';
+import BandwagonHostAgent, { BandwagonHostAPIKey } from '../../../agents/BandwagonHostAgent';
+import { Account } from '../../../type';
 
 type QueryType = 'id' | 'veid';
 

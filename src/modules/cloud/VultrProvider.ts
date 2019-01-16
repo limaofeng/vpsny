@@ -3,9 +3,10 @@ import Bluebird from 'bluebird';
 import querystring from 'querystring';
 import firebase, { RNFirebase } from 'react-native-firebase';
 
-import { getPublicKeyFingerprint, md5 } from '../../utils';
-import { Agent, APIKey, Bill, User } from './Agent';
+import { getPublicKeyFingerprint, md5, format } from '../../utils';
+import { Agent, APIKey, Bill, User, Snapshot } from './Agent';
 import { Features, ImageVersion, Instance, Plan, Region, SSHKey, SystemImage } from './Provider';
+import { IBlueprint, IRegion, IBundle } from '@modules/database/type';
 
 const invisible = [
   {
@@ -201,18 +202,29 @@ function parseInstance(id: string, data: any): Instance {
     debugger;
     console.warn('account id is null');
   }
+  const [ram, unit] = data.ram.split(' ');
   return {
     id: data.SUBID,
     name: data.label || 'Cloud Instance',
     hostname: mainIp,
+    publicIP: mainIp,
     tag: data.tag,
     os: data.os,
-    ram: data.ram,
-    disk: data.disk,
+    ram: {
+      size: format.fileSize(parseInt(ram), unit, { mode: 'hide', finalUnit: 'MB' }) as number
+    },
+    disk: {
+      size: parseInt(data.disk.split(' ')[1]),
+      type: data.disk.includes('Virtual ') ? 'SSD' : 'HDD'
+    },
     vcpu: parseInt(data.vcpu_count),
     location: {
       title: data.location,
-      region: data.location
+      region: data.location,
+      city: '',
+      continent: '',
+      country: '',
+      state: ''
     },
     defaultPassword: data.default_password,
     status: getStatus(data.status, data.power_status, data.server_state),
@@ -453,16 +465,16 @@ export class VultrAgent implements Agent {
 
   async deploy(
     hostname: string,
-    plan: Plan,
-    region: Region,
-    image: SystemImage,
+    bundle: IBundle,
+    region: IRegion,
+    blueprint: IBlueprint,
     sshkeys: SSHKey[],
     features: Features
   ): Promise<string> {
     const body = querystring.stringify({
-      DCID: region.providers.find(p => p.type === 'vultr')!.id,
-      VPSPLANID: plan.id,
-      OSID: (image.version as ImageVersion).id,
+      DCID: region.id,
+      VPSPLANID: bundle.id,
+      OSID: blueprint.id,
       SSHKEYID: sshkeys.map(sshkey => sshkey.id),
       enable_ipv6: features.IPv6 ? 'yes' : 'no',
       enable_private_network: features.PrivateNetwork ? 'yes' : 'no',
@@ -613,6 +625,15 @@ export class VultrAgent implements Agent {
       );
       console.log('instance reinstall', data);
     }
+  };
+  snapshot = {
+    list: async (): Promise<Snapshot[]> => {
+      return [];
+    },
+    create: async (): Promise<Snapshot> => {
+      return {};
+    },
+    destroy: async (id: string): Promise<void> => {}
   };
 }
 

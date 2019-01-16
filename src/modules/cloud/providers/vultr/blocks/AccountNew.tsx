@@ -5,10 +5,10 @@ import { Alert, Dimensions, View } from 'react-native';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { setApi } from '../..';
-import SubmitButtonWrapper, { SubmitButton } from '../../../../components/SubmitButton';
-import { User, Bill } from '../../Agent';
-import { Account } from '../../type';
+import { setApi } from '../../..';
+import SubmitButtonWrapper, { SubmitButton } from '../../../../../components/SubmitButton';
+import { User, Bill } from '../../../Agent';
+import { Account } from '../../../type';
 import { VultrAPIKey, VultrAgent } from '@modules/cloud/VultrProvider';
 import { format } from '@utils';
 

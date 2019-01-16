@@ -5,6 +5,7 @@ import { Agent, APIKey, Bill, User, Continent, Country, Snapshot } from '../Agen
 import { Features, Instance, Plan, Region, SSHKey, SystemImage } from '../Provider';
 import NetworkError, { ERROR_CODES } from './NetworkError';
 import moment = require('moment');
+import { IBundle, IRegion, IBlueprint } from '@modules/database/type';
 
 const statusMappings: { [key: string]: string } = { new: 'Installing', active: 'Running', off: 'Stopped' };
 
@@ -104,7 +105,7 @@ const DataCenters: {
 function parseInstance(data: any, account: string): Instance {
   const datacenter = DataCenters[data.node_location_id];
   let status = getStatus(data.ve_status);
-  const vcpu = Number.isInteger(parseInt(data.vcpus)) ? parseInt(data.vcpus) : undefined;
+  const vcpu: any = Number.isInteger(parseInt(data.vcpus)) ? parseInt(data.vcpus) : undefined;
   if (status === 'Running') {
     const started = Number.isInteger(parseInt(data.vcpus));
     status = started ? status : 'Pending';
@@ -132,7 +133,7 @@ function parseInstance(data: any, account: string): Instance {
       size: data.plan_disk / 1024 / 1024 / 1024,
       type: 'SSD'
     },
-    vcpu,
+    vcpu: vcpu,
     location: {
       title: datacenter.name,
       continent: datacenter.continent,
@@ -229,9 +230,9 @@ export default class BandwagonHostAgent implements Agent {
 
   async deploy(
     hostname: string,
-    plan: Plan,
-    region: Region,
-    image: SystemImage,
+    bundle: IBundle,
+    region: IRegion,
+    blueprint: IBlueprint,
     sshkeys: SSHKey[],
     features: Features
   ): Promise<string> {

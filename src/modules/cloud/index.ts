@@ -415,40 +415,6 @@ export default new Feature({
         }
       }
       console.log('setup agents ->', Array.from(agents.keys()));
-      // 加载默认数据
-      agents.set('vultr', new VultrAgent({ apiKey: '' }));
-      // TODO: AWS 请求数据需要一个 KEY , 不想写死在代码中。可以从服务端获取。
-      // agents.set(
-      //   'aws',
-      //   new AWSLightsailAgent(
-      //     { accessKeyId: '', secretAccessKey: '' },
-      //     {
-      //       defaultRegion: 'us-east-1',
-      //       regions: []
-      //     }
-      //   )
-      // );
-      // 加载 Vultr 数据
-      const { provider, ...vultrDatabase } = await loadVultr(agents.get('vultr')!);
-      // 加载 AWS 数据
-      // const awsDatabase = await loadAWS(agents.get('aws') as AWSLightsailAgent);
-      // 合并地区数据
-      const allRegions = new Map<string, Region>();
-      for (const region of vultrDatabase.regions) {
-        allRegions.set(region.id, region);
-      }
-      // for (const region of awsDatabase.regions) {
-      //   if (allRegions.has(region.id)) {
-      //     allRegions.get(region.id)!.providers.push(...region.providers);
-      //   } else {
-      //     allRegions.set(region.id, region);
-      //   }
-      // }
-
-      dispatch({
-        type: 'setup',
-        payload: { providers: [provider], ...vultrDatabase, regions: Array.from(allRegions.values()) }
-      });
     },
     async tracking({ dispatch, state }: { dispatch: Dispatch; state: CloudState }) {
       const { instances } = state;

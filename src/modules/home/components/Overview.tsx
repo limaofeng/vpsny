@@ -95,17 +95,6 @@ class Overview extends React.Component<OverviewProps> {
         </Modal>
         <View style={{ marginTop: 10 }} />
         <ServerView theme={this.props.theme} data={data} navigation={navigation} />
-
-        <List visible={data.provider === 'vultr'}>
-          <Item push>
-            <Note>Backups</Note>
-          </Item>
-        </List>
-        <List visible={data.provider === 'vultr'}>
-          <Item push>
-            <Note>DDOS</Note>
-          </Item>
-        </List>
       </>
     );
   }

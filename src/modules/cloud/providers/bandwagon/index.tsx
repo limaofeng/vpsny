@@ -8,11 +8,11 @@ import { NavigationScreenProp } from 'react-navigation';
 import { Dispatch } from 'redux';
 
 import { ComponentName, Provider, ServerAction } from '../';
-import AccountNew from './AccountNew';
-import AccountView from './AccountView';
-import Reinstall from './Reinstall';
-import Migration from './Migration';
-import ServerView from './ServerView';
+import AccountNew from './blocks/AccountNew';
+import AccountView from './blocks/AccountView';
+import Reinstall from './pages/Reinstall';
+import Migration from './pages/Migration';
+import ServerView from './blocks/ServerView';
 import { getTip } from '../utils';
 
 
