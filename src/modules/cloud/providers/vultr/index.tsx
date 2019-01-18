@@ -9,12 +9,16 @@ import { getApi } from '@modules/cloud';
 import AccountNew from './blocks/AccountNew';
 import AccountView from './blocks/AccountView';
 import ServerView from './blocks/ServerView';
+import { ProviderType } from '@modules/cloud/type';
 
 class VultrHost implements Provider {
-  id = 'vultr';
+  id: ProviderType = 'vultr';
   name = 'Vultr';
   logo = require('./assets/vultr.png');
   description = 'Global Cloud Hosting';
+  features = {
+    deploy: true
+  };
   actions(data: Instance, theme: Theme, dispatch: Dispatch, navigation: NavigationScreenProp<any>): ServerAction[] {
     const additions = getTip(data, theme);
     const api = getApi(data.account);

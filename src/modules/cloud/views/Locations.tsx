@@ -95,7 +95,7 @@ class Locations extends React.Component<LocationsProps, LocationsState> {
 
   static getFeatureText(region: Region) {
     const defaultTxt = 'Private Networking, Backups, IPv6';
-/*     if (ddosProtection || blockStorage) {
+    /*     if (ddosProtection || blockStorage) {
       return (
         'Also ' +
         (ddosProtection ? 'DDOS Protection' : '') +
@@ -190,15 +190,13 @@ const mapStateToProps = ({ database: { regions, countrys } }: AppState, { naviga
     getCountryName: (id: string) => {
       const country = countrys.find(country => country.id === id);
       return country ? country.name : id;
-    },
+    }
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => {
-  const api = getApi('vultr');
   return {
     async refresh() {
-      const regions = await api.regions();
-      dispatch({ type: 'cloud/regions', payload: regions });
+      dispatch({ type: 'database/fetchRegions' });
     }
   };
 };

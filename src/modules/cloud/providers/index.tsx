@@ -4,7 +4,7 @@ import BandwagonHost from './bandwagon';
 import DigitalOcean from './digitalocean';
 import AWSLightsail from './lightsail';
 import Vultr from './vultr';
-import { Instance } from '../type';
+import { Instance, ProviderType } from '../type';
 import { Theme } from '@components';
 import { Dispatch } from 'redux';
 import { NavigationScreenProp } from 'react-navigation';
@@ -24,14 +24,47 @@ export interface ServerAction {
   };
 }
 
+export interface Features {
+  deploy: boolean;
+}
+
 export interface Provider {
-  id: string;
+  /**
+   * 唯一标示
+   */
+  id: ProviderType;
+  /**
+   * Logo
+   */
   logo: ImageSourcePropType;
+  /**
+   * 名称
+   */
   name: string;
+  /**
+   * 描述
+   */
   description: string;
+  /**
+   * 功能特征
+   */
+  features: Features;
+  /**
+   * 扩展路由
+   */
   routes(): any;
+  /**
+   * VPS 动作
+   * @param data 当前 VPS 对象
+   * @param theme 主题选项
+   * @param dispatch Redux Dispatch 对象
+   * @param navigation 路由对象
+   */
   actions(data: Instance, theme: Theme, dispatch: Dispatch, navigation: NavigationScreenProp<any>): ServerAction[];
-  viewComponents(): string[];
+  /**
+   * 返回自定义组件
+   * @param name 组件标示
+   */
   getComponent(name: ComponentName): any;
 }
 

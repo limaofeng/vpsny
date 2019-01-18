@@ -11,12 +11,16 @@ import AccountView from './blocks/AccountView';
 import ServerView from './blocks/ServerView';
 import Snapshots from './pages/Snapshots';
 import History from './pages/History';
+import { ProviderType } from '@modules/cloud/type';
 
 class Lightsail implements Provider {
-  id = 'lightsail';
+  id: ProviderType = 'lightsail';
   name = 'Lightsail';
   logo = require('./assets/lightsail.png');
   description = 'Now available worldwide';
+  features = {
+    deploy: false
+  };
   routes(): any {
     return {
       Lightsail_Snapshots: Snapshots,

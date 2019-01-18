@@ -1,6 +1,6 @@
 import { Theme } from '@components';
 import { getApi } from '@modules/cloud';
-import { Instance } from '@modules/cloud/type';
+import { Instance, ProviderType } from '@modules/cloud/type';
 import { NavigationScreenProp } from 'react-navigation';
 import { Dispatch } from 'redux';
 
@@ -11,10 +11,13 @@ import AccountView from './blocks/AccountView';
 import ServerView from './blocks/ServerView';
 
 class DigitalOcean implements Provider {
-  id = 'digitalocean';
+  id: ProviderType = 'digitalocean';
   name = 'DigitalOcean';
   logo = require('./assets/digitalocean.png');
   description = 'The simplest cloud platform for developers & teams';
+  features = {
+    deploy: false
+  };
   routes(): any {
     return {
     };
@@ -89,9 +92,6 @@ class DigitalOcean implements Provider {
         })
       }
     ];
-  }
-  viewComponents(): string[] {
-    return [''];
   }
   getComponent(name: ComponentName) {
     switch (name) {

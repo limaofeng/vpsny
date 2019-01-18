@@ -1,5 +1,5 @@
 import { AppState } from '@modules';
-import { IRegion } from '@modules/database/type';
+import { IRegion, IBundle } from '@modules/database/type';
 import React from 'react';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
@@ -9,13 +9,12 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
 import { Icon, Item, Label, List, Note } from '../../../components';
 import { ItemBody, ItemStart } from '../../../components/Item';
 import MultiSelection from '../../../components/MultiSelection';
 import Theme, { withTheme } from '../../../components/Theme';
 import { fileSize } from '../../../utils/format';
-import { Plan, Provider, Region } from '../Provider';
+import { Provider } from '../Provider';
 
 const { Option } = MultiSelection;
 
@@ -200,7 +199,7 @@ const Toolbar = withTheme(
 
 interface Conditions {
   providers: string[];
-  regions: Region[];
+  regions: IRegion[];
   prices: number[];
   products: string[];
   soldOut: boolean;
@@ -210,20 +209,20 @@ type Mode = 'choose' | 'manage';
 
 interface PricingProps {
   navigation: NavigationScreenProp<any>;
-  plans: Plan[];
-  regions: Region[];
+  plans: IBundle[];
+  regions: IRegion[];
   providers: Provider[];
   mode: Mode;
-  value: Plan;
-  onChange: (value: Plan) => void;
+  value: IBundle;
+  onChange: (value: IBundle) => void;
   theme: Theme;
   refresh: () => void;
 }
 interface PricingState {
   conditions: Conditions;
   temporary?: Conditions;
-  results: Plan[];
-  value: Plan;
+  results: IBundle[];
+  value: IBundle;
   provider?: string;
   product?: string;
   region?: number;
@@ -259,7 +258,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
         products: [],
         soldOut: false
       },
-      value: plans.find(p => defaultValue && p.id === defaultValue.id) as Plan,
+      value: plans.find(p => defaultValue && p.id === defaultValue.id) as IBundle,
       temporary: undefined,
       provider: 'vultr',
       product: undefined,
@@ -281,7 +280,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     navigation.navigate('Information', { id });
   };
 
-  handleChange = async (value: Plan) => {
+  handleChange = async (value: IBundle) => {
     this.setState({ value });
     if (this.props.value.id !== value.id) {
       this.handleDone(value);
@@ -295,7 +294,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     this.setState({ refreshing: false });
   };
 
-  handleDone = (value?: Plan) => {
+  handleDone = (value?: IBundle) => {
     const { onChange } = this.props;
     onChange(value || this.state.value);
   };
@@ -326,7 +325,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     );
   };
 
-  createItem = (plan: Plan) => {
+  createItem = (plan: IBundle) => {
     const {
       theme: { colors, fonts }
     } = this.props;
@@ -426,7 +425,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     this.setState({ temporary });
   };
 
-  handleeRegionChange = (values: Region[]) => {
+  handleeRegionChange = (values: IRegion[]) => {
     const { temporary } = this.state;
     (temporary as Conditions).regions = values;
     this.setState({ temporary });
@@ -490,7 +489,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     this.setState({ results, panel: false, conditions: temporary as Conditions, temporary: undefined });
   };
 
-  sorting = (l: Plan, r: Plan) => {
+  sorting = (l: IBundle, r: IBundle) => {
     const {
       sort: { id, sort }
     } = this.state;
@@ -520,8 +519,6 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     } = this.props;
     const { provider: providerId, sort, temporary, results: plans, value } = this.state;
     const conditions = temporary as Conditions;
-    const location: Region = this.props.navigation.getParam('location');
-    // const provider: Provider = this.props.navigation.getParam('provider');
     const { regions, providers } = this.props;
     const { products, prices } = providers.find(p => p.id === providerId) as Provider;
 
@@ -541,11 +538,6 @@ class Pricing extends React.Component<PricingProps, PricingState> {
             { id: 'storage', name: 'Storage' }
           ]}
         >
-          <TouchableOpacity onPress={this.handleFilterPanel}>
-            <Text style={{ paddingRight: 20 }}>
-              <Ionicons color={this.state.panel ? colors.primary : colors.minor} name="ios-funnel" size={14} />
-            </Text>
-          </TouchableOpacity>
         </Toolbar>
         {this.state.panel && (
           <View
@@ -680,7 +672,7 @@ const mapStateToProps = ({ database: { bundles, providers, regions } }: AppState
     providers,
     mode,
     value,
-    onChange: (value: Plan) => {
+    onChange: (value: IBundle) => {
       if (!onChange) {
         return;
       }
@@ -690,11 +682,9 @@ const mapStateToProps = ({ database: { bundles, providers, regions } }: AppState
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => {
-  const api = getApi('vultr');
   return {
     async refresh() {
-      const pricing = await api.pricing();
-      dispatch({ type: 'cloud/pricing', payload: pricing });
+      dispatch({ type: 'database/fetchBundles' });
     }
   };
 };

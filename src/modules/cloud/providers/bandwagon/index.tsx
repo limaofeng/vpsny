@@ -8,19 +8,23 @@ import { NavigationScreenProp } from 'react-navigation';
 import { Dispatch } from 'redux';
 
 import { ComponentName, Provider, ServerAction } from '../';
+import { getTip } from '../utils';
 import AccountNew from './blocks/AccountNew';
 import AccountView from './blocks/AccountView';
-import Reinstall from './pages/Reinstall';
-import Migration from './pages/Migration';
 import ServerView from './blocks/ServerView';
-import { getTip } from '../utils';
+import Migration from './pages/Migration';
+import Reinstall from './pages/Reinstall';
+import { ProviderType } from '@modules/cloud/type';
 
 
 class BandwagonHost implements Provider {
-  id = 'bandwagonhost';
+  id: ProviderType = 'bandwagonhost';
   name = 'BandwagonHost';
   logo = require('./assets/bandwagonhost.png');
   description = 'Self-Managed SSD VPS';
+  features = {
+    deploy: false
+  };
   routes(): any {
     return {
       BWG_Reinstall: Reinstall,
@@ -107,9 +111,6 @@ class BandwagonHost implements Provider {
         })
       }
     ];
-  }
-  viewComponents(): string[] {
-    return [''];
   }
   getComponent(name: ComponentName) {
     switch (name) {

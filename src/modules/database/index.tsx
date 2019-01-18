@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Bluebird from 'bluebird';
-import { Feature } from 'walkuere-rn';
-import { IBlueprint, IBundle } from './type';
+import { Feature, InAction } from 'walkuere-rn';
+import { IBlueprint, IBundle, IRegion } from './type';
 
 const request = axios.create({
   baseURL: 'https://api.vpsny.app'
@@ -27,9 +27,31 @@ export default new Feature({
   reducers: {
     setup(state: any, { payload }: any) {
       return { ...state, ...payload };
+    },
+    queryRegions(state: DataBaseState, { payload }: InAction<IRegion[]>) {
+      return { ...state, regions: payload };
+    },
+    queryBlueprints(state: DataBaseState, { payload }: InAction<IBlueprint[]>) {
+      return { ...state, blueprints: payload };
+    },
+    queryBundles(state: DataBaseState, { payload }: InAction<IBundle[]>) {
+      return { ...state, bundles: payload };
     }
   },
-  effects: {},
+  effects: {
+    *fetchRegions(state: any, { put, call }: any) {
+      const { data: regions } = yield call(() => request.get('/regions'));
+      yield put({ type: 'queryRegions', payload: regions });
+    },
+    *fetchBlueprints(state: any, { put, call }: any) {
+      const { data: blueprints } = yield call(() => request.get('/blueprints'));
+      yield put({ type: 'queryBlueprints', payload: blueprints });
+    },
+    *fetchBundles(state: any, { put, call }: any) {
+      const { data: bundles } = yield call(() => request.get('/bundles'));
+      yield put({ type: 'queryBundles', payload: bundles });
+    }
+  },
   subscriptions: {
     async setup({ dispatch }: any) {
       const {
@@ -37,7 +59,7 @@ export default new Feature({
         bundles: { data: bundles },
         regions: { data: regions },
         blueprints: { data: blueprints },
-        countrys: { data: countrys}
+        countrys: { data: countrys }
       } = await Bluebird.props({
         providers: request.get('/providers'),
         bundles: request.get('/bundles'),

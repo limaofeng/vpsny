@@ -3,7 +3,7 @@ import React from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
-import { connect } from 'react-redux';
+import { connect, Provider } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { getApi } from '..';
@@ -14,8 +14,9 @@ import Theme, { withTheme } from '../../../components/Theme';
 import { format, sleep } from '../../../utils';
 import Country from '../components/Country';
 import { Features, ImageVersion, Plan, Region, SSHKey, SystemImage } from '../Provider';
-import { Account, KeyPair } from '../type';
+import { Account, KeyPair, ProviderType } from '../type';
 import { IBundle, IRegion, IBlueprint } from '@modules/database/type';
+import { CloudManager } from '../providers';
 
 interface DeployProps {
   navigation: NavigationScreenProp<any>;
@@ -24,17 +25,17 @@ interface DeployProps {
   bundles: any[];
   blueprints: any[];
   regions: any[];
-  getDefaultRegion: () => IRegion;
-  getDefaultImage: () => IBlueprint;
-  getDefaultPlan: (region: IRegion) => IBundle;
+  getDefaultRegion: (provider: ProviderType) => IRegion;
+  getDefaultImage: (provider: ProviderType) => IBlueprint;
+  getDefaultPlan: (provider: ProviderType, region: IRegion) => IBundle;
   getDefaultAccount: () => Account;
   getCountryName: (id: string) => string;
   deploy: (
     hostname: string,
     account: Account,
-    plan: Plan,
-    region: Region,
-    image: SystemImage,
+    plan: IBundle,
+    region: IRegion,
+    image: IBlueprint,
     sshkeys: SSHKey[],
     features: Features
   ) => Promise<void>;
@@ -61,14 +62,15 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   constructor(props: DeployProps) {
     super(props);
     const account = props.getDefaultAccount() as Account;
-    const region = props.getDefaultRegion();
-    const plan = props.getDefaultPlan(region);
+    const provider = account != null ? account.provider : 'vultr';
+    const region = props.getDefaultRegion(provider);
+    const plan = props.getDefaultPlan(provider, region);
     this.state = {
       hostname: '',
-      provider: plan.provider,
+      provider,
       plan,
       location: region,
-      image: props.getDefaultImage(),
+      image: props.getDefaultImage(provider),
       account: account,
       sshkeys: [],
       features: []
@@ -118,12 +120,16 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   };
 
   handleJumpToAccounts = () => {
+    const { getDefaultRegion } = this.props;
     const { provider, account } = this.state;
     this.props.navigation.navigate('AccountList', {
       provider,
       value: account,
       callback: (account: Account) => {
-        this.setState({ account, sshkeys: [] });
+        const additional = {
+          location: getDefaultRegion(account.provider)
+        };
+        this.setState({ account, sshkeys: [], provider: account.provider });
       }
     });
   };
@@ -173,7 +179,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
       IPv6: afs.indexOf('IPv6') != -1,
       AutoBackups: afs.indexOf('Auto Backups') != -1
     };
-    await deploy(hostname, account, plan, location as Region, image, sshkeys, features);
+    await deploy(hostname, account, plan, location, image, sshkeys, features);
     this.timer = setTimeout(() => {
       this.timer && clearTimeout(this.timer);
       navigation.goBack();
@@ -202,9 +208,11 @@ class Deploy extends React.Component<DeployProps, DeployState> {
         style={[styles.container, { backgroundColor: colors.backgroundColor }]}
       >
         <ScrollView>
-          <List title="Hostname" style={{ marginTop: 13 }}>
-            <Item size={50}>
-              <Input onValueChange={this.handleChangeHostname} placeholder="Enter hostname" />
+          <List title="Choose a account" style={{ marginTop: 13 }}>
+            <Item push onClick={this.handleJumpToAccounts}>
+              <Note>
+                {account.provider.toUpperCase()} - {account.email}
+              </Note>
             </Item>
           </List>
           {/*
@@ -321,13 +329,6 @@ class Deploy extends React.Component<DeployProps, DeployState> {
               </ItemBody>
             </Item>
           </List>
-          <List title="Choose a account">
-            <Item push onClick={this.handleJumpToAccounts}>
-              <Note>
-                {account.name} - {account.email}
-              </Note>
-            </Item>
-          </List>
           <List title="Add your SSH keys">
             <Item testID="servers-deploy-choose-sshkeys" onClick={this.toSSHKeys} push>
               <View style={{ flexDirection: 'column', flex: 1 }}>
@@ -368,8 +369,17 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             onChange={this.handleAdditionalFeatures}
             title="Additional Features"
           >
-            <Item value="IPv6">
-              <Note style={{ color: colors.secondary }}>Enable IPv6</Note>
+            <Item value="private_networking" visible={false}>
+              <Note style={{ color: colors.secondary }}>Private networking</Note>
+            </Item>
+            <Item value="backups" visible={false}>
+              <Note style={{ color: colors.secondary }}>Backups</Note>
+            </Item>
+            <Item value="ipv6" visible={false}>
+              <Note style={{ color: colors.secondary }}>IPv6</Note>
+            </Item>
+            <Item value="install_agent" visible={false}>
+              <Note style={{ color: colors.secondary }}>Monitoring</Note>
             </Item>
             {plan.type !== 'baremetal' && (
               <>
@@ -397,6 +407,11 @@ class Deploy extends React.Component<DeployProps, DeployState> {
                 </Item>
               </>
             )}
+          </List>
+          <List title="Hostname">
+            <Item size={45}>
+              <Input onValueChange={this.handleChangeHostname} placeholder="Enter hostname" />
+            </Item>
           </List>
         </ScrollView>
         <BottomRegion height={125} backgroundColor={colors.backgroundColorDeeper}>
@@ -472,22 +487,23 @@ const mapStateToProps = ({
   database: { bundles, blueprints, regions, countrys }
 }: AppState) => {
   return {
-    getDefaultRegion: () => {
-      return regions.find(r => r.provider === 'vultr') as IRegion;
+    getDefaultRegion: (provider: ProviderType) => {
+      return regions.find(r => r.provider === provider) as IRegion;
     },
-    getDefaultPlan: (region: IRegion) => {
+    getDefaultPlan: (provider: ProviderType, region: IRegion) => {
       return bundles.find(
         plan =>
-          plan.provider === 'vultr' && plan.type! === 'ssd' && plan.requirements.regions.some(id => id == region.id)
+          plan.provider === provider && plan.type! === 'ssd' && plan.requirements.regions.some(id => id == region.id)
       ) as IBundle;
     },
-    getDefaultImage: () => {
+    getDefaultImage: (provider: ProviderType) => {
       return blueprints.find(
-        blueprint => blueprint.provider === 'vultr' && blueprint.type === 'os' && blueprint.family === 'ubuntu'
+        blueprint => blueprint.provider === provider && blueprint.type === 'os' && blueprint.family === 'ubuntu'
       ) as IBlueprint;
     },
     getDefaultAccount: () => {
-      return accounts.find(a => a.provider === 'vultr') as Account;
+      const providers = CloudManager.getProviders().filter(p => p.features.deploy).map(p => p.id);
+      return accounts.find(a => providers.some(p => p === a.provider)) as Account;
     },
     keyPairs,
     getCountryName: (id: string) => {

@@ -4,15 +4,14 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
 import { Item, List, Note } from '../../../components';
 import HeaderRight from '../../../components/HeaderRight';
 import { ItemDivider, ItemGroup } from '../../../components/List';
 import Theme, { withTheme } from '../../../components/Theme';
-import { ImageVersion, SystemImage } from '../Provider';
 import firebase, { RNFirebase } from 'react-native-firebase';
 import { AppState } from '@modules';
 import { IBlueprint } from '@modules/database/type';
+import { ProviderType } from '../type';
 
 type Mode = 'choose' | 'manage';
 
@@ -137,14 +136,15 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ database: { blueprints } }: AppState, { navigation }: any) => {
   const onChange = navigation.getParam('callback');
+  const provider = navigation.getParam('provider') as ProviderType;
   const value = navigation.getParam('value');
   if (value) {
     value.key = `${value.id}-${value.version.id}`;
   }
   const mode: Mode = !!onChange ? 'choose' : 'manage';
   const images = blueprints.filter(
-    blueprint => blueprint.provider === 'vultr' && blueprint.type === 'os'
-  ); /** && blueprint.platform === 'LINUX_UNIX' */
+    blueprint => blueprint.provider === provider && blueprint.type === 'os'
+  );
   const data: IBlueprintGroup[] = [];
   images.forEach(image => {
     let group = data.find(({ id }) => id === image.family);
@@ -163,7 +163,7 @@ const mapStateToProps = ({ database: { blueprints } }: AppState, { navigation }:
     images: data,
     mode,
     value,
-    onChange: (value: SystemImage) => {
+    onChange: (value: IBlueprint) => {
       if (!onChange) {
         return;
       }
@@ -174,11 +174,9 @@ const mapStateToProps = ({ database: { blueprints } }: AppState, { navigation }:
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
-  const api = getApi('vultr');
   return {
     async refresh() {
-      const images = await api.images();
-      dispatch({ type: 'cloud/images', payload: { pid: 'vultr', images } });
+      dispatch({ type: 'database/fetchBlueprints' });
     }
   };
 };
