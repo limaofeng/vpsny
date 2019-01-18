@@ -4,28 +4,35 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
 import { Item, List, Note } from '../../../components';
 import HeaderRight from '../../../components/HeaderRight';
 import { ItemDivider, ItemGroup } from '../../../components/List';
 import Theme, { withTheme } from '../../../components/Theme';
-import { ImageVersion, SystemImage } from '../Provider';
 import firebase, { RNFirebase } from 'react-native-firebase';
+import { AppState } from '@modules';
+import { IBlueprint } from '@modules/database/type';
+import { ProviderType } from '../type';
 
 type Mode = 'choose' | 'manage';
 
+interface IBlueprintGroup {
+  id: string;
+  name: string;
+  images: IBlueprint[];
+}
+
 interface ImagesProps {
   navigation: NavigationScreenProp<any>;
-  images: SystemImage[];
+  images: IBlueprintGroup[];
   theme: Theme;
   mode: Mode;
-  value: SystemImage;
+  value: IBlueprint;
   refresh: () => void;
-  onChange: (value: SystemImage) => void;
+  onChange: (value: IBlueprint) => void;
 }
 
 interface ImagesState {
-  value: SystemImage;
+  value: IBlueprint;
   refreshing: boolean;
 }
 class Images extends React.Component<ImagesProps, ImagesState> {
@@ -63,17 +70,10 @@ class Images extends React.Component<ImagesProps, ImagesState> {
     this.analytics.setCurrentScreen('Images', 'Images.tsx');
   }
 
-  handleChange = (value: SystemImage) => {
+  handleChange = (value: IBlueprint) => {
     this.setState({ value });
-    if (
-      !this.props.value ||
-      `${this.props.value.id}-${(this.props.value.version as ImageVersion).id}` !==
-        `${value.id}-${(value.version as ImageVersion).id}`
-    ) {
-      Images.headerRight.current.show();
+    if (this.props.value.id !== value.id) {
       this.handleDone(value);
-    } else {
-      Images.headerRight.current.hide();
     }
   };
   handleRefresh = async () => {
@@ -83,7 +83,7 @@ class Images extends React.Component<ImagesProps, ImagesState> {
     this.setState({ refreshing: false });
   };
 
-  handleDone = (value?: SystemImage) => {
+  handleDone = (value?: IBlueprint) => {
     const { onChange } = this.props;
     onChange(value || this.state.value);
   };
@@ -93,7 +93,10 @@ class Images extends React.Component<ImagesProps, ImagesState> {
       theme: { colors }
     } = this.props;
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.backgroundColor }]}
+        forceInset={{ bottom: 'never' }}
+      >
         <ScrollView
           refreshControl={
             <RefreshControl
@@ -103,16 +106,13 @@ class Images extends React.Component<ImagesProps, ImagesState> {
             />
           }
         >
-          <List type="radio-group" value={this.state.value} valueKey="key" onChange={this.handleChange}>
-            {images.map(image => (
-              <ItemGroup key={`image-group-${image.name}`}>
-                <ItemDivider>{image.name}</ItemDivider>
-                {image.versions.map(version => (
-                  <Item
-                    key={`image-version-${image.name}-${version.id}`}
-                    value={{ ...image, version, key: `${image.id}-${version.id}` }}
-                  >
-                    <Note>{version.name}</Note>
+          <List type="radio-group" value={this.state.value} valueKey="id" onChange={this.handleChange}>
+            {images.map(group => (
+              <ItemGroup key={`image-group-${group.id}`}>
+                <ItemDivider>{group.name}</ItemDivider>
+                {group.images.map(image => (
+                  <Item key={`image-version-${image.id}`} value={image}>
+                    <Note>{image.name.replace(group.name, '')}</Note>
                   </Item>
                 ))}
               </ItemGroup>
@@ -134,21 +134,36 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { providers } }: any, { navigation }: any) => {
+const mapStateToProps = ({ database: { blueprints } }: AppState, { navigation }: any) => {
   const onChange = navigation.getParam('callback');
+  const provider = navigation.getParam('provider') as ProviderType;
   const value = navigation.getParam('value');
   if (value) {
     value.key = `${value.id}-${value.version.id}`;
   }
   const mode: Mode = !!onChange ? 'choose' : 'manage';
-  let images = providers.find((p: any) => p.id === 'vultr').images;
-  // 剔除 非 os 与 windows 系统
-  images = images.filter((i: SystemImage) => i.type === 'os').filter((i: SystemImage) => i.name !== 'Windows');
+  const images = blueprints.filter(
+    blueprint => blueprint.provider === provider && blueprint.type === 'os'
+  );
+  const data: IBlueprintGroup[] = [];
+  images.forEach(image => {
+    let group = data.find(({ id }) => id === image.family);
+    if (!group) {
+      group = {
+        id: image.family,
+        name: image.name.split(' ')[0],
+        images: []
+      };
+      data.push(group);
+    }
+    group.images.push(image);
+  });
+
   return {
-    images,
+    images: data,
     mode,
     value,
-    onChange: (value: SystemImage) => {
+    onChange: (value: IBlueprint) => {
       if (!onChange) {
         return;
       }
@@ -159,11 +174,9 @@ const mapStateToProps = ({ cloud: { providers } }: any, { navigation }: any) => 
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
-  const api = getApi('vultr');
   return {
     async refresh() {
-      const images = await api.images();
-      dispatch({ type: 'cloud/images', payload: { pid: 'vultr', images } });
+      dispatch({ type: 'database/fetchBlueprints' });
     }
   };
 };

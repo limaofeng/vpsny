@@ -1,20 +1,20 @@
+import { AppState } from '@modules';
+import { IRegion, IBundle } from '@modules/database/type';
 import React from 'react';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
 import { Icon, Item, Label, List, Note } from '../../../components';
-import HeaderRight from '../../../components/HeaderRight';
 import { ItemBody, ItemStart } from '../../../components/Item';
 import MultiSelection from '../../../components/MultiSelection';
 import Theme, { withTheme } from '../../../components/Theme';
 import { fileSize } from '../../../utils/format';
-import { Plan, Provider, Region } from '../Provider';
-import firebase, { RNFirebase } from 'react-native-firebase';
+import { Provider } from '../Provider';
 
 const { Option } = MultiSelection;
 
@@ -199,7 +199,7 @@ const Toolbar = withTheme(
 
 interface Conditions {
   providers: string[];
-  regions: Region[];
+  regions: IRegion[];
   prices: number[];
   products: string[];
   soldOut: boolean;
@@ -209,20 +209,20 @@ type Mode = 'choose' | 'manage';
 
 interface PricingProps {
   navigation: NavigationScreenProp<any>;
-  plans: Plan[];
-  regions: Region[];
+  plans: IBundle[];
+  regions: IRegion[];
   providers: Provider[];
   mode: Mode;
-  value: Plan;
-  onChange: (value: Plan) => void;
+  value: IBundle;
+  onChange: (value: IBundle) => void;
   theme: Theme;
   refresh: () => void;
 }
 interface PricingState {
   conditions: Conditions;
   temporary?: Conditions;
-  results: Plan[];
-  value: Plan;
+  results: IBundle[];
+  value: IBundle;
   provider?: string;
   product?: string;
   region?: number;
@@ -240,17 +240,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     const title = navigation.getParam('callback') ? 'Choose a size' : 'Instance plans';
     return {
       headerTitle: title,
-      headerBackTitle: ' ',
-      headerRight: (
-        <HeaderRight
-          onClick={() => {
-            Pricing.handleClickHeaderRight();
-          }}
-          visible={false}
-          ref={Pricing.headerRight}
-          title="Done"
-        />
-      )
+      headerBackTitle: ' '
     };
   };
   analytics?: RNFirebase.Analytics;
@@ -260,7 +250,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     const { navigation, plans } = this.props;
     const defaultValue = navigation.getParam('value');
     this.state = {
-      results: props.plans.filter(plan => !!plan.regions.length),
+      results: props.plans, // .filter(plan => !!plan.regions.length),
       conditions: {
         providers: [],
         regions: [],
@@ -268,7 +258,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
         products: [],
         soldOut: false
       },
-      value: plans.find(p => defaultValue && p.id === defaultValue.id) as Plan,
+      value: plans.find(p => defaultValue && p.id === defaultValue.id) as IBundle,
       temporary: undefined,
       provider: 'vultr',
       product: undefined,
@@ -278,7 +268,6 @@ class Pricing extends React.Component<PricingProps, PricingState> {
       sort: { id: 'price', sort: 'asc' },
       refreshing: false
     };
-    Pricing.handleClickHeaderRight = this.handleDone;
   }
 
   componentDidMount() {
@@ -291,13 +280,10 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     navigation.navigate('Information', { id });
   };
 
-  handleChange = async (value: Plan) => {
+  handleChange = async (value: IBundle) => {
     this.setState({ value });
     if (this.props.value.id !== value.id) {
-      Pricing.headerRight.current.show();
       this.handleDone(value);
-    } else {
-      Pricing.headerRight.current.hide();
     }
   };
 
@@ -308,7 +294,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     this.setState({ refreshing: false });
   };
 
-  handleDone = (value?: Plan) => {
+  handleDone = (value?: IBundle) => {
     const { onChange } = this.props;
     onChange(value || this.state.value);
   };
@@ -339,7 +325,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     );
   };
 
-  createItem = (plan: Plan) => {
+  createItem = (plan: IBundle) => {
     const {
       theme: { colors, fonts }
     } = this.props;
@@ -439,7 +425,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     this.setState({ temporary });
   };
 
-  handleeRegionChange = (values: Region[]) => {
+  handleeRegionChange = (values: IRegion[]) => {
     const { temporary } = this.state;
     (temporary as Conditions).regions = values;
     this.setState({ temporary });
@@ -503,7 +489,7 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     this.setState({ results, panel: false, conditions: temporary as Conditions, temporary: undefined });
   };
 
-  sorting = (l: Plan, r: Plan) => {
+  sorting = (l: IBundle, r: IBundle) => {
     const {
       sort: { id, sort }
     } = this.state;
@@ -533,14 +519,15 @@ class Pricing extends React.Component<PricingProps, PricingState> {
     } = this.props;
     const { provider: providerId, sort, temporary, results: plans, value } = this.state;
     const conditions = temporary as Conditions;
-    const location: Region = this.props.navigation.getParam('location');
-    // const provider: Provider = this.props.navigation.getParam('provider');
     const { regions, providers } = this.props;
     const { products, prices } = providers.find(p => p.id === providerId) as Provider;
 
     //  && plan.regions.some(r => r === location.id)
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.backgroundColor }]}
+        forceInset={{ bottom: 'never' }}
+      >
         <Toolbar
           value={sort}
           onChange={this.handleSortChange}
@@ -551,11 +538,6 @@ class Pricing extends React.Component<PricingProps, PricingState> {
             { id: 'storage', name: 'Storage' }
           ]}
         >
-          <TouchableOpacity onPress={this.handleFilterPanel}>
-            <Text style={{ paddingRight: 20 }}>
-              <Ionicons color={this.state.panel ? colors.primary : colors.minor} name="ios-funnel" size={14} />
-            </Text>
-          </TouchableOpacity>
         </Toolbar>
         {this.state.panel && (
           <View
@@ -677,17 +659,20 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { pricing: plans, regions, providers } }: any, { navigation }: PricingProps) => {
+const mapStateToProps = ({ database: { bundles, providers, regions } }: AppState, { navigation }: PricingProps) => {
   const onChange = navigation.getParam('callback');
+  const region = navigation.getParam('region') as IRegion;
   const value = navigation.getParam('value');
   const mode: Mode = !!onChange ? 'choose' : 'manage';
   return {
-    plans: plans.sort((l: Plan, r: Plan) => l.price - r.price),
+    plans: bundles
+      .filter(bundle => bundle.requirements.regions.some(r => r == region.id))
+      .sort((l, r) => l.price - r.price),
     regions,
     providers,
     mode,
     value,
-    onChange: (value: Plan) => {
+    onChange: (value: IBundle) => {
       if (!onChange) {
         return;
       }
@@ -697,11 +682,9 @@ const mapStateToProps = ({ cloud: { pricing: plans, regions, providers } }: any,
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => {
-  const api = getApi('vultr');
   return {
     async refresh() {
-      const pricing = await api.pricing();
-      dispatch({ type: 'cloud/pricing', payload: pricing });
+      dispatch({ type: 'database/fetchBundles' });
     }
   };
 };

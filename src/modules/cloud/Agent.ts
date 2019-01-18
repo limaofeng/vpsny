@@ -1,4 +1,5 @@
 import { Plan, Region, SystemImage, SSHKey, Instance, Features } from './Provider';
+import { IBundle, IRegion, IBlueprint } from '@modules/database/type';
 
 export enum Country {
   au = 'Australia',
@@ -42,16 +43,17 @@ export interface Bill {
   pendingCharges: number;
 }
 
+export interface Snapshot {
+  [key: string]: any;
+}
+
 export interface Agent {
   id: string;
-  pricing(): Promise<Plan[]>;
-  regions(): Promise<Region[]>;
-  images(): Promise<SystemImage[]>;
   deploy(
     hostname: string,
-    plan: Plan,
-    region: Region,
-    image: SystemImage,
+    bundle: IBundle,
+    region: IRegion,
+    blueprint: IBlueprint,
     sshkeys: SSHKey[],
     features: Features
   ): Promise<string>;
@@ -72,20 +74,19 @@ export interface Agent {
     get(id: string): Promise<Instance>;
     /**
      * 停止实例
+     * @param id 实例ID
+     * @param force 是否强制停止
+     *        搬瓦工支持该参数
      */
-    stop(id: string): Promise<void>;
+    stop(id: string, force?: boolean): Promise<void>;
     /**
      * 启动实例
      */
     start(id: string): Promise<void>;
     /**
-     * 重新启动实例
+     * 重新启动实例 等同 reboot
      */
     restart(id: string): Promise<void>;
-    /**
-     * 重启
-     */
-    reboot(id: string): Promise<void>;
     /**
      * 重新安装
      */
@@ -93,6 +94,11 @@ export interface Agent {
     /**
      * 销毁实例
      */
+    destroy(id: string): Promise<void>;
+  };
+  snapshot: {
+    list(): Promise<Snapshot[]>;
+    create(): Promise<Snapshot>;
     destroy(id: string): Promise<void>;
   };
 }

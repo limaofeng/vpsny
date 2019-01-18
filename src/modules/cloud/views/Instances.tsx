@@ -10,15 +10,17 @@ import { getApi, utils } from '../';
 import { AppState } from '../..';
 import ActionButton from '../../../components/ActionButton';
 import Card from '../../../components/Card';
-import Theme, { withTheme } from '../../../components/Theme';
+import Theme, { withTheme, defaultTheme } from '../../../components/Theme';
 import { SafeArea, sleep } from '../../../utils';
 import { SSHConnection } from '../../ssh/type';
 import { User } from '../Agent';
-import InstanceActions, { Operate, OperateStatus } from '../components/InstanceActions';
+import InstanceActions, { OperateStatus } from '../components/InstanceActions';
 import OSLogo from '../components/OSLogo';
 import { Account, Instance, KeyPair } from '../type';
+import { format } from '@utils';
 
 interface InstancesProps {
+  dispatch: Dispatch;
   navigation: NavigationScreenProp<any>;
   instances: Instance[];
   keyPairs: KeyPair[];
@@ -26,6 +28,7 @@ interface InstancesProps {
   refresh: () => Promise<void>;
   track: (node: Instance) => Promise<void>;
   isNoAccount: boolean;
+  currentAccount: string;
   theme: Theme;
 }
 
@@ -63,32 +66,18 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
     display && this.setState({ refreshing: false });
   };
 
-  handleActionExecute = async (operate: Operate, status: OperateStatus, data: Instance) => {
-    const { instantStates } = this.state;
+  handleActionExecute = async (operate: string, status: OperateStatus, data: Instance) => {
     const { track } = this.props;
-    console.log(operate, status);
-    if (status == 'start') {
-      switch (operate) {
-        case 'stop':
-          instantStates.push({
-            id: data.id,
-            status: 'Stopping'
-          });
-          break;
-        case 'reinstall':
-        case 'start':
-        case 'reboot':
-        case 'delete':
-        default:
-          instantStates.push({
-            id: data.id,
-            status: 'Pending'
-          });
-      }
+    const { instantStates } = this.state;
+    if (status != 'Complete') {
+      instantStates.push({
+        id: data.id,
+        status
+      });
       this.setState({ instantStates });
     } else {
       track(data);
-      await sleep(1000);
+      await sleep(200);
       this.setState({ instantStates: instantStates.filter(state => state.id !== data.id) });
     }
   };
@@ -133,11 +122,8 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
   };
 
   render() {
-    const {
-      instances,
-      isNoAccount,
-      theme: { colors, fonts }
-    } = this.props;
+    const { instances, isNoAccount, currentAccount } = this.props;
+    const { colors, fonts } = defaultTheme;
     return (
       <SafeAreaView
         forceInset={{ bottom: 'never' }}
@@ -155,7 +141,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
             />
           }
         >
-          {instances.map(data => {
+          {instances.filter(node => !currentAccount || node.account === currentAccount).map(data => {
             const status = this.getStatusText(data);
             const statusColor = utils.getStatusColor(status, colors);
             return (
@@ -194,27 +180,33 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                         }}
                       >
                         {/*
-                          TODO: 先隐藏 Terminal 功能
-                        <TouchableOpacity
-                          onPress={this.handleOpenTerminal(data)}
-                          style={{
-                            width: 30,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginRight: 5
-                          }}
-                        >
-                          <Icon name="terminal" color="#4180EE" size={18} />
-                        </TouchableOpacity>
-                        */}
-                        <InstanceActions data={data} onExecute={this.handleActionExecute} />
+                            TODO: 先隐藏 Terminal 功能
+                          <TouchableOpacity
+                            onPress={this.handleOpenTerminal(data)}
+                            style={{
+                              width: 30,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginRight: 5
+                            }}
+                          >
+                            <Icon name="terminal" color="#4180EE" size={18} />
+                          </TouchableOpacity>
+                          */}
+                        <InstanceActions
+                          data={data}
+                          theme={defaultTheme}
+                          dispatch={this.props.dispatch}
+                          navigation={this.props.navigation}
+                          onExecute={this.handleActionExecute}
+                        />
                       </View>
                     </ItemBody>
                   </Item>
                   <Item>
                     <Label>
-                      {data.ram} RAM、 {data.vcpu} vCPU
-                      {data.vcpu > 1 ? 's' : ''}、 {data.disk}
+                      {data.ram.size} MB RAM、 {data.vcpu} vCPU
+                      {data.vcpu > 1 ? 's' : ''}、{format.fileSize(data.disk.size, 'GB')} {data.disk.type}
                     </Label>
                   </Item>
                   <Item>
@@ -224,7 +216,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
                     <View style={{ justifyContent: 'center', alignItems: 'flex-end' }}>
                       <View style={{ height: 16 }}>
                         <Text style={{ fontSize: 12, color: colors.secondary, textAlign: 'right' }}>
-                          {data.hostname}
+                          {data.publicIP}
                         </Text>
                       </View>
                       <View style={{ height: 14 }}>
@@ -267,22 +259,21 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
 }
 
 const mapStateToProps = (
-  { cloud: { instances, accounts }, ssh: { connections } }: AppState,
+  { cloud: { instances, accounts }, ssh: { connections }, settings: { currentAccount } }: AppState,
   { navigation }: InstancesProps
 ) => {
-  const account = navigation.getParam('data');
+  navigation.state.currentAccount = currentAccount;
   return {
     connections: connections,
-    instances: account ? instances.filter((a: Instance) => a.account === account.id) : instances,
+    instances: currentAccount ? instances.filter((a: Instance) => a.account === currentAccount) : instances,
     isNoAccount: !accounts.length
   };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch, { navigation }: InstancesProps) => {
+const mapDispatchToProps = (dispatch: Dispatch, { navigation, instances }: InstancesProps) => {
   const source = {
     get accountId() {
-      const account: Account = navigation.getParam('data');
-      return account ? account.id : null;
+      return navigation.state.currentAccount;
     },
     get api() {
       const api = this.accountId ? getApi(this.accountId) : false;
@@ -295,6 +286,7 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: InstancesProps) 
     }
   };
   return {
+    dispatch,
     async get(id: string) {
       return await source.api.instance.get(id);
     },

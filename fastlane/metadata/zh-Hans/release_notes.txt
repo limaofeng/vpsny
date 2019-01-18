@@ -1,1 +1,1 @@
-修复启动崩溃问题
+Now you can manage BandwagonHost's VPS on VPSNY.

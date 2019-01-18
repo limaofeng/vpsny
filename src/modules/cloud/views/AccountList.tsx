@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { Account } from '../type';
+import { CloudManager } from '../providers';
 
 type Mode = 'choose' | 'manage';
 
@@ -97,9 +98,9 @@ class AccountList extends React.Component<AccountListProps, AccountListState> {
             title="Cloud Server Account"
           >
             {accounts.map(a => (
-              <Item key={`account-${a.id}`} value={a} onClick={this.handleClick} push={!isSelection}>
+              <Item key={`account-${a.id}`} value={a} push={!isSelection}>
                 <Note>
-                  {a.name} - {a.email} for {a.provider}
+                {a.provider} - {a.email || a.name}
                 </Note>
               </Item>
             ))}
@@ -120,12 +121,12 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = ({ cloud: { accounts } }: AppState, { navigation }: AccountListProps) => {
-  const provider = navigation.getParam('provider');
   const onChange = navigation.getParam('callback');
   const value = navigation.getParam('value');
   const mode: Mode = !!onChange ? 'choose' : 'manage';
+  const providers = CloudManager.getProviders().filter(p => p.features.deploy).map(p => p.id);
   return {
-    accounts: provider ? accounts.filter(a => a.provider === provider) : accounts,
+    accounts: accounts.filter(a => providers.some(p => p === a.provider)),
     mode,
     value,
     onChange: (value: Account) => {

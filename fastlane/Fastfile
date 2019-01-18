@@ -51,10 +51,6 @@ platform :ios do
     "#{version_number} (#{build_number})"
   end
 
-  private_lane :verify_xcode_version do
-    ensure_xcode_version(version: '10')
-  end
-
   desc '获取最新的 证书 与 配置文件'
   lane :setup_signing do
     keychain_name = ENV['KEYCHAIN_NAME']
@@ -90,7 +86,9 @@ platform :ios do
   lane :update_metadata do
     load_keys
 
-    deliver
+    deliver(
+      app_version: '0.0.7'
+    )
   end
 
   desc 'Runs all the tests'
@@ -110,6 +108,8 @@ platform :ios do
 
     unless only_build
       unless skip_build
+
+        ensure_git_status_clean
 
         pre_version_number = get_version_number(xcodeproj: './ios/vpsny.xcodeproj')
 

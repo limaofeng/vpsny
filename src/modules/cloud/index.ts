@@ -9,7 +9,7 @@ import { SSHConnection } from '../ssh/type';
 import { AppState } from './../index';
 import { Agent, Bill, User } from './Agent';
 import AgentAdapter from './AgentAdapter';
-import { AWSAPIKey, AWSLightsailAgent } from './AWSProvider';
+import { AWSAPIKey, AWSLightsailAgent } from './providers/lightsail/AWSProvider';
 import { Plan, SSHKey } from './Provider';
 import { Account, Instance, Provider, Region } from './type';
 import AccountList from './views/AccountList';
@@ -25,7 +25,9 @@ import Locations from './views/Locations';
 import Pricing from './views/Pricing';
 import SSHPublicKeys from './views/SSHPublicKeys';
 import { VultrAgent, VultrAPIKey } from './VultrProvider';
-import { DigitalOceanAPIKey, DigitalOceanAgent } from './agents/DigitalOceanAgent';
+import { DigitalOceanAPIKey, DigitalOceanAgent } from './providers/digitalocean/DigitalOceanAgent';
+import BandwagonHostAgent, { BandwagonHostAPIKey } from './agents/BandwagonHostAgent';
+import { CloudManager } from './providers';
 
 export const getApi = (key: 'vultr' | 'adapter' | string): Agent => {
   return agents.get(key)!;
@@ -75,8 +77,6 @@ async function loadAccount(id: string) {
   });
   return {
     id: user.id,
-    status: 'authorized',
-    provider: 'vultr',
     name: user.name,
     email: user.email,
     apiKey: user.apiKey,
@@ -108,6 +108,7 @@ export interface CloudState {
 
 interface TrackPayload {
   node: Instance;
+  expectedState: string;
   timeout: number;
   interval: number;
 }
@@ -140,7 +141,8 @@ export default new Feature({
     InstanceView,
     Locations,
     Pricing,
-    SSHPublicKeys
+    SSHPublicKeys,
+    ...CloudManager.getRoutes()
   },
   state: {
     accounts: [],
@@ -233,7 +235,7 @@ export default new Feature({
   },
   effects: {
     *track(
-      { payload: { node: instance, timeout = 120, interval = 3 } }: InAction<TrackPayload>,
+      { payload: { node: instance, desiredState: string, timeout = 120, interval = 3 } }: InAction<TrackPayload>,
       { put, call, select }: any
     ) {
       const { id, account } = instance;
@@ -247,7 +249,7 @@ export default new Feature({
             break;
           }
           const status = node.status; // utils.getStatusText(node);
-          if (!isEqual(previous, node)) {
+          if (previous.status !== node.status) {
             times = 1;
             previous = node;
             yield put({ type: 'instance', payload: { operate: 'update', instance: node } });
@@ -320,29 +322,28 @@ export default new Feature({
         };
         yield put({ type: 'ssh/connection', payload: connection });
       } else {
-        const originalConnection: SSHConnection = yield select(({ ssh: { connections } }: any) =>
-          connections.find((con: SSHConnection) => con.id === instance.id)
-        );
-        if (
-          originalConnection.hostname != instance.hostname || // 更换 IP 后需要更新 SSHConnection
-          (originalInstance.defaultPassword === originalConnection.password &&
-            originalConnection.password !== instance.defaultPassword) // 如果之前的密码为 默认密码后 需要更新 SSHConnection
-        ) {
-          const connection: SSHConnection = {
-            id: instance.id,
-            hostname: instance.hostname,
-            port: 22,
-            username: 'root',
-            password: instance.defaultPassword
-          };
-          yield put({ type: 'ssh/connection', payload: connection });
-        }
+        // const originalConnection: SSHConnection = yield select(({ ssh: { connections } }: any) =>
+        //   connections.find((con: SSHConnection) => con.id === instance.id)
+        // );
+        // if (
+        //   originalConnection.hostname != instance.hostname || // 更换 IP 后需要更新 SSHConnection
+        //   (originalInstance.defaultPassword === originalConnection.password &&
+        //     originalConnection.password !== instance.defaultPassword) // 如果之前的密码为 默认密码后 需要更新 SSHConnection
+        // ) {
+        //   const connection: SSHConnection = {
+        //     id: instance.id,
+        //     hostname: instance.hostname,
+        //     port: 22,
+        //     username: 'root',
+        //     password: instance.defaultPassword
+        //   };
+        //   yield put({ type: 'ssh/connection', payload: connection });
+        // }
       }
     },
 
     *refreshAccount({ payload: { id } }: InAction<Account>, { put, call }: any) {
       try {
-        yield put({ type: 'updateAccount', payload: { id, status: 'refreshing' } });
         const account: Account = yield call(loadAccount, id);
         yield put({ type: 'updateAccount', payload: { ...account, id } });
       } catch ({ response }) {
@@ -404,6 +405,8 @@ export default new Feature({
           });
         } else if (account.provider === 'digitalocean') {
           api = new DigitalOceanAgent(account.apiKey as DigitalOceanAPIKey);
+        } else if (account.provider === 'bandwagonhost') {
+          api = new BandwagonHostAgent(account.apiKey as BandwagonHostAPIKey);
         } else {
           console.warn('Wrong parameter' + JSON.stringify(account));
         }
@@ -412,40 +415,6 @@ export default new Feature({
         }
       }
       console.log('setup agents ->', Array.from(agents.keys()));
-      // 加载默认数据
-      agents.set('vultr', new VultrAgent({ apiKey: '' }));
-      // TODO: AWS 请求数据需要一个 KEY , 不想写死在代码中。可以从服务端获取。
-      // agents.set(
-      //   'aws',
-      //   new AWSLightsailAgent(
-      //     { accessKeyId: '', secretAccessKey: '' },
-      //     {
-      //       defaultRegion: 'us-east-1',
-      //       regions: []
-      //     }
-      //   )
-      // );
-      // 加载 Vultr 数据
-      const { provider, ...vultrDatabase } = await loadVultr(agents.get('vultr')!);
-      // 加载 AWS 数据
-      // const awsDatabase = await loadAWS(agents.get('aws') as AWSLightsailAgent);
-      // 合并地区数据
-      const allRegions = new Map<string, Region>();
-      for (const region of vultrDatabase.regions) {
-        allRegions.set(region.id, region);
-      }
-      // for (const region of awsDatabase.regions) {
-      //   if (allRegions.has(region.id)) {
-      //     allRegions.get(region.id)!.providers.push(...region.providers);
-      //   } else {
-      //     allRegions.set(region.id, region);
-      //   }
-      // }
-
-      dispatch({
-        type: 'setup',
-        payload: { providers: [provider], ...vultrDatabase, regions: Array.from(allRegions.values()) }
-      });
     },
     async tracking({ dispatch, state }: { dispatch: Dispatch; state: CloudState }) {
       const { instances } = state;

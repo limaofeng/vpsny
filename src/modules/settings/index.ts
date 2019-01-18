@@ -37,15 +37,20 @@ const getPublicKeyOpenSSHByPrivateKey = (keyPair: KeyPair) => {
 
 export interface SettingState {
   keyPairs: KeyPair[];
+  currentAccount: string;
 }
 
 export default new Feature({
   routes: { Sidebar, Settings, SSHKeyList, SSHKeyView },
   namespace: 'settings',
   state: {
+    currentAccount: '',
     keyPairs: []
   },
   reducers: {
+    current(state: any, { payload: currentAccount }: any) {
+      return { ...state, currentAccount };
+    },
     setup(state: any, { payload }: AnyAction) {
       return { ...state, ...payload };
     },

@@ -120,6 +120,7 @@
       "^image![a-zA-Z0-9$_-]+$": "GlobalImageStub",
       "^[@./a-zA-Z0-9$_-]+\\.(png|gif)$": "RelativeImageStub",
       "@utils": "<rootDir>/src/utils",
+      "@modules": "<rootDir>/src/modules",
       "@components": "<rootDir>/src/components"
     },
     "testPathIgnorePatterns": [

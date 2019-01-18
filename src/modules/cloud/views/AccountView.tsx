@@ -2,18 +2,17 @@ import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
 import { AppState } from '@modules';
 import React from 'react';
 import { Alert, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { APIKey } from '../Agent';
-import AWSLightsailView from '../components/AWSLightsailView';
-import VultrView from '../components/VultrView';
-import { Instance } from '../Provider';
-import { Account } from '../type';
 import { getApi } from '..';
-import { AWSLightsailAgent } from '../AWSProvider';
-import firebase, { RNFirebase } from 'react-native-firebase';
+import { APIKey } from '../Agent';
+import { AWSLightsailAgent } from '../providers/lightsail/AWSProvider';
+import { Instance } from '../Provider';
+import { CloudManager } from '../providers';
+import { Account } from '../type';
 
 export type UpdateAccount = (key: 'title' | 'alias' | 'apiKey' | 'defaultRegion', value: string | APIKey) => void;
 
@@ -105,6 +104,8 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
     const { colors } = this.props.theme as Theme;
     const { account } = this.props;
     const { title, alias } = this.state;
+    const provider = CloudManager.getProvider(account.provider);
+    const Component = provider.getComponent('AccountView');
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
         <ScrollView
@@ -127,10 +128,7 @@ class AccountView extends React.Component<AccountViewProps, AccountViewState> {
               <Input defaultValue={alias} onValueChange={this.handleAliasChange} clearButtonMode="never" />
             </Item>
           </List>
-          {account.provider === 'vultr' && <VultrView account={account} />}
-          {account.provider === 'lightsail' && (
-            <AWSLightsailView navigation={this.props.navigation} update={this.props.update} account={account} />
-          )}
+          <Component account={account}/>
           <List title=" ">
             <Item testID="account-delete" onClick={this.handleDelete}>
               <View style={{ alignItems: 'center', flex: 1 }}>

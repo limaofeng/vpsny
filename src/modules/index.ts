@@ -3,6 +3,7 @@ import { Feature } from 'walkuere-rn';
 
 import apps from './apps';
 import cloud, { CloudState } from './cloud';
+import database, { DataBaseState } from './database';
 import home from './home';
 import settings from './settings';
 import { SettingState } from './settings';
@@ -13,6 +14,7 @@ export type AppState = {
   ssh: SSHState;
   settings: SettingState;
   nav: NavigationState;
+  database: DataBaseState;
 };
 
-export default new Feature(home, settings, ssh, apps, cloud);
+export default new Feature(home, settings, ssh, apps, cloud, database);

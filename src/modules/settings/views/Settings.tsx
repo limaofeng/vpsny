@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import { Account } from '../../cloud/type';
-import { logos } from '../components/AccountLable';
+import { CloudManager } from '@modules/cloud/providers';
 
 type Mode = 'choose' | 'manage';
 
@@ -54,27 +54,26 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
   componentDidMount() {
     this.analytics = firebase.analytics();
     this.analytics.setCurrentScreen('Settings', 'Settings.tsx');
-    this.props.navigation.addListener('didBlur', () => {
+    this.props.navigation.addListener('didBlur', (...arg) => {
       this.isFocused = false;
     });
-    this.props.navigation.addListener('didFocus', () => {
+    this.props.navigation.addListener('didFocus', (...arg) => {
       this.isFocused = true;
     });
   }
 
   handleClose = async () => {
     const { navigation } = this.props;
-    await this.waitFocused();
-    navigation.pop();
-  }
+    navigation.dismiss();
+  };
 
   async waitFocused(timeout: number = 5000) {
     const time = Date.now();
     while (!this.isFocused) {
-      console.log('waitFocused...');
       await sleep(100);
       if (Date.now() - time >= timeout) {
-        throw 'await focused error';
+        console.warn('await focused error');
+        this.isFocused = true;
       }
     }
   }
@@ -135,7 +134,11 @@ class Settings extends React.Component<SettingsProps, SettingsState> {
                 push
               >
                 <ItemStart>
-                  <Image source={logos[a.provider]} resizeMode="contain" style={{ height: 32, width: 32 }} />
+                  <Image
+                    source={CloudManager.getProvider(a.provider).logo}
+                    resizeMode="contain"
+                    style={{ height: 32, width: 32 }}
+                  />
                 </ItemStart>
                 <View style={{ flex: 1 }}>
                   <Note style={[{ color: colors.major, textAlignVertical: 'bottom' }, fonts.callout]}>{a.title}</Note>
