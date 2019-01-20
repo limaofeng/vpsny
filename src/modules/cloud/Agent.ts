@@ -44,6 +44,21 @@ export interface Bill {
 }
 
 export interface Snapshot {
+  id: string;
+  os: string;
+  name: string;
+  size: number;
+  uncompressed: number;
+  md5: string;
+  sticky: boolean;
+  expires: number;
+  fileName?: string;
+  downloadLink?: string;
+  [key: string]: any;
+}
+
+export interface Backup {
+  id: string;
   [key: string]: any;
 }
 
@@ -90,16 +105,25 @@ export interface Agent {
     /**
      * 重新安装
      */
-    reinstall(id: string): Promise<void>;
+    reinstall(id: string, os?: string): Promise<void | string>;
     /**
      * 销毁实例
      */
     destroy(id: string): Promise<void>;
+    /**
+     * 追踪 VPS 状态的方法
+     * @param id ID
+     * @param status 期望状态
+     */
+    track(id: string, status: string): Promise<void>;
   };
   snapshot: {
-    list(): Promise<Snapshot[]>;
-    create(): Promise<Snapshot>;
-    destroy(id: string): Promise<void>;
+    list(id?: string): Promise<Snapshot[]>;
+    create(id: string, name: string): Promise<Snapshot | string>;
+    delete(id: string): Promise<void>;
+  };
+  backup: {
+    list(id?: string): Promise<Backup[]>;
   };
 }
 

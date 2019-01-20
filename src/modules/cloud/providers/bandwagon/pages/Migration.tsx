@@ -1,77 +1,120 @@
-import { Theme, withTheme, List, Item, Note } from '@components';
+import { Theme, withTheme, List, Item, Note, HeaderRight } from '@components';
 import { getApi } from '@modules/cloud';
 import { Instance } from '@modules/cloud/Provider';
 import React from 'react';
-import { RefreshControl, ScrollView, StyleSheet } from 'react-native';
+import { RefreshControl, ScrollView, StyleSheet, Alert } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { AppState } from '@modules';
 import BandwagonHostAgent from '@modules/cloud/agents/BandwagonHostAgent';
+import Message from '../../../../../utils/Message';
 
-interface ReinstallProps {
+interface MigrationProps {
   navigation: NavigationScreenProp<any>;
   refresh: () => Promise<any>;
+  migrate: (location: string) => Promise<any>;
   instance: Instance;
   theme: Theme;
 }
 
-interface ReinstallState {
+interface MigrationState {
   refreshing: boolean;
   value: string;
-  data: any;
+  initialValue: string;
+  locations: any[];
 }
 
-class Reinstall extends React.Component<ReinstallProps, ReinstallState> {
+class Migration extends React.Component<MigrationProps, MigrationState> {
+  static headerRight = React.createRef<any>();
+  static handleClickHeaderRight: any;
   static navigationOptions: NavigationScreenOptions = {
     title: 'Migration',
-    headerBackTitle: ' '
+    headerBackTitle: ' ',
+    headerRight: (
+      <HeaderRight
+        onClick={() => {
+          Migration.handleClickHeaderRight();
+        }}
+        visible={false}
+        title="Switch"
+        ref={Migration.headerRight}
+      />
+    )
   };
   analytics?: RNFirebase.Analytics;
-  constructor(props: ReinstallProps) {
+  constructor(props: MigrationProps) {
     super(props);
     this.state = {
       refreshing: false,
       value: '',
-      data: {
-        locations: []
-      }
+      initialValue: '',
+      locations: []
     };
+    Migration.handleClickHeaderRight = this.handleMigrate;
   }
 
   componentDidMount() {
     this.handleRefresh();
     this.analytics = firebase.analytics();
-    this.analytics.setCurrentScreen('ServerView', 'ServerView.tsx');
+    this.analytics.setCurrentScreen('BWG/Migration', 'BWG/Migration.tsx');
   }
 
-  handleOpenTerminal = () => {
-    const { navigation, instance } = this.props;
-    navigation.navigate('Terminal', { value: instance });
-  };
-
-  handleGoToBindHost = () => {
-    const { navigation } = this.props;
-    navigation.navigate('Deploy');
+  handleMigrate = async () => {
+    const { migrate } = this.props;
+    const { value, initialValue } = this.state;
+    Alert.alert(
+      'Migrate to another DC ?',
+      `Please back up your data to prevent data loss.`,
+      [
+        { text: 'Cancel' },
+        {
+          text: 'Migrate',
+          onPress: async () => {
+            const email = await await migrate(value);
+            Message.info(
+              `Migrate to another DC in progress`,
+              `From ${initialValue} to ${value} \r\n Once completed, an email notification will be sent to the following address: ${email}.`
+            );
+          }
+        }
+      ],
+      {
+        cancelable: false
+      }
+    );
   };
 
   handleRefresh = async () => {
     const { refresh } = this.props;
     this.setState({ refreshing: true });
-    const data = await refresh();
-    this.setState({ data, refreshing: false });
+    const { locations, currentLocation, descriptions } = await refresh();
+    this.setState({
+      locations: locations.map((location: any) => ({
+        id: location,
+        title: descriptions[location]
+      })),
+      value: currentLocation,
+      initialValue: currentLocation,
+      refreshing: false
+    });
+    this.handleChange(currentLocation);
   };
 
   handleChange = async (value: any) => {
+    const { initialValue } = this.state;
     this.setState({ value });
+    if (initialValue === value) {
+      Migration.headerRight.current!.hide();
+    } else {
+      Migration.headerRight.current!.show();
+    }
   };
 
   render() {
-    const { colors, fonts } = this.props.theme as Theme;
-
-    const { refreshing, data } = this.state;
-
+    const { colors } = this.props.theme as Theme;
+    const { refreshing, locations, value } = this.state;
     return (
       <SafeAreaView style={styles.container} forceInset={{ bottom: 'never' }}>
         <ScrollView
@@ -80,10 +123,10 @@ class Reinstall extends React.Component<ReinstallProps, ReinstallState> {
             <RefreshControl refreshing={refreshing} onRefresh={this.handleRefresh} tintColor={colors.minor} />
           }
         >
-          <List type="radio-group" value={data.currentLocation} isEqual={(l, r) => l === r} onChange={this.handleChange}>
-            {data.locations.map((location: any) => (
-              <Item value={location}>
-                <Note>{data.descriptions[location]}</Note>
+          <List type="radio-group" value={value} isEqual={(l, r) => l === r} onChange={this.handleChange}>
+            {locations.map((location: any) => (
+              <Item key={location.id} value={location.id}>
+                <Note>{location.title}</Note>
               </Item>
             ))}
           </List>
@@ -100,16 +143,19 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = (state: AppState, { navigation }: ReinstallProps) => {
+const mapStateToProps = (state: AppState, { navigation }: MigrationProps) => {
   return {};
 };
 
-const mapDispatchToProps = (dispatch: Dispatch, { navigation }: ReinstallProps) => {
+const mapDispatchToProps = (dispatch: Dispatch, { navigation }: MigrationProps) => {
   const value = navigation.getParam('value') as Instance;
   const api = getApi(value.account) as BandwagonHostAgent;
   return {
     async refresh() {
       return await api.instance.getMigrateLocations(value.id);
+    },
+    async migrate(location: string) {
+      await api.instance.migrate(value.id, location);
     },
     instance: value
   };
@@ -118,4 +164,4 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: ReinstallProps) 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withTheme(Reinstall, false));
+)(withTheme(Migration, false));

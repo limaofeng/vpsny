@@ -1,1 +1,1 @@
-VPS Manage, Vultr
+VPS Manage, Vultr, BandwagonHost, AWS, Lightsail, DigitalOcean, 

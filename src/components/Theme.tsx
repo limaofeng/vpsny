@@ -37,6 +37,7 @@ export default interface Theme {
       green: string;
       purple: string;
       darkBlue: string;
+      orange: string;
       red: string;
       iron: string;
       /**
@@ -131,6 +132,7 @@ export const defaultTheme: Theme = {
     colorful: {
       green: '#1FC700',
       purple: '#8641F4',
+      orange: '#F5BC0C',
       darkBlue: '#44239A',
       red: '#E43934',
       iron: '#d2d8dc',

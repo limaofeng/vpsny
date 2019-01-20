@@ -110,6 +110,9 @@ class Deploy extends React.Component<DeployProps, DeployState> {
 
   toSSHKeys = () => {
     const { account, sshkeys } = this.state;
+    if (!account) {
+      return;
+    }
     this.props.navigation.navigate('SSHPublicKeys', {
       data: account,
       values: sshkeys,
@@ -120,16 +123,12 @@ class Deploy extends React.Component<DeployProps, DeployState> {
   };
 
   handleJumpToAccounts = () => {
-    const { getDefaultRegion } = this.props;
     const { provider, account } = this.state;
     this.props.navigation.navigate('AccountList', {
       provider,
       value: account,
       callback: (account: Account) => {
-        const additional = {
-          location: getDefaultRegion(account.provider)
-        };
-        this.setState({ account, sshkeys: [], provider: account.provider });
+        this.setState({ account, sshkeys: [], provider });
       }
     });
   };
@@ -210,9 +209,13 @@ class Deploy extends React.Component<DeployProps, DeployState> {
         <ScrollView>
           <List title="Choose a account" style={{ marginTop: 13 }}>
             <Item push onClick={this.handleJumpToAccounts}>
-              <Note>
-                {account.provider.toUpperCase()} - {account.email}
-              </Note>
+              {account ? (
+                <Note>
+                  {account.provider.toUpperCase()} - {account.email}
+                </Note>
+              ) : (
+                <Note> Only Vultr is supported </Note>
+              )}
             </Item>
           </List>
           {/*
@@ -502,7 +505,9 @@ const mapStateToProps = ({
       ) as IBlueprint;
     },
     getDefaultAccount: () => {
-      const providers = CloudManager.getProviders().filter(p => p.features.deploy).map(p => p.id);
+      const providers = CloudManager.getProviders()
+        .filter(p => p.features.deploy)
+        .map(p => p.id);
       return accounts.find(a => providers.some(p => p === a.provider)) as Account;
     },
     keyPairs,

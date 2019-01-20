@@ -27,12 +27,12 @@ class ServerOverview extends Component<ServerOverviewProps> {
 
   handleSnapshots = () => {
     const { navigation, data } = this.props;
-    navigation.navigate('BWG_Snapshots', { value: data });
+    navigation.navigate('BWG_Snapshot', { value: data });
   };
 
   handleBackups = () => {
     const { navigation, data } = this.props;
-    navigation.navigate('BWG_Backups', { value: data });
+    navigation.navigate('BWG_Backup', { value: data });
   };
 
   render() {
@@ -50,7 +50,7 @@ class ServerOverview extends Component<ServerOverviewProps> {
         </List>
         <List>
           <Item push onClick={this.handleMigration}>
-            <Note>Migrate to another DC</Note>
+            <Note>Migration</Note>
           </Item>
         </List>
         <List>

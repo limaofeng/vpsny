@@ -2,6 +2,7 @@ import { Theme } from '@components';
 import { getApi } from '@modules/cloud';
 import BandwagonHostAgent from '@modules/cloud/agents/BandwagonHostAgent';
 import { Instance } from '@modules/cloud/Provider';
+import { ProviderType } from '@modules/cloud/type';
 import { sleep } from '@utils';
 import React from 'react';
 import { NavigationScreenProp } from 'react-navigation';
@@ -14,8 +15,8 @@ import AccountView from './blocks/AccountView';
 import ServerView from './blocks/ServerView';
 import Migration from './pages/Migration';
 import Reinstall from './pages/Reinstall';
-import { ProviderType } from '@modules/cloud/type';
-
+import Snapshot from './pages/Snapshot';
+import Backup from './pages/Backup';
 
 class BandwagonHost implements Provider {
   id: ProviderType = 'bandwagonhost';
@@ -28,7 +29,9 @@ class BandwagonHost implements Provider {
   routes(): any {
     return {
       BWG_Reinstall: Reinstall,
-      BWG_Migration: Migration
+      BWG_Migration: Migration,
+      BWG_Snapshot: Snapshot,
+      BWG_Backup: Backup
     };
   }
   actions(data: Instance, theme: Theme, dispatch: Dispatch, navigation: NavigationScreenProp<any>): ServerAction[] {

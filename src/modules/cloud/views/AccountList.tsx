@@ -100,10 +100,16 @@ class AccountList extends React.Component<AccountListProps, AccountListState> {
             {accounts.map(a => (
               <Item key={`account-${a.id}`} value={a} push={!isSelection}>
                 <Note>
-                {a.provider} - {a.email || a.name}
+                  {a.provider} - {a.email || a.name}
                 </Note>
               </Item>
             ))}
+            {!accounts.length && (
+              <Item>
+                <Note> No Vultr account</Note>
+              </Item>
+            )}
+
             {/* <Item skip onClick={this.handleCreate} push>
               <Note>Connect to your cloud providers</Note>
             </Item> */}
@@ -124,7 +130,9 @@ const mapStateToProps = ({ cloud: { accounts } }: AppState, { navigation }: Acco
   const onChange = navigation.getParam('callback');
   const value = navigation.getParam('value');
   const mode: Mode = !!onChange ? 'choose' : 'manage';
-  const providers = CloudManager.getProviders().filter(p => p.features.deploy).map(p => p.id);
+  const providers = CloudManager.getProviders()
+    .filter(p => p.features.deploy)
+    .map(p => p.id);
   return {
     accounts: accounts.filter(a => providers.some(p => p === a.provider)),
     mode,
