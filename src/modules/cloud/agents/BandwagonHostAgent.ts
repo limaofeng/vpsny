@@ -1,23 +1,22 @@
-import { md5 } from '@utils';
+import { md5, decode64, format, sleep } from '@utils';
 import Bluebird from 'bluebird';
 import axios, { AxiosInstance } from 'axios';
-import { Agent, APIKey, Bill, User, Continent, Country, Snapshot } from '../Agent';
+import { Agent, APIKey, Bill, User, Continent, Country, Snapshot, Backup } from '../Agent';
 import { Features, Instance, Plan, Region, SSHKey, SystemImage } from '../Provider';
 import NetworkError, { ERROR_CODES } from './NetworkError';
 import moment = require('moment');
 import { IBundle, IRegion, IBlueprint } from '@modules/database/type';
+import Message from '../../../utils/Message';
 
 const statusMappings: { [key: string]: string } = { new: 'Installing', active: 'Running', off: 'Stopped' };
 
 function getStatus(name: string) {
   const state = statusMappings[name];
   if (state) {
-    console.log('BandwagonHost Status -> ', name, state);
     return state;
   }
   const [first, ...leftover] = name.split('');
   const text = first.toUpperCase() + leftover.join('');
-  console.log('BandwagonHost Status -> ', name, text);
   return text;
 }
 
@@ -198,6 +197,24 @@ export default class BandwagonHostAgent implements Agent {
     this.request = axios.create({
       baseURL: 'https://api.64clouds.com/v1'
     });
+    this.request.interceptors.response.use(
+      response => {
+        const {
+          config,
+          data: { error, message, additionalErrorInfo }
+        } = response;
+        if (error && !config.url!.endsWith('errorignore')) {
+          console.warn(error, message, additionalErrorInfo);
+          Message.error(message + '\r\n' + additionalErrorInfo);
+        }
+        return response;
+      },
+      error => {
+        console.warn(error);
+        Message.error(error.message);
+        return Promise.reject(error);
+      }
+    );
   }
 
   setKey(apiKey: BandwagonHostAPIKey): void {
@@ -277,7 +294,7 @@ export default class BandwagonHostAgent implements Agent {
         this.apiKey.vpses.map(({ veid, token }) =>
           this.request.get(`/getLiveServiceInfo?veid=${veid}&api_key=${token}`).then(({ data }) => {
             return this.request
-              .get(`/basicShell/exec?veid=${veid}&api_key=${token}&command=${GetCpuCommand}`)
+              .get(`/basicShell/exec?veid=${veid}&api_key=${token}&command=${GetCpuCommand}&errorignore`)
               .then(({ data: { message: vcpus } }) => {
                 return { ...data, vcpus: vcpus.replace(/\n/g, '') };
               });
@@ -295,7 +312,9 @@ export default class BandwagonHostAgent implements Agent {
         const account = await this.getId();
         const {
           data: { message: vcpus }
-        } = await this.request.get(`/basicShell/exec?veid=${id}&api_key=${apiKey}&command=${GetCpuCommand}`);
+        } = await this.request.get(
+          `/basicShell/exec?veid=${id}&api_key=${apiKey}&command=${GetCpuCommand}&errorignore`
+        );
         return parseInstance({ ...data, vcpus: vcpus.replace(/\n/g, '') }, account);
       } catch (error) {
         const { response } = error;
@@ -312,6 +331,7 @@ export default class BandwagonHostAgent implements Agent {
         const apiKey = this.apiKey.vpses.find(data => data.veid === id)!.token;
         const { data } = await this.request.get(`/${force ? 'kill' : 'stop'}?veid=${id}&api_key=${apiKey}`);
         this.validate(data);
+        await this.instance.track(id, 'Stopped');
       } catch (e) {
         console.log('BandwagonHost Bug', e);
       }
@@ -322,6 +342,7 @@ export default class BandwagonHostAgent implements Agent {
         const { data } = await this.request.get(`/start?veid=${id}&api_key=${apiKey}`);
         this.validate(data);
         console.log('instance start', id);
+        await this.instance.track(id, 'Running');
       } catch (e) {
         console.log('BandwagonHost Bug', e);
       }
@@ -332,6 +353,7 @@ export default class BandwagonHostAgent implements Agent {
         const { data } = await this.request.get(`/restart?veid=${id}&api_key=${apiKey}`);
         this.validate(data);
         console.log('instance start', id);
+        await this.instance.track(id, 'Running');
       } catch (e) {
         console.log('BandwagonHost Bug', e);
       }
@@ -339,7 +361,35 @@ export default class BandwagonHostAgent implements Agent {
     destroy: async (id: string): Promise<void> => {
       throw 'This function is not supported';
     },
-    reinstall: async (id: string): Promise<void> => {},
+    track: async (id: string, status: string) => {
+      const apiKey = this.apiKey.vpses.find(data => data.veid === id!.toString())!.token;
+      const get = async () => {
+        const { data } = await this.request.get(`/getLiveServiceInfo?veid=${id}&api_key=${apiKey}&errorignore`);
+        console.log(`track [${id}] status = ${getStatus(data.ve_status)} hope = ${status}`);
+        return data;
+      };
+      let node = await get();
+      while (getStatus(node.ve_status) !== status) {
+        await sleep(2000);
+        node = await get();
+      }
+    },
+    reinstall: async (id: string, os?: string): Promise<void | string> => {
+      const apiKey = this.apiKey.vpses.find(data => data.veid === id!.toString())!.token;
+      await this.instance.stop(id);
+      await this.instance.track(id, 'Stopped');
+      const { data } = await this.request.get(`/reinstallOS?veid=${id}&api_key=${apiKey}&os=${os}`);
+      this.validate(data);
+      console.log(data);
+      return data.notificationEmail;
+    },
+    migrate: async (id: string, location: string): Promise<string> => {
+      const apiKey = this.apiKey.vpses.find(data => data.veid === id!.toString())!.token;
+      const { data } = await this.request.get(`/migrate/start?veid=${id}&api_key=${apiKey}&location=${location}`);
+      this.validate(data);
+      console.log(data);
+      return data.notificationEmail;
+    },
     getAvailableOS: async (id: string): Promise<any> => {
       const apiKey = this.apiKey.vpses.find(data => data.veid === id.toString())!.token;
       const { data } = await this.request.get(`/getAvailableOS?veid=${id}&api_key=${apiKey}`);
@@ -352,13 +402,87 @@ export default class BandwagonHostAgent implements Agent {
     }
   };
   snapshot = {
-    list: async (): Promise<Snapshot[]> => {
-      return [];
+    list: async (id?: string): Promise<Snapshot[]> => {
+      const apiKey = this.apiKey.vpses.find(data => data.veid === id!.toString())!.token;
+      const {
+        data: { snapshots }
+      } = await this.request.get(`/snapshot/list?veid=${id}&api_key=${apiKey}`);
+      return snapshots.map((item: any) => ({
+        ...item,
+        id: id + ':' + item.fileName,
+        name: decode64(item.description),
+        expires: item.purgesIn,
+        size: format.fileSize(parseInt(item.size), 'bytes', {
+          finalUnit: 'MB',
+          mode: 'hide'
+        }),
+        uncompressed: format.fileSize(item.uncompressed, 'bytes', {
+          finalUnit: 'MB',
+          mode: 'hide'
+        })
+      }));
     },
-    create: async (): Promise<Snapshot> => {
-      return {};
+    create: async (id: string, name: string): Promise<Snapshot | string> => {
+      const apiKey = this.apiKey.vpses.find(data => data.veid === id!.toString())!.token;
+      const { data } = await this.request.get(`/snapshot/create?veid=${id}&api_key=${apiKey}&description=${name}`);
+      this.validate(data);
+      return data.notificationEmail;
     },
-    destroy: async (id: string): Promise<void> => {}
+    delete: async (id: string): Promise<void> => {
+      const [veid, fileName] = id.split(':');
+      const apiKey = this.apiKey.vpses.find(data => data.veid === veid)!.token;
+      const { data } = await this.request.get(`/snapshot/delete?veid=${veid}&api_key=${apiKey}&snapshot=${fileName}`);
+      this.validate(data);
+    },
+    restore: async (id: string): Promise<void> => {
+      const [veid, fileName] = id.split(':');
+      const apiKey = this.apiKey.vpses.find(data => data.veid === veid)!.token;
+      const { data } = await this.request.get(`/snapshot/restore?veid=${veid}&api_key=${apiKey}&snapshot=${fileName}`);
+      this.validate(data);
+    },
+    sticky: async (id: string, sticky: boolean): Promise<void> => {
+      const [veid, fileName] = id.split(':');
+      const apiKey = this.apiKey.vpses.find(data => data.veid === veid)!.token;
+      const { data } = await this.request.get(
+        `/snapshot/toggleSticky?veid=${veid}&api_key=${apiKey}&snapshot=${fileName}&sticky=${sticky ? 1 : 0}`
+      );
+      this.validate(data);
+    }
+  };
+  backup = {
+    list: async (id?: string): Promise<Backup[]> => {
+      const apiKey = this.apiKey.vpses.find(data => data.veid === id!.toString())!.token;
+      const {
+        backups: { data: body },
+        snapshots: {
+          data: { snapshots = [] }
+        }
+      } = await Bluebird.props({
+        backups: this.request.get(`/backup/list?veid=${id}&api_key=${apiKey}`),
+        snapshots: this.request.get(`/snapshot/list?veid=${id}&api_key=${apiKey}`)
+      });
+      this.validate(body);
+      const { backups } = body;
+      return Object.keys(backups).map(token => ({
+        ...backups[token],
+        id: id + ':' + token,
+        size: format.fileSize(parseInt(backups[token].size), 'bytes', {
+          finalUnit: 'MB',
+          mode: 'hide'
+        }),
+        snapshot: snapshots.some((snapshot: any) => snapshot.md5 === backups[token].md5)
+      }));
+    },
+    copyToSnapshot: async (id: string): Promise<string> => {
+      const [veid, backup_token] = id.split(':');
+      debugger;
+      const apiKey = this.apiKey.vpses.find(data => data.veid === veid)!.token;
+      const { data } = await this.request.get(
+        `/backup/copyToSnapshot?veid=${veid}&api_key=${apiKey}&backupToken=${backup_token}`
+      );
+      this.validate(data);
+      return data.notificationEmail;
+    }
   };
   validate(result: any) {
     if (result.error !== 0) {

@@ -1,1 +1,3 @@
-Now you can manage BandwagonHost's VPS on VPSNY.
+ - 增加了对 BandwagonHOST 的支持
+   
+

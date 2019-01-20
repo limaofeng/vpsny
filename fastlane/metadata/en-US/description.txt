@@ -3,7 +3,7 @@ vpsny is a third-party cloud platform server management tool. Realize the runnin
 * Before using, you must obtain the accessible credentials at the corresponding cloud service provider.
 
 Features:
-- Supported cloud providers Vultr, AWS Lightsail, DigitalOcean
+- Supported cloud providers Vultr, AWS Lightsail, DigitalOcean, BandwagonHOST
 - It is convenient to view your billing information on the cloud platform (only Vultr is supported for the time being due to API restrictions)
 - Can deploy new servers quickly, temporarily only supporting Vultr
 - SSH-Key can be generated within the app and synced to the cloud service provider

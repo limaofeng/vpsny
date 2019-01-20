@@ -1,2 +1,1 @@
-
-Vultr / AWS Lightsail / DigitalOcean is now supported
+Vultr / AWS Lightsail / DigitalOcean / BandwagonHOST is now supported

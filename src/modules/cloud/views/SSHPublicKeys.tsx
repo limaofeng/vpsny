@@ -153,7 +153,6 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
     this.setState({ values: values });
     if (values.length > 0) {
       SSHPublicKeys.headerRight.current.show();
-      this.handleDone(values);
     } else {
       SSHPublicKeys.headerRight.current.hide();
     }

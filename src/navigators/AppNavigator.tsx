@@ -1,6 +1,7 @@
 import { merge } from 'lodash';
 import * as React from 'react';
 import { Dimensions, TouchableOpacity, Text } from 'react-native';
+import DropdownAlert from 'react-native-dropdownalert';
 import {
   createBottomTabNavigator,
   createStackNavigator,
@@ -14,6 +15,7 @@ import SideMenu from '../components/SideMenu';
 import { defaultTheme } from '../components/Theme';
 import modules from '../modules';
 import { format } from '../utils';
+import Message from '../utils/Message';
 
 const { colors } = defaultTheme;
 
@@ -233,17 +235,18 @@ class Application extends React.Component<ApplicationProps> {
       }
     };
     return (
-        <SideMenu
-          ref={this.side}
-          disableGestures={() => {
-            const { routes } = navigation.state;
-            return routes.length > 1;
-          }}
-          openMenuOffset={Dimensions.get('window').width * 0.88}
-          menu={menu}
-        >
-          <Stack navigation={navigation} />
-        </SideMenu>
+      <SideMenu
+        ref={this.side}
+        disableGestures={() => {
+          const { routes } = navigation.state;
+          return routes.length > 1;
+        }}
+        openMenuOffset={Dimensions.get('window').width * 0.88}
+        menu={menu}
+      >
+        <Stack navigation={navigation} />
+        <DropdownAlert ref={ref => Message.setDropdown(ref)} />
+      </SideMenu>
     );
   }
 }

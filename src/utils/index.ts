@@ -102,6 +102,10 @@ export function getPublicKeyFingerprint(sshkey: string): string {
   return forge.ssh.getPublicKeyFingerprint(publicKey, { encoding: 'hex', delimiter: ':' }) as string;
 }
 
+export function decode64(str: string) {
+  return new String(forge.util.decode64(str));
+}
+
 export function uuid(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     const r = (Math.random() * 16) | 0;
