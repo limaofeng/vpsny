@@ -22,12 +22,12 @@ class ServerOverview extends Component<ServerOverviewProps> {
 
   handleSnapshots = () => {
     const { navigation, data } = this.props;
-    navigation.navigate('DROPLET_Snapshots', { value: data });
+    navigation.navigate('DROPLET_Snapshot', { value: data });
   };
 
   handleBackups = () => {
     const { navigation, data } = this.props;
-    navigation.navigate('DROPLET_Backups', { value: data });
+    navigation.navigate('DROPLET_Backup', { value: data });
   };
 
   render() {
@@ -37,7 +37,7 @@ class ServerOverview extends Component<ServerOverviewProps> {
         <Basic theme={theme} data={data} />
         <Hardware theme={theme} data={data} />
         <Networking theme={theme} data={data} />
-        <List visible={false}>
+        <List>
           <Item push onClick={this.handleSnapshots}>
             <Note>Snapshots</Note>
           </Item>

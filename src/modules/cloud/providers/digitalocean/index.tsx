@@ -9,6 +9,9 @@ import { getTip } from '../utils';
 import AccountNew from './blocks/AccountNew';
 import AccountView from './blocks/AccountView';
 import ServerView from './blocks/ServerView';
+import Snapshot from './pages/Snapshot';
+// import Reinstall from './pages/Reinstall';
+// import Backup from './pages/Backup';
 
 class DigitalOcean implements Provider {
   id: ProviderType = 'digitalocean';
@@ -20,6 +23,9 @@ class DigitalOcean implements Provider {
   };
   routes(): any {
     return {
+      DROPLET_Snapshot: Snapshot
+      // DROPLET_Reinstall: Reinstall,
+      // DROPLET_Backup: Backup
     };
   }
   actions(data: Instance, theme: Theme, dispatch: Dispatch, navigation: NavigationScreenProp<any>): ServerAction[] {

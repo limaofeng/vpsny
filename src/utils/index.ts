@@ -1,12 +1,43 @@
 import { Dimensions, Platform, StyleSheet, PixelRatio } from 'react-native';
 import { isEqual as _isEqual, clone, uniq, zipObject } from 'lodash'; // isEqual as _isEqual,
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import forge from 'node-forge';
+import firebase, { RNFirebase } from 'react-native-firebase';
 import * as formatUtil from './format';
 
 export const format = formatUtil;
 
 export * from './fonts';
+
+export const metric = (request: AxiosInstance) => {
+  request.interceptors.request.use(
+    async config => {
+      const metric = firebase
+        .perf()
+        .newHttpMetric(config.baseURL + config.url!, config.method!.toUpperCase() as RNFirebase.perf.HttpMethod);
+      await metric.start();
+      const store = config as any;
+      store.metric = metric;
+      return config;
+    },
+    error => {
+      return Promise.reject(error);
+    }
+  );
+  request.interceptors.response.use(
+    async response => {
+      const store = response.config as any;
+      const metric: RNFirebase.perf.HttpMetric = store.metric;
+      await metric.setHttpResponseCode(response.status);
+      await metric.setResponseContentType(response.headers['content-type']);
+      await metric.stop();
+      return response;
+    },
+    error => {
+      return Promise.reject(error);
+    }
+  );
+};
 
 export const diff = (lvalue: any, rvalue: any) => {
   if (_isEqual(lvalue, rvalue)) {

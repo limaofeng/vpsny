@@ -1,4 +1,4 @@
-import { md5, decode64, format, sleep } from '@utils';
+import { md5, decode64, format, sleep, metric } from '@utils';
 import Bluebird from 'bluebird';
 import axios, { AxiosInstance } from 'axios';
 import { Agent, APIKey, Bill, User, Continent, Country, Snapshot, Backup } from '../Agent';
@@ -197,6 +197,7 @@ export default class BandwagonHostAgent implements Agent {
     this.request = axios.create({
       baseURL: 'https://api.64clouds.com/v1'
     });
+    metric(this.request);
     this.request.interceptors.response.use(
       response => {
         const {

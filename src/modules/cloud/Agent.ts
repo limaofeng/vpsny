@@ -48,12 +48,13 @@ export interface Snapshot {
   os: string;
   name: string;
   size: number;
-  uncompressed: number;
-  md5: string;
-  sticky: boolean;
-  expires: number;
+  uncompressed?: number;
+  md5?: string;
+  sticky?: boolean;
+  expires?: number;
   fileName?: string;
   downloadLink?: string;
+  createdAt?: Date;
   [key: string]: any;
 }
 

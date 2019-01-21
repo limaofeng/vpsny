@@ -3,7 +3,7 @@ import { StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewSty
 import Spinner from 'react-native-spinkit';
 
 import { sleep } from '../utils';
-import { Icon } from './Item';
+import { Icon, Note } from './Item';
 import Theme, { withTheme } from './Theme';
 
 interface SubmitButtonProps {
@@ -22,6 +22,7 @@ interface SubmitButtonProps {
     style?: StyleProp<ViewStyle>;
   };
   theme?: Theme;
+  simple?: boolean;
 }
 
 interface SubmitButtonState {
@@ -40,6 +41,7 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
     reentrant: false,
     submittingText: 'Saving',
     doneText: 'Done',
+    simple: false,
     disabledStyle: {
       style: {},
       buttonStyle: {}
@@ -71,6 +73,16 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
       // Alert.alert('Error', error.message);
     }
   };
+  reset = async () => {
+    await sleep(1);
+    this.setState({
+      title: this.props.title,
+      submitting: false,
+      disabled: !!this.props.disabled,
+      done: false,
+      submittingText: this.props.submittingText || SubmitButton.defaultProps.submittingText
+    });
+  };
   update = (state: SubmitButtonState) => {
     this.setState({ ...state });
   };
@@ -83,7 +95,50 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
   enable = () => {
     this.setState({ disabled: false });
   };
+
   render() {
+    const { simple } = this.props;
+    return simple ? this.randerSimple() : this.renderClassic();
+  }
+
+  randerSimple = () => {
+    const { colors, fonts } = this.props.theme as Theme;
+    const { doneText, style, spinnerSize, disabledStyle, testID } = this.props;
+    const { submitting, done, submittingText, disabled, title } = this.state;
+    return (
+      <TouchableOpacity
+        disabled={disabled}
+        onPress={this.handleSubmit}
+        testID={testID}
+        accessibilityTraits="button"
+        style={[{ flex: 1, alignItems: 'center' }, style, disabled ? disabledStyle!.style : {}]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Spinner
+            isVisible={submitting}
+            style={{ marginRight: 10 }}
+            size={spinnerSize || 21}
+            type="Arc"
+            color={colors.primary}
+          />
+          {done && (
+            <Icon
+              type="Ionicons"
+              name="md-checkmark"
+              size={spinnerSize || 21}
+              color={colors.backgroundColorDeeper}
+              style={{ marginRight: 10 }}
+            />
+          )}
+          <Note style={[fonts.callout, { color: colors.primary }]}>
+            {submitting ? submittingText : done ? doneText : title}
+          </Note>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  renderClassic = () => {
     const { colors, fonts } = this.props.theme as Theme;
     const { doneText, style, buttonStyle, spinnerSize, disabledStyle, testID } = this.props;
     const { submitting, done, submittingText, disabled, title } = this.state;
@@ -131,7 +186,7 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
         </View>
       </TouchableOpacity>
     );
-  }
+  };
 }
 
 const styles = StyleSheet.create({
