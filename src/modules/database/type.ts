@@ -1,3 +1,5 @@
+import { ProviderType } from "@modules/cloud/type";
+
 export interface IBundle {
   /**
    * ID标示
@@ -61,7 +63,7 @@ export interface IBlueprint {
   /**
    * 提供商
    */
-  provider: string;
+  provider: ProviderType;
   /**
    * 类型
    * iso | snapshot | backup | application | os

@@ -4,9 +4,11 @@ import Bluebird from 'bluebird';
 import querystring from 'querystring';
 import firebase, { RNFirebase } from 'react-native-firebase';
 
-import { format, getPublicKeyFingerprint, md5 } from '../../utils';
-import { Agent, APIKey, Bill, Snapshot, User } from './Agent';
-import { Features, Instance, Plan, Region, SSHKey, SystemImage } from './Provider';
+import { format, getPublicKeyFingerprint, md5 } from '../../../../utils';
+import { Agent, APIKey, Bill, Snapshot, User } from '../../Agent';
+import { Features, Instance, Plan, Region, SSHKey, SystemImage } from '../../Provider';
+import Message from '../../../../utils/Message';
+import moment = require('moment');
 
 const invisible = [
   {
@@ -184,7 +186,8 @@ function getStatus(status: string, powerStatus: string, serverState: string) {
     if (['installingbooting', 'isomounting'].some(state => state === serverState)) {
       text = 'Booting';
     } else if (serverState !== 'ok') {
-      text = 'Installing';
+      const [first, ...leftover] = serverState.split('');
+      text = first.toUpperCase() + leftover.join('');
     } else if (status !== 'active') {
       text = 'Pending';
     }
@@ -219,11 +222,7 @@ function parseInstance(id: string, data: any): Instance {
     vcpu: parseInt(data.vcpu_count),
     location: {
       title: data.location,
-      region: data.location,
-      city: '',
-      continent: '',
-      country: '',
-      state: ''
+      region: data.location
     },
     defaultPassword: data.default_password,
     status: getStatus(data.status, data.power_status, data.server_state),
@@ -288,18 +287,18 @@ export interface VultrAPIKey extends APIKey {
 export class VultrAgent implements Agent {
   id: string;
   apiKey: string;
-  http: AxiosInstance;
+  request: AxiosInstance;
   constructor({ apiKey }: VultrAPIKey) {
     this.apiKey = apiKey;
     this.id = apiKey === 'vultr' ? 'vultr' : md5('vultr:' + apiKey, ':');
-    this.http = axios.create({
-      baseURL: 'https://api.vultr.com',
+    this.request = axios.create({
+      baseURL: 'https://api.vultr.com/v1',
       headers: {
         ...(apiKey ? { 'API-Key': apiKey } : {}),
         'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
       }
     });
-    this.http.interceptors.request.use(
+    this.request.interceptors.request.use(
       async config => {
         const metric = firebase
           .perf()
@@ -313,7 +312,7 @@ export class VultrAgent implements Agent {
         return Promise.reject(error);
       }
     );
-    this.http.interceptors.response.use(
+    this.request.interceptors.response.use(
       async response => {
         const store = response.config as any;
         const metric: RNFirebase.perf.HttpMetric = store.metric;
@@ -326,10 +325,28 @@ export class VultrAgent implements Agent {
         return Promise.reject(error);
       }
     );
+    this.request.interceptors.response.use(
+      response => {
+        const {
+          config,
+          data: { error, message, additionalErrorInfo }
+        } = response;
+        if (error && !config.url!.endsWith('errorignore')) {
+          console.warn(error, message, additionalErrorInfo);
+          Message.error(message + '\r\n' + additionalErrorInfo);
+        }
+        return response;
+      },
+      (error, ...args) => {
+        console.warn(error.response.data);
+        Message.error(error.response.data);
+        return Promise.reject(error);
+      }
+    );
   }
 
   async regions(): Promise<Region[]> {
-    const { data } = await this.http.get('/v1/regions/list');
+    const { data } = await this.request.get('/regions/list');
     const regions: Region[] = [];
     for (const id of Object.keys(data)) {
       const region = data[id];
@@ -358,11 +375,11 @@ export class VultrAgent implements Agent {
       all: { data },
       baremetal: { data: baremetal }
     } = await Bluebird.props({
-      all: this.http.get(`/v1/plans/list?type=all`),
-      baremetal: this.http.get('/v1/plans/list_baremetal')
+      all: this.request.get(`/plans/list?type=all`),
+      baremetal: this.request.get('/plans/list_baremetal')
     });
 
-    const { data: regions } = await this.http.get('/v1/regions/list');
+    const { data: regions } = await this.request.get('/regions/list');
 
     for (const plan of invisible) {
       data[plan.VPSPLANID] = { ...plan, available_locations: Object.keys(regions).map(region => parseInt(region)) };
@@ -424,7 +441,7 @@ export class VultrAgent implements Agent {
   async images(): Promise<SystemImage[]> {
     const images: SystemImage[] = [];
 
-    const { data: oslist } = await this.http.get('/v1/os/list');
+    const { data: oslist } = await this.request.get('/os/list');
     for (const vid of Object.keys(oslist)) {
       const version = oslist[vid];
       if (['iso', 'snapshot', 'backup', 'application'].some(val => val === version.family)) {
@@ -442,7 +459,7 @@ export class VultrAgent implements Agent {
       });
     }
 
-    // const { data: applist } = await this.http.get('https://api.vultr.com/v1/os/list');
+    // const { data: applist } = await this.request.get('https://api.vultr.com/os/list');
     // for (const vid of Object.keys(applist)) {
     //   const version = applist[vid];
 
@@ -482,13 +499,13 @@ export class VultrAgent implements Agent {
       hostname
     });
     console.log(body);
-    const { data } = await this.http.post('/v1/server/create', body);
+    const { data } = await this.request.post('/server/create', body);
     console.log('server deploy!', data);
     return data.SUBID;
   }
 
   async user(): Promise<User> {
-    const { data }: any = await this.http.get('/v1/auth/info');
+    const { data }: any = await this.request.get('/auth/info');
     const vultrAPIKey: VultrAPIKey = {
       apiKey: this.apiKey
     };
@@ -501,14 +518,14 @@ export class VultrAgent implements Agent {
     };
   }
   async bill(): Promise<Bill> {
-    const { data }: any = await this.http.get('/v1/account/info');
+    const { data }: any = await this.request.get('/account/info');
     return {
       balance: Math.abs(parseFloat(data.balance)),
       pendingCharges: parseFloat(data.pending_charges)
     };
   }
   async sshkeys(): Promise<SSHKey[]> {
-    const { data }: any = await this.http.get('/v1/sshkey/list');
+    const { data }: any = await this.request.get('/sshkey/list');
     const sshkeys = Object.keys(data).map((id: string) => ({
       id,
       name: data[id].name,
@@ -519,8 +536,8 @@ export class VultrAgent implements Agent {
     return sshkeys;
   }
   async createSSHKey(data: SSHKey): Promise<void> {
-    const { data: info }: any = await this.http.post(
-      '/v1/sshkey/create',
+    const { data: info }: any = await this.request.post(
+      '/sshkey/create',
       querystring.stringify({
         name: data.name,
         ssh_key: data.publicKey
@@ -529,8 +546,8 @@ export class VultrAgent implements Agent {
     console.log('createSSHKey', info);
   }
   async updateSSHKey(data: SSHKey): Promise<void> {
-    const { data: info }: any = await this.http.post(
-      '/v1/sshkey/update',
+    const { data: info }: any = await this.request.post(
+      '/sshkey/update',
       querystring.stringify({
         SSHKEYID: data.id,
         name: data.name,
@@ -540,8 +557,8 @@ export class VultrAgent implements Agent {
     console.log('updateSSHKey', info);
   }
   async destroySSHKey(id: string): Promise<void> {
-    const { data: info }: any = await this.http.post(
-      '/v1/sshkey/destroy',
+    const { data: info }: any = await this.request.post(
+      '/sshkey/destroy',
       querystring.stringify({
         SSHKEYID: id
       })
@@ -550,7 +567,7 @@ export class VultrAgent implements Agent {
   }
   instance = {
     list: async (): Promise<Instance[]> => {
-      const { data }: any = await this.http.get('/v1/server/list');
+      const { data }: any = await this.request.get('/server/list');
       const list = [];
       for (const id of Object.keys(data)) {
         list.push(parseInstance(this.id as string, data[id]));
@@ -559,8 +576,8 @@ export class VultrAgent implements Agent {
     },
     get: async (id: string): Promise<Instance> => {
       try {
-        const { data }: any = await this.http.get(
-          '/v1/server/list?' +
+        const { data }: any = await this.request.get(
+          '/server/list?' +
             querystring.stringify({
               SUBID: id
             })
@@ -577,8 +594,8 @@ export class VultrAgent implements Agent {
       }
     },
     stop: async (id: string): Promise<void> => {
-      const { data }: any = await this.http.post(
-        '/v1/server/halt',
+      const { data }: any = await this.request.post(
+        '/server/halt',
         querystring.stringify({
           SUBID: id
         })
@@ -586,8 +603,8 @@ export class VultrAgent implements Agent {
       console.log('instance start', data);
     },
     start: async (id: string): Promise<void> => {
-      const { data }: any = await this.http.post(
-        '/v1/server/start',
+      const { data }: any = await this.request.post(
+        '/server/start',
         querystring.stringify({
           SUBID: id
         })
@@ -598,8 +615,8 @@ export class VultrAgent implements Agent {
       await this.instance.start(id);
     },
     reboot: async (id: string): Promise<void> => {
-      const { data }: any = await this.http.post(
-        '/v1/server/reboot',
+      const { data }: any = await this.request.post(
+        '/server/reboot',
         querystring.stringify({
           SUBID: id
         })
@@ -607,8 +624,8 @@ export class VultrAgent implements Agent {
       console.log('instance reboot', data);
     },
     destroy: async (id: string): Promise<void> => {
-      const { data }: any = await this.http.post(
-        '/v1/server/destroy',
+      const { data }: any = await this.request.post(
+        '/server/destroy',
         querystring.stringify({
           SUBID: id
         })
@@ -616,8 +633,8 @@ export class VultrAgent implements Agent {
       console.log('instance destroy', data);
     },
     reinstall: async (id: string): Promise<void> => {
-      const { data }: any = await this.http.post(
-        '/v1/server/reinstall',
+      const { data }: any = await this.request.post(
+        '/server/reinstall',
         querystring.stringify({
           SUBID: id
         })
@@ -626,43 +643,37 @@ export class VultrAgent implements Agent {
     }
   };
   snapshot = {
-    list: async (): Promise<Snapshot[]> => {
-      return [];
+    list: async (id?: string): Promise<Snapshot[]> => {
+      const { data: snapshots } = await this.request.get('/snapshot/list');
+      return Object.keys(snapshots).map((key: string) => {
+        const item: any = snapshots[key];
+        const size = format.fileSize(parseInt(item.size), 'bytes', {
+          finalUnit: 'MB',
+          mode: 'hide'
+        }) as number;
+        return {
+          id: item.SNAPSHOTID,
+          name: item.description || `${key}(${format.fileSize(size, 'MB')})`,
+          status: item.status,
+          size,
+          os: item.OSID || item.APPID,
+          osid: item.OSID,
+          appid: item.APPID,
+          createdAt: moment(item.date_created).toDate()
+        };
+      });
     },
-    create: async (): Promise<Snapshot> => {
-      return {};
+    create: async (id: string, name: string): Promise<Snapshot | string> => {
+      const {
+        data: { SNAPSHOTID = '' }
+      } = await this.request.post('/snapshot/create', querystring.stringify({ SUBID: id, description: name }));
+      return SNAPSHOTID;
     },
-    destroy: async (id: string): Promise<void> => {}
+    delete: async (id: string): Promise<void> => {
+      await this.request.post('/snapshot/destroy', querystring.stringify({ SNAPSHOTID: id}));
+    },
+    restore: async (id: string, snapshot: string): Promise<void> => {
+      await this.request.post('/server/restore_snapshot', querystring.stringify({ SUBID: id, SNAPSHOTID: snapshot }));
+    }
   };
 }
-
-// class VultrProvider implements Provider {
-//   images: SystemImage[] = [];
-//   prices: string[] = [];
-//   products = ['ssd', 'baremetal', 'storage', 'dedicated'];
-//   id = 'vultr';
-//   name = 'Vultr';
-//   url = 'https://www.vultr.com';
-//   private agent: Agent;
-//   constructor(agent: Agent) {
-//     this.agent = agent;
-//   }
-
-//   pricing(region?: string): Plan[] {
-//     const plans: Plan[] = [];
-//     return plans;
-//   }
-//   regions(plan?: string): Region[] {
-//     throw new Error('Method not implemented.');
-//   }
-//   os(): OS[] {
-//     throw new Error('Method not implemented.');
-//   }
-//   apps(): App[] {
-//     throw new Error('Method not implemented.');
-//   }
-//   getAgent(): Agent {
-//     return this.agent;
-//   }
-//   sshkey(): void {}
-// }

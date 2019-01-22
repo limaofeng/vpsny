@@ -55,6 +55,7 @@ export interface Snapshot {
   fileName?: string;
   downloadLink?: string;
   createdAt?: Date;
+  status?: 'complete' | 'pending';
   [key: string]: any;
 }
 

@@ -1,15 +1,16 @@
-import { Provider, ComponentName } from '../';
-import { Instance } from '@modules/cloud/Provider';
 import { Theme } from '@components';
-import { Dispatch } from 'redux';
-import { NavigationScreenProp } from 'react-navigation';
-import { getTip } from '../utils';
 import { getApi } from '@modules/cloud';
+import { Instance } from '@modules/cloud/Provider';
+import { ProviderType } from '@modules/cloud/type';
+import { NavigationScreenProp } from 'react-navigation';
+import { Dispatch } from 'redux';
 
+import { ComponentName, Provider } from '../';
+import { getTip } from '../utils';
 import AccountNew from './blocks/AccountNew';
 import AccountView from './blocks/AccountView';
 import ServerView from './blocks/ServerView';
-import { ProviderType } from '@modules/cloud/type';
+import Snapshot from './pages/Snapshot';
 
 class VultrHost implements Provider {
   id: ProviderType = 'vultr';
@@ -19,6 +20,11 @@ class VultrHost implements Provider {
   features = {
     deploy: true
   };
+  routes(): any {
+    return {
+      VULTR_Snapshot: Snapshot
+    };
+  }
   actions(data: Instance, theme: Theme, dispatch: Dispatch, navigation: NavigationScreenProp<any>): ServerAction[] {
     const additions = getTip(data, theme);
     const api = getApi(data.account);
@@ -89,12 +95,6 @@ class VultrHost implements Provider {
         })
       }
     ];
-  }
-  routes(): any {
-    return {};
-  }
-  options(): any[] {
-    throw new Error('Method not implemented.');
   }
   viewComponents(): string[] {
     return [''];

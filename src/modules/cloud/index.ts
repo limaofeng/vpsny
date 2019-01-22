@@ -24,7 +24,7 @@ import InstanceView from './views/InstanceView';
 import Locations from './views/Locations';
 import Pricing from './views/Pricing';
 import SSHPublicKeys from './views/SSHPublicKeys';
-import { VultrAgent, VultrAPIKey } from './VultrProvider';
+import { VultrAgent, VultrAPIKey } from './providers/vultr/VultrAgent';
 import { DigitalOceanAPIKey, DigitalOceanAgent } from './providers/digitalocean/DigitalOceanAgent';
 import BandwagonHostAgent, { BandwagonHostAPIKey } from './agents/BandwagonHostAgent';
 import { CloudManager } from './providers';
