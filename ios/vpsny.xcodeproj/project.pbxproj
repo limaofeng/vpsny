@@ -448,7 +448,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = life.homeworld.app.vpser;
-				PRODUCT_NAME = vpsny;
+				PRODUCT_NAME = VPSNY;
 				PROVISIONING_PROFILE = "91c344c5-9c07-4835-9838-8729f87c141e";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development life.homeworld.app.vpser";
 				RESOURCES_TARGETED_DEVICE_FAMILY = "";
@@ -482,7 +482,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = life.homeworld.app.vpser;
-				PRODUCT_NAME = vpsny;
+				PRODUCT_NAME = VPSNY;
 				PROVISIONING_PROFILE = "12cf0d2b-025f-499a-b48c-fb0c1b7d7013";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore life.homeworld.app.vpser";
 				SWIFT_OBJC_BRIDGING_HEADER = "vpsny/vpsny-Bridging-Header.h";

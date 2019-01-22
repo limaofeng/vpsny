@@ -1,10 +1,9 @@
 import { AppState } from '@modules';
-import { IRegion, IBundle } from '@modules/database/type';
+import { IBundle, IRegion } from '@modules/database/type';
 import React from 'react';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';

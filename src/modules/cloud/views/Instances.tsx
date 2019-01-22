@@ -61,9 +61,13 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
   handleRefresh = async (display: boolean = true) => {
     this.analytics!.logEvent('Refresh');
     const { refresh } = this.props;
-    display && this.setState({ refreshing: true });
-    await refresh();
-    display && this.setState({ refreshing: false });
+    try {
+      display && this.setState({ refreshing: true });
+      await refresh();
+      display && this.setState({ refreshing: false });
+    } catch (e) {
+      this.setState({ refreshing: false });
+    }
   };
 
   handleActionExecute = async (operate: string, status: OperateStatus, data: Instance) => {

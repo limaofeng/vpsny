@@ -79,9 +79,13 @@ class InstanceView extends React.Component<InstanceViewProps, InstanceViewState>
 
   handleRefresh = async (ignore?: boolean) => {
     const { refresh } = this.props;
-    !ignore && this.setState({ refreshing: true });
-    await refresh();
-    !ignore && this.setState({ refreshing: false });
+    try {
+      !ignore && this.setState({ refreshing: true });
+      await refresh();
+      !ignore && this.setState({ refreshing: false });
+    } catch (e) {
+      this.setState({ refreshing: false });
+    }
     // const client = getSSHClient(instance.id);
     // await client.connect();
     // await client.authenticate();
