@@ -28,7 +28,7 @@ class ServerOverview extends Component<ServerOverviewProps> {
 
   handleBackups = () => {
     const { navigation, data } = this.props;
-    navigation.navigate('VULTR_Backups', { value: data });
+    navigation.navigate('VULTR_Backup', { value: data });
   };
 
   render() {

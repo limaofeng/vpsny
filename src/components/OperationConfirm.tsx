@@ -206,6 +206,7 @@ export class OperationConfirm extends React.PureComponent<OperationConfirmProps,
                 title={okText}
                 disabled={!!doubleConfirmText}
                 buttonStyle={{ fontWeight: 'normal' }}
+                doneText={okText}
                 disabledStyle={{
                   style: defaultStyle.submit.disable
                 }}

@@ -74,7 +74,7 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
     }
   };
   reset = async () => {
-    await sleep(1);
+    await sleep(10);
     this.setState({
       title: this.props.title,
       submitting: false,

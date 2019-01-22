@@ -116,8 +116,8 @@ export interface Agent {
      * 追踪 VPS 状态的方法
      * @param id ID
      * @param status 期望状态
-     */
     track(id: string, status: string): Promise<void>;
+    */
   };
   snapshot: {
     list(id?: string): Promise<Snapshot[]>;

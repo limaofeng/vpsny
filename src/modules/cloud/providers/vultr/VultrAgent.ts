@@ -5,7 +5,7 @@ import querystring from 'querystring';
 import firebase, { RNFirebase } from 'react-native-firebase';
 
 import { format, getPublicKeyFingerprint, md5 } from '../../../../utils';
-import { Agent, APIKey, Bill, Snapshot, User } from '../../Agent';
+import { Agent, APIKey, Bill, Snapshot, User, Backup } from '../../Agent';
 import { Features, Instance, Plan, Region, SSHKey, SystemImage } from '../../Provider';
 import Message from '../../../../utils/Message';
 import moment = require('moment');
@@ -179,13 +179,22 @@ const defaultImages: SystemImage[] = [
   }
 ];
 
+export interface BackupSchedule {
+  enabled: boolean;
+  cronType: 'daily' | 'weekly' | 'monthly' | 'daily_alt_even' | 'daily_alt_odd';
+  nextScheduledTimeUtc: Date;
+  hour: number;
+  dow: number;
+  dom: number;
+}
+
 function getStatus(status: string, powerStatus: string, serverState: string) {
   const [first, ...leftover] = powerStatus.split('');
   let text = first.toUpperCase() + leftover.join('');
   if (powerStatus === 'stopped' || powerStatus === 'running') {
     if (['installingbooting', 'isomounting'].some(state => state === serverState)) {
       text = 'Booting';
-    } else if (serverState !== 'ok') {
+    } else if (['ok', 'none'].every(s => s !== serverState)) {
       const [first, ...leftover] = serverState.split('');
       text = first.toUpperCase() + leftover.join('');
     } else if (status !== 'active') {
@@ -204,6 +213,18 @@ function parseInstance(id: string, data: any): Instance {
   if (!id) {
     console.warn('account id is null');
   }
+  const IPv6 = data.v6_main_ip
+    ? {
+        ip: data.v6_main_ip,
+        networkSize: parseInt(data.v6_network_size),
+        network: data.v6_network,
+        networks: data.v6_networks.map((network: any) => ({
+          ip: network.v6_main_ip,
+          networkSize: parseInt(network.v6_network_size),
+          network: network.v6_network
+        }))
+      }
+    : undefined;
   const [ram, unit] = data.ram.split(' ');
   return {
     id: data.SUBID,
@@ -239,17 +260,8 @@ function parseInstance(id: string, data: any): Instance {
     },
     internalIP: data.internal_ip,
     kvmUrl: data.kvm_url,
-    autoBackups: data.auto_backups !== 'no',
-    IPv6: {
-      ip: data.v6_main_ip,
-      networkSize: parseInt(data.v6_network_size),
-      network: data.v6_network,
-      networks: data.v6_networks.map((network: any) => ({
-        ip: network.v6_main_ip,
-        networkSize: parseInt(network.v6_network_size),
-        network: network.v6_network
-      }))
-    },
+    autoBackups: !(data.auto_backups === 'no' || data.auto_backups === 'disabled'),
+    IPv6,
     IPv4: {
       ip: data.main_ip,
       netmask: data.netmask_v4,
@@ -266,18 +278,6 @@ function parseInstance(id: string, data: any): Instance {
     account: id,
     createdAt: data.date_created
   };
-}
-
-function getImage(type: string, name: string, images: SystemImage[]) {
-  const defaultImage = defaultImages.find(
-    di => di.type === type && di.name.toLowerCase() === name.toLowerCase()
-  ) as SystemImage;
-  let image = images.find(i => i.id === defaultImage.id);
-  if (!image) {
-    image = { ...defaultImage, versions: [] };
-    images.push(image);
-  }
-  return image;
 }
 
 export interface VultrAPIKey extends APIKey {
@@ -338,147 +338,12 @@ export class VultrAgent implements Agent {
         return response;
       },
       (error, ...args) => {
-        console.warn(error.response.data);
+        console.warn(error.response.data, error.response.config);
         Message.error(error.response.data);
         return Promise.reject(error);
       }
     );
   }
-
-  async regions(): Promise<Region[]> {
-    const { data } = await this.request.get('/regions/list');
-    const regions: Region[] = [];
-    for (const id of Object.keys(data)) {
-      const region = data[id];
-      regions.push({
-        id: region.name!.toLowerCase(),
-        providers: [
-          {
-            id: id,
-            type: 'vultr',
-            features: {
-              ddosProtection: region.ddos_protection,
-              blockStorage: region.block_storage
-            }
-          }
-        ],
-        name: region.name,
-        state: region.state,
-        country: countryNames[region.country.toLowerCase()],
-        continent: region.continent
-      });
-    }
-    return regions;
-  }
-  async pricing(): Promise<Plan[]> {
-    const {
-      all: { data },
-      baremetal: { data: baremetal }
-    } = await Bluebird.props({
-      all: this.request.get(`/plans/list?type=all`),
-      baremetal: this.request.get('/plans/list_baremetal')
-    });
-
-    const { data: regions } = await this.request.get('/regions/list');
-
-    for (const plan of invisible) {
-      data[plan.VPSPLANID] = { ...plan, available_locations: Object.keys(regions).map(region => parseInt(region)) };
-    }
-
-    const getType = (type: string): string => {
-      switch (type) {
-        case 'SSD':
-          return 'ssd';
-        case 'SATA':
-          return 'storage';
-        case 'DEDICATED':
-          return 'dedicated';
-        case 'baremetal':
-          return 'baremetal';
-        default:
-          throw '不支持的 type 类型';
-      }
-    };
-
-    const convert = (id: number, plan: any): Plan => {
-      const vcpu = parseInt(plan.plan_type === 'baremetal' ? plan.cpu_count : plan.vcpu_count); // cpu 核心数
-      let disk = 0;
-      if (plan.plan_type === 'baremetal') {
-        const [left, storage] = plan.disk.split(' ');
-        const number = left.replace(/x$/, '');
-        disk = parseInt(number) * parseInt(storage);
-      } else {
-        disk = parseInt(plan.disk);
-      }
-      return {
-        id: String(id), // 服务商ID标示
-        provider: 'vultr', // 服务提供商标示
-        name: plan.name, // 名称
-        isActive: !!plan.available_locations.length,
-        vcpu,
-        ram: parseInt(plan.ram), // 内存
-        disk, // 磁盘大小
-        bandwidth: parseFloat(plan.bandwidth) * 1000, // 带宽
-        type: getType(plan.plan_type), // 类型： SSD / DEDICATED
-        price: parseFloat(plan.price_per_month), // 每月收费 小时费用得自己算
-        regions: plan.available_locations // 适用地区
-      };
-    };
-
-    const plans: Plan[] = [];
-    for (const id of Object.keys(data)) {
-      const plan = data[id];
-      plans.push(convert(parseInt(id), plan));
-    }
-    for (const id of Object.keys(baremetal)) {
-      const plan = baremetal[id];
-      plan.plan_type = 'baremetal';
-      plans.push(convert(parseInt(id), plan));
-    }
-    return plans;
-  }
-
-  async images(): Promise<SystemImage[]> {
-    const images: SystemImage[] = [];
-
-    const { data: oslist } = await this.request.get('/os/list');
-    for (const vid of Object.keys(oslist)) {
-      const version = oslist[vid];
-      if (['iso', 'snapshot', 'backup', 'application'].some(val => val === version.family)) {
-        continue;
-      }
-      const image = getImage('os', version.family, images);
-      image.versions!.push({
-        id: parseInt(vid),
-        name: version.name
-          .replace(image.name, '')
-          .replace('(jessie)', '')
-          .replace('(stretch)', '')
-          .trim(),
-        arch: version.arch
-      });
-    }
-
-    // const { data: applist } = await this.request.get('https://api.vultr.com/os/list');
-    // for (const vid of Object.keys(applist)) {
-    //   const version = applist[vid];
-
-    //   const imageName = version.short_name.includes('pleskonyx') ? 'Plesk Onyx' : version.short_name;
-    //   const name = version.deploy_name;
-    //   if (imageName === 'Plesk Onyx') {
-
-    //   }
-
-    //   const image = getImage('app', imageName, images);
-    //   image.versions.push({
-    //     id: parseInt(vid),
-    //     name: version.name.replace(image.name, '').replace('(jessie)', '').replace('(stretch)', '').trim(),
-    //     arch: version.arch
-    //   });
-    // }
-    return images;
-  }
-
   async deploy(
     hostname: string,
     bundle: IBundle,
@@ -640,11 +505,38 @@ export class VultrAgent implements Agent {
         })
       );
       console.log('instance reinstall', data);
+    },
+    enableBackups: async (id: string): Promise<void> => {
+      await this.request.post('/server/backup_enable', querystring.stringify({ SUBID: id }));
+    },
+    disableBackups: async (id: string): Promise<void> => {
+      await this.request.post('/server/backup_disable', querystring.stringify({ SUBID: id }));
+    },
+    restoreBackup: async (id: string, backup: string): Promise<void> => {
+      await this.request.post('/server/restore_backup', querystring.stringify({ SUBID: id, BACKUPID: backup }));
+    },
+    getBackupSchedule: async (id: string): Promise<BackupSchedule> => {
+      const { data } = await this.request.post('/server/backup_get_schedule', querystring.stringify({ SUBID: id }));
+      return {
+        ...data,
+        cronType: data.cron_type,
+        nextScheduledTimeUtc: data.next_scheduled_time_utc
+      };
+    },
+    setBackupSchedule: async (id: string, { cronType, ...schedule }: BackupSchedule): Promise<void> => {
+      await this.request.post(
+        '/server/backup_set_schedule',
+        querystring.stringify({
+          SUBID: id,
+          ...schedule,
+          cron_type: cronType
+        })
+      );
     }
   };
   snapshot = {
     list: async (id?: string): Promise<Snapshot[]> => {
-      const { data: snapshots } = await this.request.get('/snapshot/list');
+      const { data: snapshots } = await this.request.get('/snapshot/list?' + querystring.stringify({ SUBID: id }));
       return Object.keys(snapshots).map((key: string) => {
         const item: any = snapshots[key];
         const size = format.fileSize(parseInt(item.size), 'bytes', {
@@ -670,10 +562,29 @@ export class VultrAgent implements Agent {
       return SNAPSHOTID;
     },
     delete: async (id: string): Promise<void> => {
-      await this.request.post('/snapshot/destroy', querystring.stringify({ SNAPSHOTID: id}));
+      await this.request.post('/snapshot/destroy', querystring.stringify({ SNAPSHOTID: id }));
     },
     restore: async (id: string, snapshot: string): Promise<void> => {
       await this.request.post('/server/restore_snapshot', querystring.stringify({ SUBID: id, SNAPSHOTID: snapshot }));
+    }
+  };
+  backup = {
+    list: async (id?: string): Promise<Backup[]> => {
+      const { data: backups } = await this.request.get('/backup/list');
+      return Object.keys(backups).map(key => {
+        const item = backups[key];
+        return {
+          ...item,
+          id: item.id,
+          status: item.status,
+          name: item.description,
+          size: format.fileSize(parseInt(item.size), 'bytes', {
+            finalUnit: 'MB',
+            mode: 'hide'
+          }),
+          createdAt: moment(item.date_created).toDate()
+        };
+      });
     }
   };
 }

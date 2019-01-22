@@ -57,6 +57,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
   componentDidMount() {
     this.analytics = firebase.analytics();
     this.analytics.setCurrentScreen('Servers', 'Instances.tsx');
+    // this.props.navigation.navigate('VULTR_Backup');
   }
   handleRefresh = async (display: boolean = true) => {
     this.analytics!.logEvent('Refresh');
