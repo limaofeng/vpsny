@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
 
+import CheckBox from './CheckBox';
 import { Icon } from './Item';
 import SubmitButton from './SubmitButton';
 import Theme, { withTheme } from './Theme';
@@ -28,6 +29,7 @@ interface OperationConfirmState {
   loadingText?: string;
   okText: string;
   cancelText: string;
+  doubleConfirmText?: string;
   onSave?: () => Promise<void>;
 }
 
@@ -36,10 +38,11 @@ export interface Options {
   onSave?: () => Promise<void>;
   cancelText?: string;
   loadingText?: string;
+  doubleConfirmText?: string;
   additions?: React.ReactElement<any>;
 }
 
-export class OperationConfirm extends React.Component<OperationConfirmProps, OperationConfirmState> {
+export class OperationConfirm extends React.PureComponent<OperationConfirmProps, OperationConfirmState> {
   static init = {
     visible: false,
     title: '',
@@ -48,10 +51,12 @@ export class OperationConfirm extends React.Component<OperationConfirmProps, Ope
     cancelText: 'Cancel',
     action: undefined,
     loading: false,
-    loadingText: undefined,
+    doubleConfirmText: '',
+    loadingText: undefined
   };
   additions?: React.ReactElement<any>;
   timer?: NodeJS.Timer;
+  submit = React.createRef<any>();
   constructor(props: OperationConfirmProps) {
     super(props);
     this.state = { ...OperationConfirm.init, level: 'info' };
@@ -107,8 +112,16 @@ export class OperationConfirm extends React.Component<OperationConfirmProps, Ope
   private handleOk = async () => {
     const { onSave } = this.state;
     this.setState({ action: 'ok' });
-    onSave && await onSave();
+    onSave && (await onSave());
     this.close();
+  };
+
+  handleDoubleConfirm = (enable: boolean) => {
+    if (enable) {
+      this.submit.current!.enable();
+    } else {
+      this.submit.current!.disable();
+    }
   };
 
   private handleCancel = () => {
@@ -118,9 +131,29 @@ export class OperationConfirm extends React.Component<OperationConfirmProps, Ope
 
   render() {
     const { colors, fonts } = this.props.theme as Theme;
-    const { visible, cancelText, loadingText, level, okText } = this.state;
+    const { visible, cancelText, loadingText, level, okText, doubleConfirmText } = this.state;
     const { title, message, titleStyle, messageStyle } = this.props;
-    const primaryColor = level === 'warn' ? colors.colorful.red : colors.primary;
+
+    const defaultStyle: {
+      title?: any;
+      submit?: {
+        enable: any;
+        disable: any;
+      };
+    } = {};
+    if (level === 'warn') {
+      defaultStyle.title = { color: colors.colorful.red };
+      defaultStyle.submit = {
+        enable: { backgroundColor: colors.colorful.red },
+        disable: { backgroundColor: '#d9534f', opacity: 0.5 }
+      };
+    } else {
+      defaultStyle.title = { color: colors.primary };
+      defaultStyle.submit = {
+        enable: { backgroundColor: colors.primary },
+        disable: { opacity: 0.5 }
+      };
+    }
     return (
       <Modal backdropOpacity={0.2} isVisible={visible}>
         <View style={styles.layout}>
@@ -129,14 +162,14 @@ export class OperationConfirm extends React.Component<OperationConfirmProps, Ope
               <Icon
                 type={level === 'warn' ? 'MaterialCommunityIcons' : 'MaterialIcons'}
                 name={level === 'warn' ? 'alert-circle-outline' : 'info-outline'}
-                color={primaryColor}
+                color={defaultStyle.title.color}
                 size={18}
               />
               <Text
                 style={[
                   styles.title,
                   {
-                    color: primaryColor
+                    color: defaultStyle.title.color
                   },
                   titleStyle,
                   fonts.title
@@ -158,11 +191,25 @@ export class OperationConfirm extends React.Component<OperationConfirmProps, Ope
             >
               {this.state.message || message}
             </Text>
+            {doubleConfirmText && (
+              <CheckBox
+                onChange={this.handleDoubleConfirm}
+                style={{ paddingTop: 10, height: 30 }}
+                label={doubleConfirmText}
+              />
+            )}
             <View style={{ marginTop: 5 }}>
               <SubmitButton
-                style={{ marginTop: 10, backgroundColor: primaryColor }}
+                ref={this.submit}
+                style={[{ marginTop: 10 }, defaultStyle.submit.enable]}
                 onSubmit={this.handleOk}
                 title={okText}
+                disabled={!!doubleConfirmText}
+                buttonStyle={{ fontWeight: 'normal' }}
+                doneText={okText}
+                disabledStyle={{
+                  style: defaultStyle.submit.disable
+                }}
                 submittingText={loadingText as string}
               />
               <TouchableOpacity onPress={this.handleCancel} style={{ marginTop: 10 }}>

@@ -1,13 +1,13 @@
 import { IBlueprint, IBundle, IRegion } from '@modules/database/type';
-import { md5 } from '@utils';
-import { Snapshot } from 'aws-sdk/clients/directoryservice';
+import { md5, metric } from '@utils';
 import axios, { AxiosInstance } from 'axios';
 import { DigitalOcean } from 'dots-wrapper';
 import { IDroplet } from 'dots-wrapper/dist/common/interfaces';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
-import { Agent, APIKey, Bill, User } from '../../Agent';
+import { Agent, APIKey, Bill, User, Snapshot, Backup } from '../../Agent';
 import { Features, Instance, SSHKey } from '../../Provider';
+import Message from '../../../../utils/Message';
+import moment = require('moment');
 
 const statusMappings: { [key: string]: string } = { new: 'Installing', active: 'Running', off: 'Stopped' };
 
@@ -106,30 +106,22 @@ export class DigitalOceanAgent implements Agent {
         'Content-Type': 'application/json; charset=utf-8'
       }
     });
-    this.request.interceptors.request.use(
-      async config => {
-        const metric = firebase
-          .perf()
-          .newHttpMetric(config.baseURL + config.url!, config.method!.toUpperCase() as RNFirebase.perf.HttpMethod);
-        await metric.start();
-        const store = config as any;
-        store.metric = metric;
-        return config;
-      },
-      error => {
-        return Promise.reject(error);
-      }
-    );
+    metric(this.request);
     this.request.interceptors.response.use(
-      async response => {
-        const store = response.config as any;
-        const metric: RNFirebase.perf.HttpMetric = store.metric;
-        await metric.setHttpResponseCode(response.status);
-        await metric.setResponseContentType(response.headers['content-type']);
-        await metric.stop();
+      response => {
+        const {
+          config,
+          data: { error, message, additionalErrorInfo }
+        } = response;
+        if (error && !config.url!.endsWith('errorignore')) {
+          console.warn(error, message, additionalErrorInfo);
+          Message.error(message + '\r\n' + additionalErrorInfo);
+        }
         return response;
       },
       error => {
+        console.warn(error);
+        Message.error(error.message);
         return Promise.reject(error);
       }
     );
@@ -193,6 +185,7 @@ export class DigitalOceanAgent implements Agent {
     return { doid: parseInt(doid) };
   }
   instance = {
+    track: async (id: string, status: string) => {},
     list: async (): Promise<Instance[]> => {
       const pager = await this.digitalOcean.Droplet.list(1, 100).toPromise();
       return pager.items.map(data => parseInstance(data, this.id));
@@ -248,12 +241,48 @@ export class DigitalOceanAgent implements Agent {
     }
   };
   snapshot = {
-    list: async (): Promise<Snapshot[]> => {
+    list: async (id?: string): Promise<Snapshot[]> => {
+      const { doid } = this.parseId(id!);
+      const {
+        data: { snapshots }
+      } = await this.request.get(`/droplets/${doid}/snapshots?per_page=100`);
+      return snapshots.map((item: any) => ({
+        id: String(item.id),
+        name: item.name,
+        size: item.size_gigabytes * 1024,
+        os: item.distribution,
+        regions: item.regions,
+        createdAt: moment(item.created_at).toDate()
+      }));
+    },
+    create: async (id: string, name: string): Promise<Snapshot | string> => {
+      const { doid } = this.parseId(id!);
+      const {
+        data: { action }
+      } = await this.request.post(`/droplets/${doid}/actions`, {
+        type: 'snapshot',
+        name
+      });
+      console.log(action);
+      return '';
+    },
+    restore: async (id: string): Promise<void> => {
+      const { doid } = this.parseId(id!);
+      const {
+        data: { action }
+      } = await this.request.post(`/droplets/${doid}/actions`, {
+        type: 'restore',
+        image: id
+      });
+      console.log(action);
+    },
+    delete: async (id: string): Promise<void> => {
+      await this.request.delete(`/snapshots/${id}`);
+    }
+  };
+  backup = {
+    list: async (id?: string): Promise<Backup[]> => {
       return [];
-    },
-    create: async (): Promise<Snapshot> => {
-      return {};
-    },
-    destroy: async (id: string): Promise<void> => {}
+    }
   };
 }

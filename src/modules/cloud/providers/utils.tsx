@@ -13,3 +13,14 @@ export function getTip(data: Instance, theme: Theme) {
     </View>
   );
 }
+
+export function getObjectInformation(object: string, name: string, theme: Theme) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <Text style={[{ color: theme.colors.secondary }, theme.fonts.headline]}>{object}:</Text>
+      <Text style={[{ color: theme.colors.major, fontWeight: 'bold', marginLeft: 4 }, theme.fonts.footnote]}>
+        {name}
+      </Text>
+    </View>
+  );
+}

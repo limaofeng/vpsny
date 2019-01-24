@@ -80,6 +80,7 @@ export interface IconProps {
   color?: string;
   size?: number;
   style?: StyleProp<TextStyle>;
+  onPress?: () => void;
 }
 
 function getIcon(name: string): any {
@@ -109,7 +110,7 @@ export class Icon extends React.Component<IconProps> {
   render() {
     const VectorIcon = getIcon(this.props.type as string);
     const { name, color, size, style } = this.props;
-    return <VectorIcon name={name} color={color} size={size} style={[{ textAlign: 'center' }, style]} />;
+    return <VectorIcon onPress={this.props.onPress} name={name} color={color} size={size} style={[{ textAlign: 'center' }, style]} />;
   }
 }
 

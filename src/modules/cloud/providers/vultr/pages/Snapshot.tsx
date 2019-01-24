@@ -1,5 +1,4 @@
 import {
-  HeaderRight,
   Icon,
   Input,
   Item,
@@ -8,17 +7,19 @@ import {
   Label,
   List,
   Note,
+  SubmitButton,
+  OperationConfirm,
+  OperationConfirmType,
   Theme,
-  withTheme,
-  SubmitButton
+  withTheme
 } from '@components';
 import { AppState } from '@modules';
 import { getApi } from '@modules/cloud';
 import { Snapshot } from '@modules/cloud/Agent';
-import BandwagonHostAgent from '@modules/cloud/agents/BandwagonHostAgent';
 import OSLogo from '@modules/cloud/components/OSLogo';
 import { Instance } from '@modules/cloud/Provider';
-import { format } from '@utils';
+import { format, sleep } from '@utils';
+import moment = require('moment');
 import React from 'react';
 import { Alert, RefreshControl, StyleSheet, SwipeableFlatList, Text, TouchableOpacity, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
@@ -26,16 +27,18 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import Message from '../../../../../utils/Message';
+import { VultrAgent } from '../VultrAgent';
+import { IBlueprint } from '@modules/database/type';
+import { getObjectInformation } from '../../utils';
 
 interface SnapshotListProps {
   navigation: NavigationScreenProp<any>;
   refresh: () => Promise<any>;
-  instance: Instance;
+  server: Instance;
+  getBlueprint: (snapshot: Snapshot) => IBlueprint;
   createSnapshot: (name: string) => Promise<string>;
   deleteSnapshot: (id: string) => Promise<void>;
   restoreSnapshot: (id: string) => Promise<void>;
-  stickySnapshot: (id: string, sticky: boolean) => Promise<void>;
   theme: Theme;
 }
 
@@ -47,6 +50,7 @@ interface SnapshotListState {
 }
 
 class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState> {
+  confirm = React.createRef<OperationConfirmType>();
   static navigationOptions: NavigationScreenOptions = {
     title: 'Snapshots',
     headerBackTitle: ' ',
@@ -59,7 +63,7 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
     this.state = {
       refreshing: false,
       value: '',
-      name: `${props.instance.name}-${Date.now()}`,
+      name: `${props.server.name}-${Date.now()}`,
       snapshots: []
     };
   }
@@ -69,16 +73,15 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
     this.analytics.setCurrentScreen('BWG/Snapshot', 'BWG/Snapshot.tsx');
   }
 
-  handleGoToBindHost = () => {
-    const { navigation } = this.props;
-    navigation.navigate('Deploy');
-  };
-
   handleRefresh = async () => {
-    const { refresh } = this.props;
-    this.setState({ refreshing: true });
-    const { snapshots } = await refresh();
-    this.setState({ snapshots, refreshing: false });
+    try {
+      const { refresh } = this.props;
+      this.setState({ refreshing: true });
+      const { snapshots } = await refresh();
+      this.setState({ snapshots, refreshing: false });
+    } catch (e) {
+      this.setState({ refreshing: false });
+    }
   };
 
   handleChange = async (value: any) => {
@@ -91,64 +94,63 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
 
   handleSubmit = async () => {
     const { createSnapshot } = this.props;
-    const email = await createSnapshot(this.state.name);
+    await createSnapshot(this.state.name);
     this.submit.current!.reset();
-    this.setState({ name: `${this.props.instance.name}-${Date.now()}` });
-    Alert.alert(
-      'Snapshot creation in progress',
-      `Once created, an email notification will be sent to the following address: ${email}.`
-    );
+    this.setState({ name: `${this.props.server.name}-${Date.now()}` });
+    this.handleRefresh();
+    // Alert.alert('Snapshot creation in progress', `Snapshot takes some time, please wait a moment to refresh .`);
   };
 
   handleRestoreSnapshot = (item: Snapshot) => async () => {
     const { restoreSnapshot } = this.props;
-    Alert.alert('Restore snapshot ?', `This action will overwrite all data on the VPS.`, [
-      { text: 'Cancel' },
+    await this.confirm.current!.open(
+      'warn',
+      'Restore Snapshot?',
+      'Are you sure you want to restore this snapshot? Any data currently on this machine will be overwritten.',
       {
-        text: 'I agree',
-        onPress: async () => {
+        additions: getObjectInformation('Snapshot', item.name, this.props.theme),
+        doubleConfirmText: 'Yes, restore snapshot on this server.',
+        okText: 'Restore Snapshot',
+        loadingText: 'Storing Snapshot',
+        onSave: async () => {
           await restoreSnapshot(item.id);
-          await this.handleRefresh();
+          this.handleRefresh();
         }
       }
-    ]);
-  };
-
-  handleStickySnapshot = (item: Snapshot) => async () => {
-    const { stickySnapshot } = this.props;
-    await stickySnapshot(item.id, !item.sticky);
-    if (!item.sticky) {
-      Message.success('Snapshot has been successfully set sticky. Automatic expiration set to never expire.');
-    } else {
-      Message.success('Snapshot has been successfully set not sticky. Automatic expiration has been enabled.');
-    }
-    await this.handleRefresh();
+    );
   };
 
   handleDeleteSnapshot = (item: Snapshot) => async () => {
     const { deleteSnapshot } = this.props;
-    Alert.alert('Remove Snapshot ?', `Are you sure delete ${item.name}`, [
-      { text: 'Cancel' },
+    await this.confirm.current!.open(
+      'info',
+      'Delete Snapshot?',
+      'Are you sure you want to delete this snapshot? This operation cannot be undone.',
       {
-        text: 'Ok',
-        onPress: async () => {
+        additions: getObjectInformation('Snapshot', item.name, this.props.theme),
+        okText: 'Delete Snapshot',
+        loadingText: 'Deleting Snapshot',
+        onSave: async () => {
           await deleteSnapshot(item.id);
-          await this.handleRefresh();
+          this.handleRefresh();
         }
       }
-    ]);
+    );
   };
 
   render() {
-    const { colors, fonts } = this.props.theme as Theme;
+    const { colors } = this.props.theme as Theme;
     const { refreshing, snapshots, name } = this.state;
 
     return (
       <SafeAreaView style={[styles.container, {}]} forceInset={{ bottom: 'never' }}>
+        <OperationConfirm ref={this.confirm} />
         <SwipeableFlatList
           data={snapshots}
           bounceFirstRowOnMount={true}
-          maxSwipeDistance={240}
+          maxSwipeDistance={({ item }: { item: Snapshot }) => {
+            return item.status === 'pending' ? 0 : 160;
+          }}
           ListHeaderComponent={
             <>
               <List style={{ marginTop: 13 }} title="Create new snapshot">
@@ -185,39 +187,38 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
 
   renderItem = ({ item, index }: { item: Snapshot; index: number }) => {
     const { colors, fonts } = this.props.theme as Theme;
+    const { getBlueprint } = this.props;
+    const statusColor = item.status === 'pending' ? colors.colorful.geraldine : colors.colorful.green;
     return (
-      <Item size={120} key={item.md5} last={index === this.state.snapshots.length - 1} value={item}>
+      <Item size={85} key={item.md5} last={index === this.state.snapshots.length - 1} value={item}>
         <ItemBody style={{ paddingRight: 15, paddingVertical: 10 }}>
           <View style={{ flex: 1 }}>
             <View style={{ position: 'absolute', right: 12, bottom: 5 }}>
-              <OSLogo name={item.os} size={45} />
+              <OSLogo name={getBlueprint(item).family} size={45} />
+              {/*<Label style={{ width: 'auto' }}>{item.os}</Label>*/}
             </View>
-            <View style={{ height: 35, flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={[fonts.callout, { flex: 1, color: colors.major }]}>{item.name}</Text>
+            <View style={{ height: 25, flexDirection: 'row', alignItems: 'center' }}>
+              <Icon type="FontAwesome" name="circle" color={statusColor} size={10} />
               <Text
-                style={[
-                  { color: colors.secondary },
-                  item.sticky ? fonts.footnote : fonts.subhead,
-                  item.sticky ? { color: colors.colorful.green, fontWeight: 'bold' } : {}
-                ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={[fonts.callout, { paddingLeft: 5, flex: 1, color: colors.major }]}
               >
-                {item.sticky ? (
-                  <>Sticky, never expires</>
-                ) : (
-                  <>Expires in {parseInt(String(item.expires! / 60 / 60 / 24))} days</>
-                )}
+                {item.name}
               </Text>
             </View>
-            <View style={{ height: 20, justifyContent: 'center' }}>
-              <Label style={{ width: 'auto' }}>{item.os}</Label>
-            </View>
-            <View style={{ height: 20, justifyContent: 'center' }}>
+            <View style={{ height: 20, alignItems: 'center', flexDirection: 'row' }}>
+              <Label style={{ width: 'auto', marginRight: 3 }}>Size: {format.fileSize(item.size, 'MB')},</Label>
               <Label style={{ width: 'auto' }}>
-                size: {format.fileSize(item.size, 'MB')}, uncompressed: {format.fileSize(item.uncompressed!, 'MB')}
+                Status:
+                <Note style={[{ color: statusColor }, fonts.subhead]}>
+                  {' '}
+                  {item.status === 'pending' ? 'snapshot in progress' : 'Available'}
+                </Note>
               </Label>
             </View>
             <View style={{ height: 20, justifyContent: 'center' }}>
-              <Note style={[fonts.footnote]}>MD5: {item.md5}</Note>
+              <Note style={[fonts.footnote]}>Created: {moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}</Note>
             </View>
           </View>
         </ItemBody>
@@ -226,6 +227,9 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
   };
   renderQuickActions = ({ item }: { item: Snapshot }) => {
     const { colors } = this.props.theme as Theme;
+    if (item.status === 'pending') {
+      return <></>;
+    }
     return (
       <View style={[styles.actionsContainer, {}]}>
         <TouchableOpacity
@@ -233,17 +237,6 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
           onPress={this.handleRestoreSnapshot(item)}
         >
           <Icon type="MaterialIcons" name="restore" color={colors.backgroundColorDeeper} size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.colorful.orange }]}
-          onPress={this.handleStickySnapshot(item)}
-        >
-          <Icon
-            type="Ionicons"
-            name={item.sticky ? 'ios-unlock' : 'ios-lock'}
-            color={colors.backgroundColorDeeper}
-            size={24}
-          />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: colors.colorful.red }]}
@@ -288,18 +281,25 @@ const styles = StyleSheet.create({
   actionButton: {
     padding: 10,
     width: 80,
-    height: 120,
+    height: 85,
     justifyContent: 'center'
   }
 });
 
-const mapStateToProps = (state: AppState, { navigation }: SnapshotListProps) => {
-  return {};
+const mapStateToProps = ({ database: { blueprints } }: AppState, { navigation }: SnapshotListProps) => {
+  const blueprintForVultr = blueprints.filter(blueprint => blueprint.provider === 'vultr');
+  return {
+    getBlueprint(item: Snapshot) {
+      return blueprintForVultr.find(blueprint => {
+        return item.os == blueprint.id;
+      });
+    }
+  };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch, { navigation }: SnapshotListProps) => {
   const value = navigation.getParam('value') as Instance;
-  const api = getApi(value.account) as BandwagonHostAgent;
+  const api = getApi(value.account) as VultrAgent;
   return {
     async refresh() {
       const data = await api.snapshot.list(value.id);
@@ -313,12 +313,9 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: SnapshotListProp
       await api.snapshot.delete(id);
     },
     async restoreSnapshot(id: string) {
-      await api.snapshot.restore(id);
+      await api.snapshot.restore(value.id, id);
     },
-    async stickySnapshot(id: string, sticky: boolean) {
-      await api.snapshot.sticky(id, sticky);
-    },
-    instance: value
+    server: value
   };
 };
 

@@ -38,20 +38,6 @@ class DigitalOceanView extends React.Component<DigitalOceanViewProps, DigitalOce
             <Note>{account.email}</Note>
           </Item>
         </List>
-        <List title="Billing">
-          <Item>
-            <Label>Balance</Label>
-            <Note>${format.number(account.bill!.balance, '0.00')}</Note>
-          </Item>
-          <Item>
-            <Label>This Month</Label>
-            <Note>${format.number(account.bill!.pendingCharges, '0.00')}</Note>
-          </Item>
-          <Item>
-            <Label>Remaining</Label>
-            <Note>${format.number(account.bill!.balance - account.bill!.pendingCharges, '0.00')}</Note>
-          </Item>
-        </List>
       </>
     );
   }

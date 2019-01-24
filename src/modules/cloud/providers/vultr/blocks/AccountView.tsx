@@ -1,7 +1,7 @@
 import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
 import { Account } from '@modules/cloud/type';
 import React from 'react';
-import { VultrAPIKey } from '@modules/cloud/VultrProvider';
+import { VultrAPIKey } from '@modules/cloud/providers/vultr/VultrAgent';
 import { format } from '@utils';
 
 interface VultrViewProps {

@@ -9,7 +9,7 @@ import { setApi } from '../../..';
 import SubmitButtonWrapper, { SubmitButton } from '../../../../../components/SubmitButton';
 import { User, Bill } from '../../../Agent';
 import { Account } from '../../../type';
-import { VultrAPIKey, VultrAgent } from '@modules/cloud/VultrProvider';
+import { VultrAPIKey, VultrAgent } from '@modules/cloud/providers/vultr/VultrAgent';
 import { format } from '@utils';
 
 interface VultrNewProps {

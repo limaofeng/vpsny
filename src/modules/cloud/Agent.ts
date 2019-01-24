@@ -48,12 +48,14 @@ export interface Snapshot {
   os: string;
   name: string;
   size: number;
-  uncompressed: number;
-  md5: string;
-  sticky: boolean;
-  expires: number;
+  uncompressed?: number;
+  md5?: string;
+  sticky?: boolean;
+  expires?: number;
   fileName?: string;
   downloadLink?: string;
+  createdAt?: Date;
+  status?: 'complete' | 'pending';
   [key: string]: any;
 }
 
@@ -114,8 +116,8 @@ export interface Agent {
      * 追踪 VPS 状态的方法
      * @param id ID
      * @param status 期望状态
-     */
     track(id: string, status: string): Promise<void>;
+    */
   };
   snapshot: {
     list(id?: string): Promise<Snapshot[]>;

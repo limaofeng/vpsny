@@ -25,10 +25,7 @@ function handlePlaceholder(placeholder: SelectItem) {
 
 function getSelectedItem({ items, key, value }: { items: SelectItem[]; key?: string | number; value: any }) {
   let idx = items.findIndex(item => {
-    if (item.key && key) {
-      return isEqual(item.key, key);
-    }
-    return isEqual(item.value, value);
+    return isEqual(item, value);
   });
   if (idx === -1) {
     idx = 0;
@@ -85,7 +82,10 @@ interface RNPickerSelectState {
     label: string;
     value: any;
   };
-  items: SelectItem[];
+  tempItem: {
+    label: string;
+    value: any;
+  };
   showPicker: boolean;
   animationType?: 'none' | 'slide' | 'fade';
   value?: SelectItem;
@@ -113,31 +113,24 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
   };
   inputRef?: TextInput;
   static getDerivedStateFromProps(nextProps: RNPickerSelectProps, prevState: RNPickerSelectState) {
-    const itemsChanged = !isEqual(prevState.items, nextProps.items);
     const newItems = nextProps.items;
     const { selectedItem, idx } = getSelectedItem({
       items: newItems,
       key: nextProps.itemKey,
       value: nextProps.value
     });
-    const selectedItemChanged = !isEqual(nextProps.value, undefined) && !isEqual(prevState.selectedItem, selectedItem);
-
-    if (itemsChanged || selectedItemChanged) {
-      if (selectedItemChanged) {
-        nextProps.onValueChange(selectedItem.value, idx);
-      }
+    const tempItem = selectedItem;
+    if (isEqual(prevState.selectedItem, prevState.tempItem)) {
       return {
-        items: itemsChanged ? newItems : prevState.items,
-        selectedItem: selectedItemChanged ? selectedItem : prevState.selectedItem
+        selectedItem: tempItem,
+        tempItem
       };
     }
-
     return null;
   }
 
   constructor(props: RNPickerSelectProps) {
     super(props);
-
     const items = props.items;
     const { selectedItem } = getSelectedItem({
       items,
@@ -145,8 +138,8 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
       value: props.value || props.defaultValue
     });
     this.state = {
-      items,
       selectedItem,
+      tempItem: selectedItem,
       showPicker: false,
       animationType: undefined,
       value: props.value || props.defaultValue
@@ -156,17 +149,24 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
   }
 
   handleValueChange = (value: any, index: number) => {
-    this.setState({
-      selectedItem: this.state.items[index]
-    });
+    const selectedItem = this.props.items[index];
+    if (this.props.hideDoneBar) {
+      this.setState({
+        selectedItem
+      });
+      this.props.onValueChange(selectedItem, index);
+    } else {
+      this.setState({ tempItem: selectedItem });
+    }
   };
 
   onValueChange = () => {
-    const { selectedItem, items } = this.state;
-    const index = items.findIndex(item => item.value === selectedItem.value);
-    this.props.onValueChange(items[index].value, index);
+    const { tempItem } = this.state;
+    const selectedItem = tempItem;
+    const index = this.props.items.findIndex(item => item.value === selectedItem.value);
+    this.props.onValueChange(this.props.items[index].value, index);
     this.togglePicker(true);
-    this.setState({ value: items[index] });
+    this.setState({ value: this.props.items[index] });
   };
 
   handleCancel = () => {
@@ -202,7 +202,7 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
   }
 
   renderPickerItems() {
-    return this.state.items.map(item => {
+    return this.props.items.map(item => {
       return <Picker.Item label={item.label} value={item.value} key={item.key || item.label} color={item.color} />;
     });
   }
@@ -308,7 +308,7 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
                 } as any
               }
               onValueChange={this.handleValueChange}
-              selectedValue={this.state.selectedItem.value}
+              selectedValue={this.state.tempItem.value}
               testID="RNPickerSelectIOS"
             >
               {this.renderPickerItems()}
@@ -348,7 +348,7 @@ export default class RNPickerSelect extends React.PureComponent<RNPickerSelectPr
         <Picker
           style={[this.props.hideIcon ? { backgroundColor: 'transparent' } : {}, style.input]}
           onValueChange={this.onValueChange}
-          selectedValue={this.state.selectedItem.value}
+          selectedValue={this.state.tempItem.value}
           testID="RNPickerSelectAndroid"
           mode={this.props.mode}
           enabled={!this.props.disabled}
