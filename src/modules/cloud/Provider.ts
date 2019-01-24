@@ -215,6 +215,7 @@ export type Location = {
    * 关联地区编码
    */
   region: string;
+  [key: string]: any;
 };
 
 export type Disk = {

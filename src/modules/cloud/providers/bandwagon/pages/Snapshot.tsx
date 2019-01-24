@@ -1,17 +1,4 @@
-import {
-  HeaderRight,
-  Icon,
-  Input,
-  Item,
-  ItemBody,
-  ItemDivider,
-  Label,
-  List,
-  Note,
-  Theme,
-  withTheme,
-  SubmitButton
-} from '@components';
+import { Icon, Input, Item, ItemBody, ItemDivider, Label, List, Note, SubmitButton, Theme, withTheme } from '@components';
 import { AppState } from '@modules';
 import { getApi } from '@modules/cloud';
 import { Snapshot } from '@modules/cloud/Agent';
