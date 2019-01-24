@@ -13,7 +13,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		1DD03527AC6C867D04320518 /* libPods-vpsny.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B925F31AA0C73EDACCE3D09B /* libPods-vpsny.a */; };
 		BF1A7869205614C3007D27CA /* vpsny-icons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF1A7868205614C3007D27CA /* vpsny-icons.ttf */; };
-		BFD23F112180B22E00594CBB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFD23F102180B22E00594CBB /* GoogleService-Info.plist */; };
+		BF8219F721FA41E900B25481 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = BF8219F921FA41E900B25481 /* InfoPlist.strings */; };
+		BFD23F112180B22E00594CBB /* vpsny/GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BFD23F102180B22E00594CBB /* vpsny/GoogleService-Info.plist */; };
 		BFD3DC6A200F4C6100ED2CDD /* vpsnyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC69200F4C6100ED2CDD /* vpsnyUITests.swift */; };
 		BFD3DC72200F4DC900ED2CDD /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD3DC71200F4DC900ED2CDD /* SnapshotHelper.swift */; };
 		BFE219752144EF8400578B45 /* Aldrichregular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BFE219742144EF8400578B45 /* Aldrichregular.ttf */; };
@@ -37,7 +38,7 @@
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		0DB4A2AD00FE9528C2EB7D29 /* Pods-vpsny.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpsny.release.xcconfig"; path = "Pods/Target Support Files/Pods-vpsny/Pods-vpsny.release.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* vpsny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vpsny.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* vpsny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = vpsny.app; path = VPSNY.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = vpsny/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = vpsny/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -46,7 +47,10 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = vpsny/main.m; sourceTree = "<group>"; };
 		B925F31AA0C73EDACCE3D09B /* libPods-vpsny.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-vpsny.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF1A7868205614C3007D27CA /* vpsny-icons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "vpsny-icons.ttf"; sourceTree = "<group>"; };
-		BFD23F102180B22E00594CBB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vpsny/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		BF8219F821FA41E900B25481 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		BF8219FA21FA425000B25481 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		BF8219FC21FA46B000B25481 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		BFD23F102180B22E00594CBB /* vpsny/GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "vpsny/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BFD3DC67200F4C6100ED2CDD /* vpsnyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vpsnyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFD3DC69200F4C6100ED2CDD /* vpsnyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = vpsnyUITests.swift; sourceTree = "<group>"; };
 		BFD3DC6B200F4C6100ED2CDD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -83,13 +87,14 @@
 		13B07FAE1A68108700A75B9A /* vpsny */ = {
 			isa = PBXGroup;
 			children = (
+				BF8219F221FA416000B25481 /* Supporting Files */,
 				BF55D4862054108C009E59DC /* Fonts */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				BFD23F102180B22E00594CBB /* GoogleService-Info.plist */,
+				BFD23F102180B22E00594CBB /* vpsny/GoogleService-Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				BFF5048A2173600A005E8B84 /* RNAudio.m */,
@@ -158,6 +163,14 @@
 				BF1A7868205614C3007D27CA /* vpsny-icons.ttf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		BF8219F221FA416000B25481 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BF8219F921FA41E900B25481 /* InfoPlist.strings */,
+			);
+			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		BFD36F3C20529F8B00EA10AD /* Recovered References */ = {
@@ -249,6 +262,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -267,8 +281,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				BF8219F721FA41E900B25481 /* InfoPlist.strings in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				BFD23F112180B22E00594CBB /* GoogleService-Info.plist in Resources */,
+				BFD23F112180B22E00594CBB /* vpsny/GoogleService-Info.plist in Resources */,
 				BF1A7869205614C3007D27CA /* vpsny-icons.ttf in Resources */,
 				BFE219752144EF8400578B45 /* Aldrichregular.ttf in Resources */,
 			);
@@ -417,9 +432,19 @@
 			isa = PBXVariantGroup;
 			children = (
 				13B07FB21A68108700A75B9A /* Base */,
+				BF8219FA21FA425000B25481 /* zh-Hans */,
 			);
 			name = LaunchScreen.xib;
 			path = vpsny;
+			sourceTree = "<group>";
+		};
+		BF8219F921FA41E900B25481 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BF8219F821FA41E900B25481 /* en */,
+				BF8219FC21FA46B000B25481 /* zh-Hans */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -496,6 +521,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -551,6 +577,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
