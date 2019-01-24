@@ -103,7 +103,7 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
 
   randerSimple = () => {
     const { colors, fonts } = this.props.theme as Theme;
-    const { doneText, style, buttonStyle, spinnerSize, disabledStyle, testID } = this.props;
+    const { doneText, style, spinnerSize, disabledStyle, testID } = this.props;
     const { submitting, done, submittingText, disabled, title } = this.state;
     return (
       <TouchableOpacity
@@ -111,12 +111,7 @@ export class SubmitButton extends React.Component<SubmitButtonProps, SubmitButto
         onPress={this.handleSubmit}
         testID={testID}
         accessibilityTraits="button"
-        style={[
-          { flex: 1, alignItems: 'center' },
-          style,
-          { backgroundColor: disabled ? colors.trivial : colors.primary },
-          disabled ? disabledStyle!.style : {}
-        ]}
+        style={[{ flex: 1, alignItems: 'center' }, style, disabled ? disabledStyle!.style : {}]}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Spinner

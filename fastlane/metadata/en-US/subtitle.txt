@@ -1,1 +1,1 @@
-Easy to use VPS manager, support multi-service provider and multiple accounts
+Easy to use VPS manager

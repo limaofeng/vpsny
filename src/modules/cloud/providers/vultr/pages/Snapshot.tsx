@@ -30,6 +30,7 @@ import { Dispatch } from 'redux';
 import { VultrAgent } from '../VultrAgent';
 import { IBlueprint } from '@modules/database/type';
 import { getObjectInformation } from '../../utils';
+import Message from '../../../../../utils/Message';
 
 interface SnapshotListProps {
   navigation: NavigationScreenProp<any>;
@@ -94,11 +95,21 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
 
   handleSubmit = async () => {
     const { createSnapshot } = this.props;
-    await createSnapshot(this.state.name);
-    this.submit.current!.reset();
-    this.setState({ name: `${this.props.server.name}-${Date.now()}` });
-    this.handleRefresh();
-    // Alert.alert('Snapshot creation in progress', `Snapshot takes some time, please wait a moment to refresh .`);
+    await this.confirm.current!.open(
+      'info',
+      'Create Snapshot ?',
+      'Stored snapshots are currently free - pricing subject to change.',
+      {
+        okText: 'Create Snapshot',
+        loadingText: 'Creating snapshot',
+        onSave: async () => {
+          await createSnapshot(this.state.name);
+          this.setState({ name: `${this.props.server.name}-${Date.now()}` });
+          await this.handleRefresh();
+          Message.success('Snapshot in progress');
+        }
+      }
+    );
   };
 
   handleRestoreSnapshot = (item: Snapshot) => async () => {
@@ -139,7 +150,7 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
   };
 
   render() {
-    const { colors } = this.props.theme as Theme;
+    const { colors, fonts } = this.props.theme as Theme;
     const { refreshing, snapshots, name } = this.state;
 
     return (
@@ -157,14 +168,14 @@ class SnapshotList extends React.Component<SnapshotListProps, SnapshotListState>
                 <Item>
                   <Input defaultValue={name} placeholder="Enter snapshot name" />
                 </Item>
-                <Item testID="new-account" size={44} skip>
-                  <SubmitButton
-                    simple
-                    ref={this.submit}
-                    onSubmit={this.handleSubmit}
-                    title="Create snapshot"
-                    submittingText="Creating snapshot"
-                  />
+                <Item testID="createSnapshot" size={44} skip>
+                  <TouchableOpacity
+                    testID="createSnapshot"
+                    onPress={this.handleSubmit}
+                    style={{ alignItems: 'center', flex: 1 }}
+                  >
+                    <Note style={[fonts.callout, { color: colors.primary }]}>Create snapshot</Note>
+                  </TouchableOpacity>
                 </Item>
               </List>
               <ItemDivider>Snapshots</ItemDivider>
