@@ -110,7 +110,15 @@ export class Icon extends React.Component<IconProps> {
   render() {
     const VectorIcon = getIcon(this.props.type as string);
     const { name, color, size, style } = this.props;
-    return <VectorIcon onPress={this.props.onPress} name={name} color={color} size={size} style={[{ textAlign: 'center' }, style]} />;
+    return (
+      <VectorIcon
+        onPress={this.props.onPress}
+        name={name}
+        color={color}
+        size={size}
+        style={[{ textAlign: 'center' }, style]}
+      />
+    );
   }
 }
 
@@ -180,7 +188,7 @@ export const Input = withTheme(
           value={value}
           style={[styles.text, { color: colors.major }, fonts.body, layoutStyle, style]}
           keyboardType={keyboardType}
-          clearButtonMode="while-editing"
+          clearButtonMode={this.props.clearButtonMode || 'while-editing'}
           secureTextEntry={secureTextEntry}
         />
       );

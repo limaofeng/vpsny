@@ -532,6 +532,24 @@ export class VultrAgent implements Agent {
           cron_type: cronType
         })
       );
+    },
+    label: async (id: string, value: string) => {
+      await this.request.post(
+        '/server/label_set',
+        querystring.stringify({
+          SUBID: id,
+          label: value
+        })
+      );
+    },
+    tag: async (id: string, value: string) => {
+      await this.request.post(
+        '/server/tag_set',
+        querystring.stringify({
+          SUBID: id,
+          tag: value
+        })
+      );
     }
   };
   snapshot = {
