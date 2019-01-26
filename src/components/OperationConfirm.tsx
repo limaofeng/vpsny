@@ -1,12 +1,12 @@
-import { resolve } from 'dns';
 import React from 'react';
 import { StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
+import Dialog, { DialogContent, SlideAnimation } from 'react-native-popup-dialog';
 
 import CheckBox from './CheckBox';
 import { Icon } from './Item';
 import SubmitButton from './SubmitButton';
 import Theme, { withTheme } from './Theme';
+import { SafeArea } from '@utils';
 
 interface OperationConfirmProps {
   theme?: Theme;
@@ -155,81 +155,85 @@ export class OperationConfirm extends React.PureComponent<OperationConfirmProps,
       };
     }
     return (
-      <Modal backdropOpacity={0.2} isVisible={visible}>
-        <View style={styles.layout}>
-          <View style={[styles.container, { backgroundColor: colors.backgroundColorDeeper }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-              <Icon
-                type={level === 'warn' ? 'MaterialCommunityIcons' : 'MaterialIcons'}
-                name={level === 'warn' ? 'alert-circle-outline' : 'info-outline'}
-                color={defaultStyle.title.color}
-                size={18}
-              />
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    color: defaultStyle.title.color
-                  },
-                  titleStyle,
-                  fonts.title
-                ]}
-              >
-                {this.state.title || title}
-              </Text>
-            </View>
-            {this.additions}
+      <Dialog
+        visible={this.state.visible}
+        onTouchOutside={() => {
+          this.setState({ visible: false });
+        }}
+        containerStyle={{ paddingHorizontal: 10, marginTop: -100 }}
+        overlayBackgroundColor={colors.trivial}
+        dialogAnimation={new SlideAnimation({ slideFrom: 'bottom' })}
+      >
+        <DialogContent style={{ paddingTop: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+            <Icon
+              type={level === 'warn' ? 'MaterialCommunityIcons' : 'MaterialIcons'}
+              name={level === 'warn' ? 'alert-circle-outline' : 'info-outline'}
+              color={defaultStyle.title.color}
+              size={18}
+            />
             <Text
               style={[
-                styles.message,
+                styles.title,
                 {
-                  color: colors.secondary
+                  color: defaultStyle.title.color
                 },
-                messageStyle,
-                fonts.headline
+                titleStyle,
+                fonts.title
               ]}
             >
-              {this.state.message || message}
+              {this.state.title || title}
             </Text>
-            {doubleConfirmText && (
-              <CheckBox
-                onChange={this.handleDoubleConfirm}
-                style={{ paddingTop: 10, height: 30 }}
-                label={doubleConfirmText}
-              />
-            )}
-            <View style={{ marginTop: 5 }}>
-              <SubmitButton
-                ref={this.submit}
-                style={[{ marginTop: 10 }, defaultStyle.submit.enable]}
-                onSubmit={this.handleOk}
-                title={okText}
-                disabled={!!doubleConfirmText}
-                buttonStyle={{ fontWeight: 'normal' }}
-                doneText={okText}
-                disabledStyle={{
-                  style: defaultStyle.submit.disable
-                }}
-                submittingText={loadingText as string}
-              />
-              <TouchableOpacity onPress={this.handleCancel} style={{ marginTop: 10 }}>
-                <View
-                  style={[
-                    styles.cancelBut,
-                    {
-                      backgroundColor: colors.backgroundColor
-                    }
-                  ]}
-                >
-                  <Text style={[{ color: colors.secondary }, fonts.callout]}>
-                    {this.state.cancelText || cancelText}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
           </View>
-        </View>
-      </Modal>
+          {this.additions}
+          <Text
+            style={[
+              styles.message,
+              {
+                color: colors.secondary
+              },
+              messageStyle,
+              fonts.headline
+            ]}
+          >
+            {this.state.message || message}
+          </Text>
+          {doubleConfirmText && (
+            <CheckBox
+              onChange={this.handleDoubleConfirm}
+              style={{ paddingTop: 10, height: 30 }}
+              label={doubleConfirmText}
+            />
+          )}
+          <View style={{ marginTop: 5 }}>
+            <SubmitButton
+              ref={this.submit}
+              style={[{ marginTop: 10 }, defaultStyle.submit.enable]}
+              onSubmit={this.handleOk}
+              title={okText}
+              disabled={!!doubleConfirmText}
+              buttonStyle={{ fontWeight: 'normal' }}
+              doneText={okText}
+              disabledStyle={{
+                style: defaultStyle.submit.disable
+              }}
+              submittingText={loadingText as string}
+            />
+            <TouchableOpacity onPress={this.handleCancel} style={{ marginTop: 10 }}>
+              <View
+                style={[
+                  styles.cancelBut,
+                  {
+                    backgroundColor: colors.backgroundColor
+                  }
+                ]}
+              >
+                <Text style={[{ color: colors.secondary }, fonts.callout]}>{this.state.cancelText || cancelText}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </DialogContent>
+      </Dialog>
     );
   }
 }
