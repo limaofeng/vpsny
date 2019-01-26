@@ -1,3 +1,4 @@
+import React from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import walkuere from 'walkuere-rn';
 

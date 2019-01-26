@@ -28,6 +28,8 @@ target 'vpsny' do
     'RCTLinkingIOS'
   ]
 
+  # RNGestureHandler
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler/RNGestureHandler.podspec'
   # React-native-vector-icons
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   # React-native-i18n

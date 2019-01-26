@@ -1,13 +1,13 @@
 import { merge } from 'lodash';
-import * as React from 'react';
-import { Dimensions, TouchableOpacity, Text } from 'react-native';
+import React from 'react';
+import { Dimensions, TouchableOpacity } from 'react-native';
 import DropdownAlert from 'react-native-dropdownalert';
 import {
   createBottomTabNavigator,
   createStackNavigator,
   NavigationScreenConfigProps,
   NavigationScreenOptions,
-  NavigationScreenProp
+  NavigationScreenProp,
 } from 'react-navigation';
 
 import { Icon, IconType } from '../components';
@@ -45,7 +45,7 @@ const {
   AWSRegions,
   Terminal,
   ...routes
-} = merge.apply(undefined, modules.routes);
+} = merge({}, ...modules.routes);
 
 console.log('Routes', Object.keys(routes));
 
@@ -74,13 +74,15 @@ const tabs = createBottomTabNavigator(
     server: Instances
   },
   {
-    initialRouteName: 'server',
-    navigationOptions: ({ navigation }) => {
+    navigationOptions: {
+      initialRouteName: 'server'
+    },
+    defaultNavigationOptions: ({ navigation }: any) => {
       const { routeName } = navigation.state;
       const { title, icon } = tabConfigs[routeName];
       return {
         title,
-        tabBarIcon: ({ tintColor }) => {
+        tabBarIcon: ({ tintColor }: any) => {
           return (
             <Icon
               style={{ marginTop: 8 }}

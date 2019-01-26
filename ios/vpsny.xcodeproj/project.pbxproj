@@ -38,7 +38,7 @@
 /* Begin PBXFileReference section */
 		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		0DB4A2AD00FE9528C2EB7D29 /* Pods-vpsny.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-vpsny.release.xcconfig"; path = "Pods/Target Support Files/Pods-vpsny/Pods-vpsny.release.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* vpsny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = vpsny.app; path = VPSNY.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* vpsny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = vpsny.app; path = vpsny.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = vpsny/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = vpsny/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -473,7 +473,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = life.homeworld.app.vpser;
-				PRODUCT_NAME = VPSNY;
+				PRODUCT_NAME = vpsny;
 				PROVISIONING_PROFILE = "91c344c5-9c07-4835-9838-8729f87c141e";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development life.homeworld.app.vpser";
 				RESOURCES_TARGETED_DEVICE_FAMILY = "";
@@ -507,7 +507,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = life.homeworld.app.vpser;
-				PRODUCT_NAME = VPSNY;
+				PRODUCT_NAME = vpsny;
 				PROVISIONING_PROFILE = "12cf0d2b-025f-499a-b48c-fb0c1b7d7013";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore life.homeworld.app.vpser";
 				SWIFT_OBJC_BRIDGING_HEADER = "vpsny/vpsny-Bridging-Header.h";

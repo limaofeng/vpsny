@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { View, Text, StyleProp, ViewStyle, TouchableOpacity, TextStyle } from 'react-native';
 import Item, { Icon } from './Item';
 import Theme, { withTheme } from './Theme';
