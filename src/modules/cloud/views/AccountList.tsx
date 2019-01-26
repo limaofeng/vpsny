@@ -105,7 +105,7 @@ class AccountList extends React.Component<AccountListProps, AccountListState> {
               </Item>
             ))}
             {!accounts.length && (
-              <Item>
+              <Item skip>
                 <Note> No Vultr account</Note>
               </Item>
             )}
