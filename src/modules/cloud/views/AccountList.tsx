@@ -1,5 +1,5 @@
 import { HeaderRight, Item, List, Note, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { accounts } }: AppState, { navigation }: AccountListProps) => {
+const mapStateToProps = ({ cloud: { accounts } }: ReduxState, { navigation }: AccountListProps) => {
   const onChange = navigation.getParam('callback');
   const value = navigation.getParam('value');
   const mode: Mode = !!onChange ? 'choose' : 'manage';

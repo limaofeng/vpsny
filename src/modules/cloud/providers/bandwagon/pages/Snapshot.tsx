@@ -1,5 +1,5 @@
 import { Icon, Input, Item, ItemBody, ItemDivider, Label, List, Note, SubmitButton, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { getApi } from '@modules/cloud';
 import { Snapshot } from '@modules/cloud/Agent';
 import BandwagonHostAgent from '@modules/cloud/agents/BandwagonHostAgent';
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = (state: AppState, { navigation }: SnapshotListProps) => {
+const mapStateToProps = (state: ReduxState, { navigation }: SnapshotListProps) => {
   return {};
 };
 

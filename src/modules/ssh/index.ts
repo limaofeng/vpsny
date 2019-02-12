@@ -1,7 +1,7 @@
 import { AnyAction, Dispatch, Store } from 'redux';
 import { Feature, InAction } from 'walkuere-rn';
 
-import { AppState } from '..';
+import { ReduxState } from '..';
 import { sleep, uuid } from '../../utils';
 import { KeyPair } from './../cloud/type';
 import SSHConnect from './components/SSHConnect';
@@ -20,7 +20,7 @@ export const getSSHClient = (id: string): SSHClient => {
 };
 
 let supervisor: ShellSupervisor;
-type Select = (finder: (state: AppState) => any) => any;
+type Select = (finder: (state: ReduxState) => any) => any;
 
 export function getShellSupervisor() {
   return supervisor;
@@ -148,10 +148,10 @@ export default new Feature({
   },
   effects: {
     *connection({ payload }: InAction<SSHConnection>, { select, put }: any) {
-      const old: SSHConnection = yield select(({ ssh: { connections } }: AppState) =>
+      const old: SSHConnection = yield select(({ ssh: { connections } }: ReduxState) =>
         connections.find(con => con.id === payload.id)
       );
-      // const keyPairs: KeyPair[] = yield select(({ settings: { keyPairs } }: AppState) => keyPairs);
+      // const keyPairs: KeyPair[] = yield select(({ settings: { keyPairs } }: ReduxState) => keyPairs);
       // const keyPair = keyPairs.find(key => key.publicKeyFingerprint === fingerprint) as KeyPair;
       // const { id, hostname, port, password, username, keyPair: fingerprint } = payload;
       // const client = configureClient(hostname, port, username, {
@@ -175,11 +175,11 @@ export default new Feature({
       let clientKey;
       let command: Command;
       if (id) {
-        const cmd = yield select(({ ssh: { commands } }: AppState) => ({ ...commands.find(cmd => cmd.id === id) }));
+        const cmd = yield select(({ ssh: { commands } }: ReduxState) => ({ ...commands.find(cmd => cmd.id === id) }));
         clientKey = cmd.host;
         command = cmd;
       } else {
-        const connection = yield select(({ ssh: { connections } }: AppState) =>
+        const connection = yield select(({ ssh: { connections } }: ReduxState) =>
           connections.find(con => con.id === node)
         );
         clientKey = `${connection.username}@${connection.hostname}:${connection.port}`;

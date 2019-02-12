@@ -1,4 +1,4 @@
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
@@ -6,7 +6,7 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect, Provider } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
+import { getApi } from '../index';
 import { Icon, Input, Item, ItemBody, ItemStart, Label, List, Note } from '../../../components';
 import BottomRegion from '../../../components/BottomRegion';
 import SubmitButton from '../../../components/SubmitButton';
@@ -190,10 +190,239 @@ class Deploy extends React.Component<DeployProps, DeployState> {
     return !location;
   }
 
+  renderAccount = () => {
+    const { account } = this.state;
+    return (
+      <List title="Choose a account" style={{ marginTop: 13 }}>
+        <Item push onClick={this.handleJumpToAccounts}>
+          {account ? (
+            <Note>
+              {account.provider.toUpperCase()} - {account.email}
+            </Note>
+          ) : (
+            <Note> Only Vultr is supported </Note>
+          )}
+        </Item>
+      </List>
+    );
+  };
+  renderRegion = () => {
+    const { colors, fonts } = this.props.theme;
+    const { getCountryName } = this.props;
+    const { provider, location } = this.state;
+    return (
+      <List title="Choose a region">
+        <Item
+          testID="servers-deploy-choose-region"
+          size="medium"
+          push={!!location}
+          onClick={location && this.toLocations}
+        >
+          <View style={{ flex: 1, height: 54 }}>
+            {location ? (
+              <>
+                <View style={{ height: 30, justifyContent: 'flex-end' }}>
+                  <Note style={fonts.callout}>
+                    {location.name}
+                    <Text style={[{ color: colors.minor }, fonts.caption]}>
+                      {'   '}
+                      {getCountryName(location.country)}
+                    </Text>
+                  </Note>
+                  <Text />
+                </View>
+                <View style={{ height: 30, justifyContent: 'center' }}>
+                  {provider === 'vultr' && (
+                    <Text style={[{ color: colors.minor }, fonts.caption]}>Private Networking, Backups, IPv6</Text>
+                  )}
+                </View>
+              </>
+            ) : (
+              <>
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                  <Note style={fonts.callout}>No available region</Note>
+                </View>
+              </>
+            )}
+          </View>
+        </Item>
+      </List>
+    );
+  };
+
+  renderImage = () => {
+    const { image } = this.state;
+    return (
+      <List title="Choose an image">
+        <Item testID="servers-deploy-choose-image" size={45} push onClick={this.toImages}>
+          <Note>
+            {image && (image as SystemImage).name} {image && ((image as SystemImage).version as ImageVersion).name}
+          </Note>
+        </Item>
+      </List>
+    );
+  };
+
+  renderSize = () => {
+    const { colors, fonts } = this.props.theme;
+    const { plan } = this.state;
+    return (
+      <List title="Choose a size">
+        <Item testID="servers-deploy-choose-size" size={80} onClick={this.toPricing} push>
+          <ItemStart>
+            <View style={{ alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <Icon style={{ marginRight: 2 }} type="FontAwesome" color={colors.primary} name="dollar" size={12} />
+                <Text style={[{ lineHeight: 35, color: colors.primary, marginRight: 8 }, fonts.huge]}>
+                  {plan.price}
+                </Text>
+              </View>
+              <Text style={[{ color: colors.primary }, fonts.caption]}>USD</Text>
+            </View>
+          </ItemStart>
+          <ItemBody>
+            <View style={{ flex: 1, flexDirection: 'column' }}>
+              <List style={{ marginBottom: 0, backgroundColor: 'transparent' }}>
+                <Item
+                  size={20}
+                  bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
+                >
+                  <Icon type="Feather" color={colors.minor} name="cpu" size={12} />
+                  <Note style={fonts.subhead}>
+                    {plan.vcpu} vCPU {plan.vcpu > 1 && 's'}
+                  </Note>
+                  <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>CPU</Label>
+                </Item>
+                <Item
+                  size={20}
+                  bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
+                >
+                  <Icon type="FontAwesome5" color={colors.minor} name="microchip" size={12} />
+                  <Note style={fonts.subhead}>{plan.ram} MB</Note>
+                  <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>RAM</Label>
+                </Item>
+                <Item
+                  size={20}
+                  bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
+                >
+                  <Icon type="MaterialCommunityIcons" color={colors.minor} name="harddisk" size={14} />
+                  <Note style={fonts.subhead}>{plan.disk} GB</Note>
+                  <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>SSD</Label>
+                </Item>
+              </List>
+            </View>
+            <Icon type="FontAwesome" name="angle-right" color={colors.trivial} size={18} style={{ paddingRight: 15 }} />
+          </ItemBody>
+        </Item>
+      </List>
+    );
+  };
+  renderPublicKey = () => {
+    const { colors } = this.props.theme;
+    const { sshkeys } = this.state;
+    return (
+      <List title="Add your SSH keys">
+        <Item testID="servers-deploy-choose-sshkeys" onClick={this.toSSHKeys} push>
+          <View style={{ flexDirection: 'column', flex: 1 }}>
+            <View style={[{ flexDirection: 'row', alignItems: 'center', flex: 1 }]}>
+              <View pointerEvents="box-only" style={{ flex: 1, flexDirection: 'column' }}>
+                <Input
+                  style={{ height: 24 }}
+                  placeholder="New SSH Key or Choose keys"
+                  editable={false}
+                  clearButtonMode="always"
+                  value={
+                    !sshkeys.length
+                      ? undefined
+                      : sshkeys.length === 1
+                      ? sshkeys[0].name
+                      : `${sshkeys[0].name} and ${sshkeys.length - 1} other`
+                  }
+                />
+              </View>
+              {!!sshkeys.length && (
+                <TouchableOpacity onPress={this.handleCleanSSHKey} activeOpacity={1}>
+                  <Icon
+                    type="Ionicons"
+                    style={{ marginTop: 2, marginRight: 10 }}
+                    color={colors.trivial}
+                    size={17}
+                    name="ios-close-circle"
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </Item>
+      </List>
+    );
+  };
+
+  renderFeatures = () => {
+    const { colors, fonts } = this.props.theme;
+    const { getCountryName } = this.props;
+    const { location, plan } = this.state;
+    return (
+      <List
+        type="multi-choice-circle"
+        value={this.state.features || []}
+        onChange={this.handleAdditionalFeatures}
+        title="Additional Features"
+      >
+        <Item value="private_networking" visible={false}>
+          <Note style={{ color: colors.secondary }}>Private networking</Note>
+        </Item>
+        <Item value="backups" visible={false}>
+          <Note style={{ color: colors.secondary }}>Backups</Note>
+        </Item>
+        <Item value="ipv6" visible={false}>
+          <Note style={{ color: colors.secondary }}>IPv6</Note>
+        </Item>
+        <Item value="install_agent" visible={false}>
+          <Note style={{ color: colors.secondary }}>Monitoring</Note>
+        </Item>
+        {plan.type !== 'baremetal' && (
+          <>
+            {plan.type === 'ssd' && (
+              <Item value="Auto Backups">
+                <Note style={{ color: colors.secondary }}>Enable Auto Backups</Note>
+                <View style={[styles.additionalCostContainer, { backgroundColor: colors.primary }]}>
+                  <Text style={[styles.additionalCostText, fonts.subhead, { color: colors.backgroundColorDeeper }]}>
+                    {format.usMoney((plan.price / 10) * 2)}
+                    /mo
+                  </Text>
+                </View>
+              </Item>
+            )}
+            <Item visible={false} value="DDOS Protection">
+              <Note style={{ color: colors.secondary }}>Enable DDOS Protection</Note>
+              <View style={[styles.additionalCostContainer, { backgroundColor: colors.primary }]}>
+                <Text style={[styles.additionalCostText, fonts.subhead, { color: colors.backgroundColorDeeper }]}>
+                  $10/mo
+                </Text>
+              </View>
+            </Item>
+            <Item value="Private Networking" bodyStyle={{ borderBottomWidth: 0 }}>
+              <Note style={{ color: colors.secondary }}>Enable Private Networking</Note>
+            </Item>
+          </>
+        )}
+      </List>
+    );
+  };
+  renderNodeInfo = () => {
+    return (
+      <List title="Hostname">
+        <Item size={45}>
+          <Input onValueChange={this.handleChangeHostname} placeholder="Enter hostname" />
+        </Item>
+      </List>
+    );
+  };
   render() {
     const { colors, fonts } = this.props.theme;
     const { getCountryName } = this.props;
-    const { provider, location, plan, image, account, sshkeys } = this.state;
+    const { location, plan } = this.state;
     // <LinearGradient
     //   start={{ x: 0, y: 1 }}
     //   end={{ x: 0, y: 0 }}
@@ -207,17 +436,7 @@ class Deploy extends React.Component<DeployProps, DeployState> {
         style={[styles.container, { backgroundColor: colors.backgroundColor }]}
       >
         <ScrollView>
-          <List title="Choose a account" style={{ marginTop: 13 }}>
-            <Item push onClick={this.handleJumpToAccounts}>
-              {account ? (
-                <Note>
-                  {account.provider.toUpperCase()} - {account.email}
-                </Note>
-              ) : (
-                <Note> Only Vultr is supported </Note>
-              )}
-            </Item>
-          </List>
+          {this.renderAccount()}
           {/*
           <Text
             style={[
@@ -229,193 +448,12 @@ class Deploy extends React.Component<DeployProps, DeployState> {
             hostname of the server
           </Text>
           */}
-          <List title="Choose a region">
-            <Item
-              testID="servers-deploy-choose-region"
-              size="medium"
-              push={!!location}
-              onClick={location && this.toLocations}
-            >
-              <View style={{ flex: 1, height: 54 }}>
-                {location ? (
-                  <>
-                    <View style={{ height: 30, justifyContent: 'flex-end' }}>
-                      <Note style={fonts.callout}>
-                        {location.name}
-                        <Text style={[{ color: colors.minor }, fonts.caption]}>
-                          {'   '}
-                          {getCountryName(location.country)}
-                        </Text>
-                      </Note>
-                      <Text />
-                    </View>
-                    <View style={{ height: 30, justifyContent: 'center' }}>
-                      {provider === 'vultr' && (
-                        <Text style={[{ color: colors.minor }, fonts.caption]}>Private Networking, Backups, IPv6</Text>
-                      )}
-                    </View>
-                  </>
-                ) : (
-                  <>
-                    <View style={{ flex: 1, justifyContent: 'center' }}>
-                      <Note style={fonts.callout}>No available region</Note>
-                    </View>
-                  </>
-                )}
-              </View>
-            </Item>
-          </List>
-          <List title="Choose an image">
-            <Item testID="servers-deploy-choose-image" size={45} push onClick={this.toImages}>
-              <Note>
-                {image && (image as SystemImage).name} {image && ((image as SystemImage).version as ImageVersion).name}
-              </Note>
-            </Item>
-          </List>
-          <List title="Choose a size">
-            <Item testID="servers-deploy-choose-size" size={80} onClick={this.toPricing} push>
-              <ItemStart>
-                <View style={{ alignItems: 'center' }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                    <Icon
-                      style={{ marginRight: 2 }}
-                      type="FontAwesome"
-                      color={colors.primary}
-                      name="dollar"
-                      size={12}
-                    />
-                    <Text style={[{ lineHeight: 35, color: colors.primary, marginRight: 8 }, fonts.huge]}>
-                      {plan.price}
-                    </Text>
-                  </View>
-                  <Text style={[{ color: colors.primary }, fonts.caption]}>USD</Text>
-                </View>
-              </ItemStart>
-              <ItemBody>
-                <View style={{ flex: 1, flexDirection: 'column' }}>
-                  <List style={{ marginBottom: 0, backgroundColor: 'transparent' }}>
-                    <Item
-                      size={20}
-                      bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
-                    >
-                      <Icon type="Feather" color={colors.minor} name="cpu" size={12} />
-                      <Note style={fonts.subhead}>
-                        {plan.vcpu} vCPU {plan.vcpu > 1 && 's'}
-                      </Note>
-                      <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>CPU</Label>
-                    </Item>
-                    <Item
-                      size={20}
-                      bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
-                    >
-                      <Icon type="FontAwesome5" color={colors.minor} name="microchip" size={12} />
-                      <Note style={fonts.subhead}>{plan.ram} MB</Note>
-                      <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>RAM</Label>
-                    </Item>
-                    <Item
-                      size={20}
-                      bodyStyle={{ paddingVertical: 0, paddingLeft: 6, paddingRight: 15, borderBottomWidth: 0 }}
-                    >
-                      <Icon type="MaterialCommunityIcons" color={colors.minor} name="harddisk" size={14} />
-                      <Note style={fonts.subhead}>{plan.disk} GB</Note>
-                      <Label style={[fonts.subhead, { textAlign: 'right', marginRight: 15 }]}>SSD</Label>
-                    </Item>
-                  </List>
-                </View>
-                <Icon
-                  type="FontAwesome"
-                  name="angle-right"
-                  color={colors.trivial}
-                  size={18}
-                  style={{ paddingRight: 15 }}
-                />
-              </ItemBody>
-            </Item>
-          </List>
-          <List title="Add your SSH keys">
-            <Item testID="servers-deploy-choose-sshkeys" onClick={this.toSSHKeys} push>
-              <View style={{ flexDirection: 'column', flex: 1 }}>
-                <View style={[{ flexDirection: 'row', alignItems: 'center', flex: 1 }]}>
-                  <View pointerEvents="box-only" style={{ flex: 1, flexDirection: 'column' }}>
-                    <Input
-                      style={{ height: 24 }}
-                      placeholder="New SSH Key or Choose keys"
-                      editable={false}
-                      clearButtonMode="always"
-                      value={
-                        !sshkeys.length
-                          ? undefined
-                          : sshkeys.length === 1
-                            ? sshkeys[0].name
-                            : `${sshkeys[0].name} and ${sshkeys.length - 1} other`
-                      }
-                    />
-                  </View>
-                  {sshkeys.length && (
-                    <TouchableOpacity onPress={this.handleCleanSSHKey} activeOpacity={1}>
-                      <Icon
-                        type="Ionicons"
-                        style={{ marginTop: 2, marginRight: 10 }}
-                        color={colors.trivial}
-                        size={17}
-                        name="ios-close-circle"
-                      />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-            </Item>
-          </List>
-          <List
-            type="multi-choice-circle"
-            value={this.state.features || []}
-            onChange={this.handleAdditionalFeatures}
-            title="Additional Features"
-          >
-            <Item value="private_networking" visible={false}>
-              <Note style={{ color: colors.secondary }}>Private networking</Note>
-            </Item>
-            <Item value="backups" visible={false}>
-              <Note style={{ color: colors.secondary }}>Backups</Note>
-            </Item>
-            <Item value="ipv6" visible={false}>
-              <Note style={{ color: colors.secondary }}>IPv6</Note>
-            </Item>
-            <Item value="install_agent" visible={false}>
-              <Note style={{ color: colors.secondary }}>Monitoring</Note>
-            </Item>
-            {plan.type !== 'baremetal' && (
-              <>
-                {plan.type === 'ssd' && (
-                  <Item value="Auto Backups">
-                    <Note style={{ color: colors.secondary }}>Enable Auto Backups</Note>
-                    <View style={[styles.additionalCostContainer, { backgroundColor: colors.primary }]}>
-                      <Text style={[styles.additionalCostText, fonts.subhead, { color: colors.backgroundColorDeeper }]}>
-                        {format.usMoney((plan.price / 10) * 2)}
-                        /mo
-                      </Text>
-                    </View>
-                  </Item>
-                )}
-                <Item visible={false} value="DDOS Protection">
-                  <Note style={{ color: colors.secondary }}>Enable DDOS Protection</Note>
-                  <View style={[styles.additionalCostContainer, { backgroundColor: colors.primary }]}>
-                    <Text style={[styles.additionalCostText, fonts.subhead, { color: colors.backgroundColorDeeper }]}>
-                      $10/mo
-                    </Text>
-                  </View>
-                </Item>
-                <Item value="Private Networking" bodyStyle={{ borderBottomWidth: 0 }}>
-                  <Note style={{ color: colors.secondary }}>Enable Private Networking</Note>
-                </Item>
-              </>
-            )}
-          </List>
-          <List title="Hostname">
-            <Item size={45}>
-              <Input onValueChange={this.handleChangeHostname} placeholder="Enter hostname" />
-            </Item>
-          </List>
+          {this.renderRegion()}
+          {this.renderImage()}
+          {this.renderSize()}
+          {this.renderPublicKey()}
+          {this.renderFeatures()}
+          {this.renderNodeInfo()}
         </ScrollView>
         <BottomRegion height={125} backgroundColor={colors.backgroundColorDeeper}>
           <View style={{ flexDirection: 'row', paddingVertical: 10, paddingLeft: 20 }}>
@@ -488,7 +526,7 @@ const mapStateToProps = ({
   settings: { keyPairs },
   cloud: { accounts },
   database: { bundles, blueprints, regions, countrys }
-}: AppState) => {
+}: ReduxState) => {
   return {
     getDefaultRegion: (provider: ProviderType) => {
       return regions.find(r => r.provider === provider) as IRegion;

@@ -5,7 +5,7 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi, utils } from '..';
+import { getApi, utils } from '../index';
 import { Icon } from '../../../components';
 import Theme, { withTheme } from '../../../components/Theme';
 import { format, sleep } from '../../../utils';

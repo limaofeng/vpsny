@@ -8,7 +8,7 @@ import { List, Item, Label, Input, ItemBody, Icon, Password, Note } from '../../
 import Theme, { withTheme } from '../../../components/Theme';
 import { KeyPair, Instance } from '../../cloud/type';
 import { SafeArea, sleep } from '../../../utils';
-import { AppState } from '../..';
+import { ReduxState } from '../..';
 import { SSHConnection } from '../type';
 import { SSHClient } from '../SSHClient';
 import SubmitButtonWrapper, { SubmitButton } from '../../../components/SubmitButton';
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ settings: { keyPairs } }: AppState, { node, connection }: SSHConnectProps) => {
+const mapStateToProps = ({ settings: { keyPairs } }: ReduxState, { node, connection }: SSHConnectProps) => {
   let keyPair;
   if (connection.keyPair) {
     keyPair = keyPairs.find(key => key.publicKeyFingerprint === connection.keyPair);

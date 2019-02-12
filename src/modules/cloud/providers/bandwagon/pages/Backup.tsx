@@ -1,5 +1,5 @@
 import { Item, ItemBody, Label, Note, SubmitButton, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { getApi } from '@modules/cloud';
 import { Backup } from '@modules/cloud/Agent';
 import BandwagonHostAgent from '@modules/cloud/agents/BandwagonHostAgent';
@@ -101,8 +101,8 @@ class BackupList extends React.Component<BackupListProps, BackupListState> {
       <Item size={100} key={item.md5} last={index === this.state.backups.length - 1} value={item}>
         <ItemBody style={{ paddingRight: 15, paddingTop: 10, paddingBottom: 5 }}>
           <View style={{ flex: 1 }}>
-            <View style={{ position: 'absolute', right: 12, bottom: 25 }}>
-              <OSLogo name={item.os} size={35} />
+            <View style={{ position: 'absolute', right: 12, bottom: 5 }}>
+              <OSLogo name={item.os} size={45} />
             </View>
             <View style={{ height: 20, flexDirection: 'row', alignItems: 'center' }}>
               <Label style={{ width: 'auto', flex: 1 }}>{item.os}</Label>
@@ -112,25 +112,28 @@ class BackupList extends React.Component<BackupListProps, BackupListState> {
                   .format('dd, DD MMM YYYY HH:mm:ss ZZ')}
               </Text>
             </View>
-            <View style={{ height: 20, justifyContent: 'center' }}>
+            <View style={{ height: 18, justifyContent: 'center' }}>
               <Label style={{ width: 'auto' }}>size: {format.fileSize(item.size, 'MB')}</Label>
             </View>
-            <View style={{ height: 20, justifyContent: 'center' }}>
+            <View style={{ height: 16, justifyContent: 'center' }}>
               <Note style={[fonts.footnote]}>MD5: {item.md5}</Note>
             </View>
-            <SubmitButton
-              style={{ marginTop: 5, backgroundColor: colors.minor, height: 20, borderRadius: 10 }}
-              buttonStyle={[fonts.subhead]}
-              disabled={item.snapshot}
-              disabledStyle={{
-                style: { backgroundColor: colors.backgroundColor },
-                buttonStyle: { color: colors.trivial }
-              }}
-              spinnerSize={14}
-              onSubmit={this.handleSubmit(item)}
-              title={item.snapshot ? 'This backup is already in your Snapshots' : 'Import to my Snapshots'}
-              submittingText="Importing a backup into Snapshots"
-            />
+            <View style={{ flexDirection: 'row', paddingTop: 5 }}>
+              <SubmitButton
+                style={{ flex: 1, backgroundColor: colors.minor, height: 20, borderRadius: 10 }}
+                buttonStyle={[fonts.subhead]}
+                disabled={item.snapshot}
+                disabledStyle={{
+                  style: { backgroundColor: colors.backgroundColor },
+                  buttonStyle: { color: colors.trivial }
+                }}
+                spinnerSize={14}
+                onSubmit={this.handleSubmit(item)}
+                title={item.snapshot ? 'This backup is already in your Snapshots' : 'Import to my Snapshots'}
+                submittingText="Importing a backup into Snapshots"
+              />
+              <View style={{ width: 80 }} />
+            </View>
           </View>
         </ItemBody>
       </Item>
@@ -175,7 +178,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = (state: AppState, { navigation }: BackupListProps) => {
+const mapStateToProps = (state: ReduxState, { navigation }: BackupListProps) => {
   return {};
 };
 

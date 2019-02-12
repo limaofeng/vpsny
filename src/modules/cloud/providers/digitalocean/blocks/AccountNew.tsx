@@ -1,5 +1,5 @@
 import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { Alert, Dimensions, View } from 'react-native';
 import { connect } from 'react-redux';
@@ -165,7 +165,7 @@ class DigitalOceanNew extends React.Component<DigitalOceanNewProps, DigitalOcean
   }
 }
 
-const mapStateToProps = ({ cloud: { accounts: allAccount } }: AppState) => {
+const mapStateToProps = ({ cloud: { accounts: allAccount } }: ReduxState) => {
   const accounts = allAccount.filter(data => data.provider === 'digitalocean');
   return {
     find: (apiKey: string) => {

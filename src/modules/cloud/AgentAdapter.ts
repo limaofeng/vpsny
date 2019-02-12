@@ -1,8 +1,8 @@
-import { AppState } from '..';
+import { ReduxState } from '..';
 import { Agent, User, Bill, Snapshot } from './Agent';
 import { Features, Instance, Plan, Region, SSHKey, SystemImage } from './type';
 
-type Select = (finder: (state: AppState) => any) => any;
+type Select = (finder: (state: ReduxState) => any) => any;
 
 export default class AgentAdapter implements Agent {
   id = 'adapter';

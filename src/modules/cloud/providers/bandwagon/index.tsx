@@ -13,10 +13,10 @@ import { getTip } from '../utils';
 import AccountNew from './blocks/AccountNew';
 import AccountView from './blocks/AccountView';
 import ServerView from './blocks/ServerView';
+import Backup from './pages/Backup';
 import Migration from './pages/Migration';
 import Reinstall from './pages/Reinstall';
 import Snapshot from './pages/Snapshot';
-import Backup from './pages/Backup';
 
 class BandwagonHost implements Provider {
   id: ProviderType = 'bandwagonhost';

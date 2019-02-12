@@ -8,7 +8,7 @@ import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { AWSLightsailAgent } from '../AWSProvider';
 
 interface SnapshotsProps {
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = (state: AppState, { navigation }: SnapshotsProps) => {
+const mapStateToProps = (state: ReduxState, { navigation }: SnapshotsProps) => {
   return {
     snapshots: []
   };

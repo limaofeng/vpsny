@@ -1,4 +1,4 @@
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { IBundle, IRegion } from '@modules/database/type';
 import React from 'react';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ database: { bundles, providers, regions } }: AppState, { navigation }: PricingProps) => {
+const mapStateToProps = ({ database: { bundles, providers, regions } }: ReduxState, { navigation }: PricingProps) => {
   const onChange = navigation.getParam('callback');
   const region = navigation.getParam('region') as IRegion;
   const value = navigation.getParam('value');

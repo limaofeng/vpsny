@@ -1,14 +1,12 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, ActionSheetIOS, StyleProp, ViewStyle } from 'react-native';
-
+import { ActionSheetIOS, StyleProp, TouchableOpacity, ViewStyle } from 'react-native';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
+
+import { Service } from '..';
 import Theme, { withTheme } from '../../../components/Theme';
 import { Instance } from '../../cloud/Provider';
-import Confirm, { OperationConfirm } from '../../../components/OperationConfirm';
-import { Dispatch } from 'redux';
-import { Account } from '../../cloud/type';
 import { SSHClient } from '../../ssh';
-import { Service, generateCommand } from '..';
 import CommandUtils from '../../ssh/CommandUtils';
 
 export type Operate = 'start' | 'stop' | 'reboot' | 'delete' | 'reinstall';

@@ -9,7 +9,7 @@ import settings from './settings';
 import { SettingState } from './settings';
 import ssh, { SSHState } from './ssh';
 
-export type AppState = {
+export type ReduxState = {
   cloud: CloudState;
   ssh: SSHState;
   settings: SettingState;

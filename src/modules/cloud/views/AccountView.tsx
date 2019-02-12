@@ -1,5 +1,5 @@
 import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { Alert, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
@@ -7,7 +7,7 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
+import { getApi } from '../index';
 import { APIKey } from '../Agent';
 import { AWSLightsailAgent } from '../providers/lightsail/AWSProvider';
 import { Instance } from '../Provider';
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { accounts, instances } }: AppState, { navigation }: AccountViewProps) => {
+const mapStateToProps = ({ cloud: { accounts, instances } }: ReduxState, { navigation }: AccountViewProps) => {
   const account = navigation.getParam('data') as Account;
   return {
     account: accounts.find(a => a.id === account.id) || account,

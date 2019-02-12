@@ -8,7 +8,7 @@ import Theme, { withTheme } from '../../../components/Theme';
 import { KeyPair } from '../../cloud/type';
 import KeyPairNewBut from '../components/KeyPairNewBut';
 import KeyPairs from '../components/KeyPairs';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import firebase, { RNFirebase } from 'react-native-firebase';
 
 export type Mode = 'choose' | 'manage';
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ settings: { keyPairs } }: AppState, { navigation }: KeyPairListProps) => {
+const mapStateToProps = ({ settings: { keyPairs } }: ReduxState, { navigation }: KeyPairListProps) => {
   const choose = !!navigation.getParam('callback');
   const value: KeyPair = navigation.getParam('value');
   const mode: Mode = choose ? 'choose' : 'manage';

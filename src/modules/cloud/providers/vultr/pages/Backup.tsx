@@ -12,7 +12,7 @@ import {
   Theme,
   withTheme
 } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { getApi } from '@modules/cloud';
 import { Backup } from '@modules/cloud/Agent';
 import { Instance } from '@modules/cloud/Provider';
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { instances } }: AppState, { navigation }: BackupListProps) => {
+const mapStateToProps = ({ cloud: { instances } }: ReduxState, { navigation }: BackupListProps) => {
   const value = navigation.getParam('value') as Instance;
   return { instance: instances.find(node => node.id === value.id)! };
 };

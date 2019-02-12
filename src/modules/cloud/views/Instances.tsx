@@ -6,8 +6,8 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi, utils } from '../';
-import { AppState } from '../..';
+import { getApi, utils } from '../index';
+import { ReduxState } from '../..';
 import ActionButton from '../../../components/ActionButton';
 import Card from '../../../components/Card';
 import Theme, { withTheme, defaultTheme } from '../../../components/Theme';
@@ -264,7 +264,7 @@ class Instances extends React.Component<InstancesProps, InstancesState> {
 }
 
 const mapStateToProps = (
-  { cloud: { instances, accounts }, ssh: { connections }, settings: { currentAccount } }: AppState,
+  { cloud: { instances, accounts }, ssh: { connections }, settings: { currentAccount } }: ReduxState,
   { navigation }: InstancesProps
 ) => {
   navigation.state.currentAccount = currentAccount;

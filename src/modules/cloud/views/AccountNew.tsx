@@ -1,4 +1,4 @@
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import firebase, { RNFirebase } from 'react-native-firebase';
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ cloud: { accounts }, nav: { routes } }: AppState, { navigation }: AccountNewProps) => {
+const mapStateToProps = ({ cloud: { accounts }, nav: { routes } }: ReduxState, { navigation }: AccountNewProps) => {
   const provider = navigation.getParam('provider') || 'lightsail';
   return {
     provider,

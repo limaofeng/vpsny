@@ -1,5 +1,5 @@
 import { Input, Item, Label, List, Note, Select, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { AWSAPIKey, AWSLightsailAgent, AWSRegions } from '@modules/cloud/providers/lightsail/AWSProvider';
 import React from 'react';
 import { Alert, Dimensions, View } from 'react-native';
@@ -198,7 +198,7 @@ class LightsailNew extends React.Component<LightsailNewProps, LightsailNewState>
   }
 }
 
-const mapStateToProps = ({ cloud: { accounts: allAccount } }: AppState) => {
+const mapStateToProps = ({ cloud: { accounts: allAccount } }: ReduxState) => {
   const accounts = allAccount.filter(data => data.provider === 'digitalocean');
   return {
     find: (accessKey: string) => {

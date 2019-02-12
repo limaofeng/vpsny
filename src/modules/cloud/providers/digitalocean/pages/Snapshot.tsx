@@ -11,7 +11,7 @@ import {
   Theme,
   withTheme
 } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { getApi } from '@modules/cloud';
 import { Snapshot } from '@modules/cloud/Agent';
 import OSLogo from '@modules/cloud/components/OSLogo';
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = (state: AppState, { navigation }: SnapshotListProps) => {
+const mapStateToProps = (state: ReduxState, { navigation }: SnapshotListProps) => {
   return {};
 };
 

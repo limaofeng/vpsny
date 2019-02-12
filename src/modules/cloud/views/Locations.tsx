@@ -1,4 +1,4 @@
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ database: { regions, countrys } }: AppState, { navigation }: LocationsProps) => {
+const mapStateToProps = ({ database: { regions, countrys } }: ReduxState, { navigation }: LocationsProps) => {
   const onChange = navigation.getParam('callback');
   const value = navigation.getParam('value');
   const provider = navigation.getParam('provider') as ProviderType;

@@ -1,8 +1,8 @@
 import { Icon, Item, Label, List, Note, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
-import { format, SafeArea } from '@utils';
+import { ReduxState } from '@modules';
+import { format, SafeArea, sleep } from '@utils';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, AppState } from 'react-native';
 import { NavigationScreenOptions, NavigationScreenProp } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -17,6 +17,7 @@ interface SidebarProps {
   theme: Theme;
   accounts: Account[];
   openMenu: (open: boolean) => void;
+  refreshBill: (account: string) => void;
   changeAccount: (account: string) => void;
   currentAccount: string;
   instances: Instance[];
@@ -26,13 +27,28 @@ interface SidebarState {
   current?: Account;
 }
 
-class Sidebar extends React.Component<SidebarProps, SidebarState> {
+class Sidebar extends React.PureComponent<SidebarProps, SidebarState> {
   static navigationOptions: NavigationScreenOptions = {
     tabBarLabel: 'Sidebar'
   };
   constructor(props: SidebarProps) {
     super(props);
     this.state = { current: props.accounts.find(node => node.id === props.currentAccount) };
+  }
+
+  componentWillMount() {
+    AppState.removeEventListener('change', this.handleReduxStateChange);
+  }
+  handleReduxStateChange = (appState: string) => {
+    if (appState === 'active' && this.props.currentAccount) {
+      this.props.refreshBill(this.props.currentAccount);
+    }
+  };
+  componentDidMount() {
+    AppState.addEventListener('change', this.handleReduxStateChange);
+    if (this.props.currentAccount) {
+      this.props.refreshBill(this.props.currentAccount);
+    }
   }
 
   handleAccountManager = () => {
@@ -99,7 +115,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
               {accounts.map(a => (
                 <AccountLable
                   key={a.id}
-                  light={current === a}
+                  light={current && current!.id === a.id}
                   logo={CloudManager.getProvider(a.provider).logo}
                   value={a}
                   onClick={this.handleLableClick}
@@ -186,27 +202,26 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                 </Item>
               </List>
             </ScrollView>
-            {current &&
-              current.provider === 'vultr' && (
-                <List
-                  title="Billing"
-                  style={{ borderTopColor: colors.trivial, borderTopWidth: StyleSheet.hairlineWidth }}
-                  titleStyle={{ color: colors.secondary }}
-                >
-                  <Item>
-                    <Label>Balance</Label>
-                    <Note>${format.number(current.bill!.balance, '0.00')}</Note>
-                  </Item>
-                  <Item>
-                    <Label>This Month</Label>
-                    <Note>${format.number(current.bill!.pendingCharges, '0.00')}</Note>
-                  </Item>
-                  <Item>
-                    <Label>Remaining</Label>
-                    <Note>${format.number(current.bill!.balance - current.bill!.pendingCharges, '0.00')}</Note>
-                  </Item>
-                </List>
-              )}
+            {current && current.provider === 'vultr' && (
+              <List
+                title="Billing"
+                style={{ borderTopColor: colors.trivial, borderTopWidth: StyleSheet.hairlineWidth }}
+                titleStyle={{ color: colors.secondary }}
+              >
+                <Item>
+                  <Label>Balance</Label>
+                  <Note>${format.number(current.bill!.balance, '0.00')}</Note>
+                </Item>
+                <Item>
+                  <Label>This Month</Label>
+                  <Note>${format.number(current.bill!.pendingCharges, '0.00')}</Note>
+                </Item>
+                <Item>
+                  <Label>Remaining</Label>
+                  <Note>${format.number(current.bill!.balance - current.bill!.pendingCharges, '0.00')}</Note>
+                </Item>
+              </List>
+            )}
             <View style={{ height: SafeArea.bottom }} />
           </View>
         </View>
@@ -222,7 +237,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (
-  { cloud: { accounts, instances }, settings: { currentAccount } }: AppState,
+  { cloud: { accounts, instances }, settings: { currentAccount } }: ReduxState,
   { navigation }: SidebarProps
 ) => {
   return { accounts, instances, currentAccount };
@@ -232,6 +247,12 @@ const mapDispatchToProps = (dispatch: Dispatch, { navigation }: SidebarProps) =>
   return {
     changeAccount(account: string) {
       dispatch({ type: 'settings/current', payload: account });
+      if (account) {
+        dispatch({ type: 'cloud/refreshBill', payload: { id: account } });
+      }
+    },
+    refreshBill(account: string) {
+      dispatch({ type: 'cloud/refreshBill', payload: { id: account } });
     }
   };
 };

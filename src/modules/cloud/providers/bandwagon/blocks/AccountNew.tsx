@@ -1,5 +1,5 @@
 import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { Alert, Dimensions, View } from 'react-native';
 import { connect } from 'react-redux';
@@ -175,7 +175,7 @@ class BandwagonHostNew extends React.Component<BandwagonHostNewProps, BandwagonH
   }
 }
 
-const mapStateToProps = ({ cloud: { accounts } }: AppState) => {
+const mapStateToProps = ({ cloud: { accounts } }: ReduxState) => {
   const bwgAccounts = accounts.filter(data => data.provider === 'bandwagonhost');
   return {
     find: (type: QueryType, id: string) => {

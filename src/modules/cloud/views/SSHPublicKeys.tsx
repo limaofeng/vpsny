@@ -6,7 +6,7 @@ import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'rea
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getApi } from '..';
+import { getApi } from '../index';
 import { Icon, Item, Label, List, Note } from '../../../components';
 import HeaderLeftClose from '../../../components/HeaderLeftClose';
 import HeaderRight from '../../../components/HeaderRight';

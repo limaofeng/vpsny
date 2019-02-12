@@ -12,7 +12,7 @@ import Network from '../components/Network';
 import { getApi } from '@modules/cloud';
 import { VultrAgent } from '../VultrAgent';
 import { Dispatch } from 'redux';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { connect } from 'react-redux';
 
 interface ServerOverviewProps {
@@ -81,7 +81,7 @@ class ServerOverview extends React.PureComponent<ServerOverviewProps> {
   }
 }
 
-const mapStateToProps = ({ database: { blueprints } }: AppState, { navigation }: ServerOverviewProps) => {
+const mapStateToProps = ({ database: { blueprints } }: ReduxState, { navigation }: ServerOverviewProps) => {
   return {};
 };
 

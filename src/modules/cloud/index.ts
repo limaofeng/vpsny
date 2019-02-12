@@ -6,7 +6,7 @@ import { AnyAction, Dispatch, Store } from 'redux';
 import { Feature, InAction } from 'walkuere-rn';
 import { sleep } from '../../utils';
 import { SSHConnection } from '../ssh/type';
-import { AppState } from './../index';
+import { ReduxState } from './../index';
 import { Agent, Bill, User } from './Agent';
 import AgentAdapter from './AgentAdapter';
 import { AWSAPIKey, AWSLightsailAgent } from './providers/lightsail/AWSProvider';
@@ -282,9 +282,8 @@ export default new Feature({
       }
     },
     *instances({ payload: { uid, instances } }: AllInstanceAction, { put, select }: any) {
-      const originalInstances: Instance[] = yield select(
-        ({ cloud: { instances } }: any) =>
-          uid ? instances.filter((instance: Instance) => instance.account === uid) : [...instances]
+      const originalInstances: Instance[] = yield select(({ cloud: { instances } }: any) =>
+        uid ? instances.filter((instance: Instance) => instance.account === uid) : [...instances]
       );
       for (const node of instances) {
         const index = originalInstances.findIndex(original => original.id === node.id);
@@ -341,7 +340,27 @@ export default new Feature({
         // }
       }
     },
-
+    *refreshBill({ payload: { id } }: InAction<Account>, { put, call }: any) {
+      try {
+        const api = getApi(id);
+        const bill: Bill = yield call(() => api.bill());
+        console.log(bill);
+        yield put({ type: 'bill', payload: { bill, id } });
+      } catch (error) {
+        console.warn(error);
+        const { response } = error;
+        if (response) {
+          if (response.status === 403) {
+            Alert.alert(
+              'Invalid API key',
+              'APIKEY 已经失效',
+              [{ text: 'OK', onPress: () => console.log('OK Pressed') }],
+              { cancelable: false }
+            );
+          }
+        }
+      }
+    },
     *refreshAccount({ payload: { id } }: InAction<Account>, { put, call }: any) {
       try {
         const account: Account = yield call(loadAccount, id);
@@ -376,7 +395,7 @@ export default new Feature({
       }: {
         nodes: Instance[];
         account: Account;
-      } = yield select(({ cloud: { instances, accounts } }: AppState) => ({
+      } = yield select(({ cloud: { instances, accounts } }: ReduxState) => ({
         nodes: instances.filter(instance => instance.account === payload.id),
         account: accounts.find(acc => acc.id === payload.id)
       }));

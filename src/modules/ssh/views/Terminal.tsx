@@ -23,7 +23,7 @@ import {
 } from 'react-native';
 // import { docco } from 'react-syntax-highlighter/styles/hljs';
 import { Dispatch } from 'redux';
-import { AppState } from '../..';
+import { ReduxState } from '../..';
 import { getSSHClient, getShellSupervisor } from '..';
 import { Instance } from '../../cloud/type';
 import { sleep, uuid, SafeArea } from '../../../utils';
@@ -749,7 +749,7 @@ class TerminalWrap extends React.Component<TerminalWrapProps, TerminalWrapState>
 }
 
 const callbacks: any[] = [];
-const mapStateToProps = ({ ssh: { connections } }: AppState, { navigation }: TerminalProps) => {
+const mapStateToProps = ({ ssh: { connections } }: ReduxState, { navigation }: TerminalProps) => {
   const value = navigation.getParam('value') as Instance;
   return {
     connection: connections.find(con => con.id === value.id) as SSHConnection,

@@ -9,7 +9,7 @@ import HeaderRight from '../../../components/HeaderRight';
 import { ItemDivider, ItemGroup } from '../../../components/List';
 import Theme, { withTheme } from '../../../components/Theme';
 import firebase, { RNFirebase } from 'react-native-firebase';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import { IBlueprint } from '@modules/database/type';
 import { ProviderType } from '../type';
 
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = ({ database: { blueprints } }: AppState, { navigation }: any) => {
+const mapStateToProps = ({ database: { blueprints } }: ReduxState, { navigation }: any) => {
   const onChange = navigation.getParam('callback');
   const provider = navigation.getParam('provider') as ProviderType;
   const value = navigation.getParam('value');

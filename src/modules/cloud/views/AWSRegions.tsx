@@ -1,5 +1,5 @@
 import { HeaderLeftClose, HeaderRight, Item, ItemDivider, ItemGroup, List, Note, Theme, withTheme } from '@components';
-import { AppState } from '@modules';
+import { ReduxState } from '@modules';
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import Spinner from 'react-native-spinkit';
@@ -163,7 +163,7 @@ class SSHPublicKeys extends React.Component<SSHPublicKeysProps, SSHPublicKeysSta
   }
 }
 
-const mapStateToProps = ({ cloud: { regions } }: AppState, { navigation }: SSHPublicKeysProps) => {
+const mapStateToProps = ({ cloud: { regions } }: ReduxState, { navigation }: SSHPublicKeysProps) => {
   const choose = !!navigation.getParam('callback');
   const values = navigation.getParam('values') || [];
   return {
