@@ -3,7 +3,6 @@ import { getApi } from '@modules/cloud';
 import { Instance } from '@modules/cloud/Provider';
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Alert } from 'react-native';
-import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';

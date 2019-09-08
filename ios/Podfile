@@ -47,12 +47,12 @@ target 'vpsny' do
   # React-native-sound
   pod 'RNSound', :path => '../node_modules/react-native-sound'
   # RNFirebase
-  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
+  # pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
   # NMSSH
   pod 'NMSSH'
   # Firebase
-  pod 'Firebase/Core', '~> 5.9.0'
-  pod 'Firebase/Performance', '~> 5.9.0'
+  # pod 'Firebase/Core', '~> 5.10.0'
+  # pod 'Firebase/Performance', '~> 5.10.0'
   pod 'GoogleAppMeasurement', '~> 5.2.0'
   pod 'Fabric'
   pod 'Crashlytics'

@@ -2,7 +2,6 @@ import { Dimensions, Platform, StyleSheet, PixelRatio } from 'react-native';
 import { isEqual as _isEqual, clone, uniq, zipObject } from 'lodash'; // isEqual as _isEqual,
 import axios, { AxiosInstance } from 'axios';
 import forge from 'node-forge';
-import firebase, { RNFirebase } from 'react-native-firebase';
 import * as formatUtil from './format';
 
 export const format = formatUtil;

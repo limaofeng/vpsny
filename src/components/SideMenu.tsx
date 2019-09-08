@@ -10,7 +10,6 @@ import {
   StyleProp,
   ViewStyle
 } from 'react-native';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 type WindowDimensions = { width: number; height: number };
 

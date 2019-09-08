@@ -1,7 +1,6 @@
 import { ReduxState } from '@modules';
 import React from 'react';
 import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect, Provider } from 'react-redux';
 import { Dispatch } from 'redux';

@@ -14,7 +14,6 @@ import Theme, { withTheme } from '../../../components/Theme';
 import Country from '../components/Country';
 import { Region } from '../Provider';
 import { ProviderType } from '../type';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 type Mode = 'choose' | 'manage';
 

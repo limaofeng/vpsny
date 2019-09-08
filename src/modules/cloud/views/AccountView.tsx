@@ -2,7 +2,6 @@ import { Input, Item, Label, List, Note, Theme, withTheme } from '@components';
 import { ReduxState } from '@modules';
 import React from 'react';
 import { Alert, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';

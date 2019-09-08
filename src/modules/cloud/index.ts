@@ -1,7 +1,6 @@
 import Bluebird from 'bluebird';
 import { isEqual } from 'lodash';
 import { Alert } from 'react-native';
-import { crashlytics } from 'react-native-firebase';
 import { AnyAction, Dispatch, Store } from 'redux';
 import { Feature, InAction } from 'walkuere-rn';
 import { sleep } from '../../utils';

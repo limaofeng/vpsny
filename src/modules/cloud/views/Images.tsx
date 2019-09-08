@@ -8,7 +8,6 @@ import { Item, List, Note } from '../../../components';
 import HeaderRight from '../../../components/HeaderRight';
 import { ItemDivider, ItemGroup } from '../../../components/List';
 import Theme, { withTheme } from '../../../components/Theme';
-import firebase, { RNFirebase } from 'react-native-firebase';
 import { ReduxState } from '@modules';
 import { IBlueprint } from '@modules/database/type';
 import { ProviderType } from '../type';

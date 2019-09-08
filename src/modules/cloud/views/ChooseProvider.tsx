@@ -1,7 +1,6 @@
 import { Card, HeaderLeftClose, Theme, withTheme } from '@components';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import firebase, { RNFirebase } from 'react-native-firebase';
 import {
   NavigationScreenConfigProps,
   NavigationScreenOptions,

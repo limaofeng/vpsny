@@ -8,7 +8,7 @@
  */
 
 #import "AppDelegate.h"
-#import <Firebase.h>
+// #import <Firebase.h>
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import <React/RCTBundleURLProvider.h>
@@ -32,7 +32,7 @@
     UIViewController *rootViewController = [UIViewController new];
     rootViewController.view = rootView;
     self.window.rootViewController = rootViewController;
-    [FIRApp configure];
+    // [FIRApp configure];
     [Fabric with:@[[Crashlytics class]]];
     [self.window makeKeyAndVisible];
     [RNSplashScreen show];

@@ -9,7 +9,6 @@ import { Icon, Input, Item, ItemDivider, Label, List } from '../../../components
 import Theme, { withTheme } from '../../../components/Theme';
 import { KeyPair } from '../../cloud/type';
 import { SafeArea, debounce } from '@utils';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface SSHKeyViewProps {
   navigation: NavigationScreenProp<any>;

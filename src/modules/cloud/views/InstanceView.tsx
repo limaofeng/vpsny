@@ -16,7 +16,6 @@ import { InstantState } from '../../home/type';
 import InstanceActions, { OperateStatus } from '../components/InstanceActions';
 import OSLogo from '../components/OSLogo';
 import { Instance } from '../type';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface InstanceViewProps {
   navigation: NavigationScreenProp<any>;

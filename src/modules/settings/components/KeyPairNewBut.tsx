@@ -5,7 +5,6 @@ import { Dispatch } from 'redux';
 
 import { KeyPair } from '../../cloud/type';
 import { ActionButton, Theme, Icon, withTheme } from '@components';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 interface KeyPairNewButProps {
   findKeyPairByPrivateKey: (privateKey: string) => KeyPair;

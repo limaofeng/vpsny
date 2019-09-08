@@ -9,7 +9,6 @@ import { KeyPair } from '../../cloud/type';
 import KeyPairNewBut from '../components/KeyPairNewBut';
 import KeyPairs from '../components/KeyPairs';
 import { ReduxState } from '@modules';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 export type Mode = 'choose' | 'manage';
 

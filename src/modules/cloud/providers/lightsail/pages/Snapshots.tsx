@@ -4,7 +4,6 @@ import { Instance } from '@modules/cloud/Provider';
 import { Snapshot as SnapshotData } from '@modules/cloud/Agent';
 import React from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import firebase, { RNFirebase } from 'react-native-firebase';
 import { NavigationScreenOptions, NavigationScreenProp, SafeAreaView } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';

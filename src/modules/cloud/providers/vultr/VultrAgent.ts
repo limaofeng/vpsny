@@ -2,7 +2,6 @@ import { IBlueprint, IBundle, IRegion } from '@modules/database/type';
 import axios, { AxiosInstance } from 'axios';
 import Bluebird from 'bluebird';
 import querystring from 'querystring';
-import firebase, { RNFirebase } from 'react-native-firebase';
 
 import { format, getPublicKeyFingerprint, md5 } from '../../../../utils';
 import { Agent, APIKey, Bill, Snapshot, User, Backup } from '../../Agent';
